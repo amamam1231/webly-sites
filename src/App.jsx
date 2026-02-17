@@ -556,7 +556,7 @@ function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="group relative rounded-2xl p-6 md:p-8 overflow-hidden"
+                className="group relative card-gradient-border rounded-2xl p-6 md:p-8 overflow-hidden"
               >
                 <div className="blueprint-overlay absolute inset-0" />
 
@@ -603,7 +603,7 @@ function App() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 onClick={() => handleOpenTransmuteModal(asset)}
-                className="group rounded-xl p-4 md:p-6 flex items-center justify-between cursor-pointer transition-all hover:border-[#FF4D00]/50"
+                className="group card-gradient-border rounded-xl p-4 md:p-6 flex items-center justify-between cursor-pointer transition-all hover:border-[#FF4D00]/50"
               >
                 <div className="flex items-center gap-4 md:gap-6">
                   <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-white/5 flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform duration-500">

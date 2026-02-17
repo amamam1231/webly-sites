@@ -358,69 +358,6 @@ const HowItWorks = () => {
   )
 }
 
-// Instructions Section Component
-const InstructionsSection = () => {
-  const steps = [
-    {
-      number: "01",
-      title: "Опишите идею",
-      description: "Расскажите нашему ИИ, какой сайт вам нужен. Чем детальнее описание, тем лучше результат.",
-      icon: "messageSquare"
-    },
-    {
-      number: "02",
-      title: "AI генерирует",
-      description: "Нейросеть создаёт уникальный дизайн, подбирает цвета, шрифты и компоновку за секунды.",
-      icon: "wand2"
-    },
-    {
-      number: "03",
-      title: "Настройте детали",
-      description: "Отредактируйте текст, замените изображения, настройте стили в визуальном редакторе.",
-      icon: "sliders"
-    },
-    {
-      number: "04",
-      title: "Опубликуйте",
-      description: "Один клик — и ваш сайт в интернете. Подключите свой домен или используйте наш бесплатный.",
-      icon: "globe"
-    }
-  ]
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {steps.map((step, index) => (
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: index * 0.1 }}
-          className="relative bg-[#1a1a1a] rounded-3xl p-6 border border-gray-800 hover:border-[#E1FF01]/30 transition-colors group"
-        >
-          {/* Step number */}
-          <div className="absolute -top-3 -left-3 w-12 h-12 bg-[#E1FF01] rounded-2xl flex items-center justify-center font-display font-bold text-black text-lg shadow-lg shadow-[#E1FF01]/20">
-            {step.number}
-          </div>
-
-          {/* Icon */}
-          <div className="w-12 h-12 rounded-2xl bg-[#253FF6]/20 flex items-center justify-center mb-4 mt-4 group-hover:bg-[#253FF6]/30 transition-colors">
-            <SafeIcon name={step.icon} size={24} className="text-[#E1FF01]" />
-          </div>
-
-          {/* Content */}
-          <h3 className="font-display font-bold text-xl text-white mb-2">
-            {step.title}
-          </h3>
-          <p className="text-gray-400 text-sm leading-relaxed">
-            {step.description}
-          </p>
-        </motion.div>
-      ))}
-    </div>
-  )
-}
-
 // Pricing Card
 const PricingCard = ({ plan, price, features, isPopular = false, delay = 0 }) => {
   return (
@@ -643,7 +580,6 @@ function App() {
 
           <div className="hidden md:flex items-center gap-8">
             <button onClick={() => scrollToSection('how-it-works')} className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Как это работает</button>
-            <button onClick={() => scrollToSection('instructions')} className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Инструкция</button>
             <button onClick={() => scrollToSection('features')} className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Возможности</button>
             <button onClick={() => scrollToSection('pricing')} className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Тарифы</button>
             <button onClick={() => scrollToSection('faq')} className="text-gray-400 hover:text-white transition-colors text-sm font-medium">FAQ</button>
@@ -750,26 +686,6 @@ function App() {
         </div>
       </section>
 
-      {/* Instructions Section - NEW */}
-      <section id="instructions" className="py-20 md:py-32 px-4 md:px-6 relative z-10 bg-[#0a0a0a]/50">
-        <div className="container mx-auto max-w-6xl">
-          <AnimatedSection className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-[#E1FF01]/10 border border-[#E1FF01]/30 rounded-full px-4 py-2 mb-6">
-              <SafeIcon name="bookOpen" size={16} className="text-[#E1FF01]" />
-              <span className="text-[#E1FF01] text-sm font-semibold uppercase tracking-wider">Инструкция</span>
-            </div>
-            <h2 className="font-display font-bold text-4xl md:text-6xl text-white mb-4 tracking-tight">
-              КАК НАЧАТЬ
-            </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Четыре простых шага для создания вашего первого сайта с помощью ИИ
-            </p>
-          </AnimatedSection>
-
-          <InstructionsSection />
-        </div>
-      </section>
-
       {/* Bento Grid Section */}
       <section id="features" className="py-20 md:py-32 px-4 md:px-6 relative z-10">
         <div className="container mx-auto max-w-6xl">
@@ -810,7 +726,7 @@ function App() {
             <BentoCard
               title="Изучить документацию"
               description="Подробные гайды и API reference для разработчиков"
-              icon="bookOpen"
+              icon="fileText"
               color="lime"
             />
           </motion.div>

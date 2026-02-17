@@ -1,9 +1,9 @@
+import { SafeIcon } from './components/SafeIcon';
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import Lenis from 'lenis';
-import { Play, Clock, MapPin, Briefcase } from 'lucide-react';
 
 function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -91,7 +91,7 @@ const AnimatedBorder = ({ delay = 0 }) => {
   );
 };
 
-// Cell Component
+// Cell Component - Removed scale effect as requested
 const Cell = ({
   colSpan = 1,
   rowSpan = 1,
@@ -133,7 +133,6 @@ const Cell = ({
       onMouseEnter={() => setHoveredIndex(index)}
       onMouseLeave={() => setHoveredIndex(null)}
       animate={{
-        scale: isHovered ? 1.02 : 1,
         zIndex: isHovered ? 20 : 1,
       }}
       transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -282,8 +281,8 @@ const Marquee = ({ items, speed = 20 }) => {
   );
 };
 
-// Project Card with Noise
-const ProjectCard = ({ title, category, colSpan, rowSpan, index }) => {
+// Project Card with Noise - Added green badges
+const ProjectCard = ({ title, category, colSpan, rowSpan, index, badge }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -318,6 +317,15 @@ const ProjectCard = ({ title, category, colSpan, rowSpan, index }) => {
           transition={{ duration: 0.4 }}
         />
 
+        {/* Green Badge */}
+        {badge && (
+          <div className="absolute top-4 right-4 z-20">
+            <span className="bg-[#ccff00] text-black text-xs font-bold uppercase px-3 py-1 rounded-full">
+              {badge}
+            </span>
+          </div>
+        )}
+
         {/* Play Button on Hover */}
         <AnimatePresence>
           {isHovered && (
@@ -328,7 +336,7 @@ const ProjectCard = ({ title, category, colSpan, rowSpan, index }) => {
               className="absolute inset-0 flex items-center justify-center"
             >
               <div className="w-20 h-20 rounded-full bg-[#ccff00] flex items-center justify-center">
-                <Play className="w-8 h-8 text-black ml-1" fill="black" />
+                <SafeIcon name="play" size={32} className="text-black ml-1" />
               </div>
             </motion.div>
           )}
@@ -354,19 +362,22 @@ const ProjectCard = ({ title, category, colSpan, rowSpan, index }) => {
 // Project Gallery
 const ProjectGallery = () => {
   const projects = [
-    { title: "Neon Dreams", category: "Branding", colSpan: 6, rowSpan: 2 },
-    { title: "Urban Flow", category: "Web Design", colSpan: 3, rowSpan: 2 },
-    { title: "Cyber Punk", category: "Motion", colSpan: 3, rowSpan: 1 },
+    { title: "Neon Dreams", category: "Branding", colSpan: 6, rowSpan: 2, badge: "New" },
+    { title: "Urban Flow", category: "Web Design", colSpan: 3, rowSpan: 2, badge: "Hot" },
+    { title: "Cyber Punk", category: "Motion", colSpan: 3, rowSpan: 1, badge: "2024" },
     { title: "Minimalist", category: "Editorial", colSpan: 3, rowSpan: 1 },
-    { title: "Future Tech", category: "Product", colSpan: 4, rowSpan: 2 },
+    { title: "Future Tech", category: "Product", colSpan: 4, rowSpan: 2, badge: "Award" },
     { title: "Abstract", category: "Art Direction", colSpan: 4, rowSpan: 2 },
-    { title: "Concrete", category: "Architecture", colSpan: 4, rowSpan: 2 },
+    { title: "Concrete", category: "Architecture", colSpan: 4, rowSpan: 2, badge: "Featured" },
   ];
 
   return (
     <section className="py-20">
-      <div className="px-4 mb-12">
+      <div className="px-4 mb-12 flex items-end justify-between">
         <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">Selected Works</h2>
+        <span className="bg-[#ccff00] text-black text-xs font-bold uppercase px-3 py-1 rounded-full mb-2">
+          24 Projects
+        </span>
       </div>
       <InteractiveGrid>
         {projects.map((project, i) => (
@@ -381,8 +392,515 @@ const ProjectGallery = () => {
   );
 };
 
+// Services Section - NEW BLOCK
+const ServicesSection = () => {
+  const services = [
+    {
+      title: "Strategy",
+      desc: "Brand positioning, market research, and digital strategy",
+      icon: "target",
+      badge: "Popular"
+    },
+    {
+      title: "Design",
+      desc: "UI/UX, visual identity, and motion graphics",
+      icon: "palette",
+      badge: "New"
+    },
+    {
+      title: "Development",
+      desc: "Frontend, WebGL, and interactive experiences",
+      icon: "code",
+      badge: "Hot"
+    },
+    {
+      title: "Motion",
+      desc: "Animation, 3D, and video production",
+      icon: "video",
+      badge: "2024"
+    },
+  ];
+
+  return (
+    <section className="py-20 border-t border-white/10">
+      <div className="px-4 mb-12">
+        <div className="flex items-center gap-4 mb-4">
+          <span className="bg-[#ccff00] text-black text-xs font-bold uppercase px-3 py-1 rounded-full">
+            What we do
+          </span>
+          <span className="text-white/40 text-sm uppercase tracking-widest">Services</span>
+        </div>
+        <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">
+          Capabilities
+        </h2>
+      </div>
+
+      <InteractiveGrid>
+        {services.map((service, i) => (
+          <Cell key={i} colSpan={3} className="min-h-[280px] p-8 flex flex-col justify-between group">
+            <div className="flex justify-between items-start">
+              <SafeIcon name={service.icon} size={32} className="text-white/60 group-hover:text-black transition-colors" />
+              <span className="bg-[#ccff00] text-black text-[10px] font-bold uppercase px-2 py-1 rounded-full">
+                {service.badge}
+              </span>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold uppercase mb-2">{service.title}</h3>
+              <p className="text-sm text-white/60 group-hover:text-black/70 transition-colors leading-relaxed">
+                {service.desc}
+              </p>
+            </div>
+          </Cell>
+        ))}
+      </InteractiveGrid>
+    </section>
+  );
+};
+
+// Stats Section - NEW BLOCK
+const StatsSection = () => {
+  const stats = [
+    { number: "50+", label: "Projects Completed", suffix: "" },
+    { number: "12", label: "Design Awards", suffix: "" },
+    { number: "8", label: "Years Experience", suffix: "+" },
+    { number: "100", label: "Client Satisfaction", suffix: "%" },
+  ];
+
+  return (
+    <section className="py-20 border-t border-white/10">
+      <InteractiveGrid>
+        <Cell colSpan={12} className="p-8 md:p-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+            {stats.map((stat, i) => (
+              <div key={i} className="text-center md:text-left">
+                <div className="flex items-baseline justify-center md:justify-start gap-1">
+                  <span className="text-5xl md:text-7xl font-black text-white">
+                    {stat.number}
+                  </span>
+                  <span className="text-3xl md:text-5xl font-black text-[#ccff00]">
+                    {stat.suffix}
+                  </span>
+                </div>
+                <p className="text-sm uppercase tracking-widest text-white/60 mt-2">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Cell>
+      </InteractiveGrid>
+    </section>
+  );
+};
+
+// Process Section - NEW BLOCK
+const ProcessSection = () => {
+  const steps = [
+    {
+      number: "01",
+      title: "Discover",
+      desc: "Deep dive into your brand, audience, and goals"
+    },
+    {
+      number: "02",
+      title: "Design",
+      desc: "Crafting visual systems and interactive prototypes"
+    },
+    {
+      number: "03",
+      title: "Deliver",
+      desc: "Development, testing, and launch with precision"
+    },
+  ];
+
+  return (
+    <section className="py-20 border-t border-white/10">
+      <div className="px-4 mb-12">
+        <div className="flex items-center gap-4 mb-4">
+          <span className="bg-[#ccff00] text-black text-xs font-bold uppercase px-3 py-1 rounded-full">
+            How we work
+          </span>
+        </div>
+        <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">
+          Our Process
+        </h2>
+      </div>
+
+      <InteractiveGrid>
+        {steps.map((step, i) => (
+          <Cell key={i} colSpan={4} className="min-h-[350px] p-8 flex flex-col justify-between group relative">
+            <div className="absolute top-6 right-6">
+              <span className="bg-[#ccff00] text-black text-sm font-black px-4 py-2 rounded-full">
+                {step.number}
+              </span>
+            </div>
+
+            <div className="mt-12">
+              <h3 className="text-3xl font-bold uppercase mb-4">{step.title}</h3>
+              <p className="text-white/60 group-hover:text-black/70 transition-colors leading-relaxed">
+                {step.desc}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 mt-8">
+              <div className="w-12 h-px bg-white/20 group-hover:bg-black/20 transition-colors" />
+              <span className="text-xs uppercase tracking-widest text-white/40 group-hover:text-black/60">Step {step.number}</span>
+            </div>
+          </Cell>
+        ))}
+      </InteractiveGrid>
+    </section>
+  );
+};
+
+// Letter Component for Hero
+const ParallaxLetter = ({ letter, colIndex, scrollY }) => {
+  const isEven = colIndex % 2 === 0;
+  const y = useTransform(
+    scrollY,
+    [0, 500],
+    isEven ? [0, -80] : [0, 80]
+  );
+
+  return (
+    <motion.span
+      style={{ y }}
+      className="text-[15vw] md:text-[12vw] font-black leading-none uppercase block"
+    >
+      {letter}
+    </motion.span>
+  );
+};
+
+// Hero Section
+const HeroSection = () => {
+  const containerRef = useRef(null);
+  const { scrollY } = useScroll();
+  const letters = ["S", "T", "U", "D", "I", "O"];
+
+  return (
+    <section ref={containerRef} className="min-h-screen relative flex items-center justify-center overflow-hidden">
+      <InteractiveGrid className="w-full h-screen">
+        {/* Top row spacing */}
+        <Cell colSpan={12} rowSpan={1} className="h-20" />
+
+        {/* Letters row 1 */}
+        <Cell colSpan={2} className="h-32 md:h-48" />
+        <Cell colSpan={2} className="flex items-center justify-center h-32 md:h-48">
+          <ParallaxLetter letter="S" colIndex={0} scrollY={scrollY} />
+        </Cell>
+        <Cell colSpan={2} className="flex items-center justify-center h-32 md:h-48">
+          <ParallaxLetter letter="T" colIndex={1} scrollY={scrollY} />
+        </Cell>
+        <Cell colSpan={2} className="flex items-center justify-center h-32 md:h-48">
+          <ParallaxLetter letter="U" colIndex={2} scrollY={scrollY} />
+        </Cell>
+        <Cell colSpan={2} className="flex items-center justify-center h-32 md:h-48">
+          <ParallaxLetter letter="D" colIndex={3} scrollY={scrollY} />
+        </Cell>
+        <Cell colSpan={2} className="h-32 md:h-48" />
+
+        {/* Letters row 2 */}
+        <Cell colSpan={4} className="h-32 md:h-48" />
+        <Cell colSpan={2} className="flex items-center justify-center h-32 md:h-48">
+          <ParallaxLetter letter="I" colIndex={0} scrollY={scrollY} />
+        </Cell>
+        <Cell colSpan={2} className="flex items-center justify-center h-32 md:h-48">
+          <ParallaxLetter letter="O" colIndex={1} scrollY={scrollY} />
+        </Cell>
+        <Cell colSpan={4} className="h-32 md:h-48" />
+
+        {/* Info row */}
+        <Cell colSpan={3} className="h-24 flex items-center justify-center border-t border-white/10">
+          <span className="text-xs uppercase tracking-widest text-white/60">Est. 2024</span>
+        </Cell>
+        <Cell colSpan={6} className="h-24 flex items-center justify-center border-t border-white/10">
+          <span className="text-xs uppercase tracking-widest text-center text-white/60">
+            Digital Design Studio<br />Creating Bold Experiences
+          </span>
+        </Cell>
+        <Cell colSpan={3} className="h-24 flex items-center justify-center border-t border-white/10">
+          <span className="text-xs uppercase tracking-widest text-white/60">Scroll Down</span>
+        </Cell>
+      </InteractiveGrid>
+    </section>
+  );
+};
+
+// Project Card with Noise - Added green badges
+const ProjectCard = ({ title, category, colSpan, rowSpan, index, badge }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <Cell
+      colSpan={colSpan}
+      rowSpan={rowSpan}
+      index={index}
+      className="relative min-h-[300px] md:min-h-[400px] group"
+    >
+      <div
+        className="absolute inset-0 overflow-hidden"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {/* Video/Image Background */}
+        <motion.div
+          className="absolute inset-0 bg-neutral-800"
+          animate={{ scale: isHovered ? 1.05 : 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <img
+            src={`https://images.unsplash.com/photo-${1550000000000 + index * 1000}?w=800&q=80`}
+            alt={title}
+            className="w-full h-full object-cover opacity-60"
+          />
+        </motion.div>
+
+        {/* Noise Overlay */}
+        <motion.div
+          className="absolute inset-0 noise-bg pointer-events-none"
+          animate={{ opacity: isHovered ? 0 : 0.3 }}
+          transition={{ duration: 0.4 }}
+        />
+
+        {/* Green Badge */}
+        {badge && (
+          <div className="absolute top-4 right-4 z-20">
+            <span className="bg-[#ccff00] text-black text-xs font-bold uppercase px-3 py-1 rounded-full">
+              {badge}
+            </span>
+          </div>
+        )}
+
+        {/* Play Button on Hover */}
+        <AnimatePresence>
+          {isHovered && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="absolute inset-0 flex items-center justify-center"
+            >
+              <div className="w-20 h-20 rounded-full bg-[#ccff00] flex items-center justify-center">
+                <SafeIcon name="play" size={32} className="text-black ml-1" />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Content */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
+          <motion.div
+            animate={{ y: isHovered ? 0 : 10, opacity: isHovered ? 1 : 0.7 }}
+            transition={{ duration: 0.3 }}
+          >
+            <span className="text-xs uppercase tracking-widest text-white/60 block mb-2">
+              {category}
+            </span>
+            <h3 className="text-2xl md:text-3xl font-bold uppercase">{title}</h3>
+          </motion.div>
+        </div>
+      </div>
+    </Cell>
+  );
+};
+
+// Project Gallery
+const ProjectGallery = () => {
+  const projects = [
+    { title: "Neon Dreams", category: "Branding", colSpan: 6, rowSpan: 2, badge: "New" },
+    { title: "Urban Flow", category: "Web Design", colSpan: 3, rowSpan: 2, badge: "Hot" },
+    { title: "Cyber Punk", category: "Motion", colSpan: 3, rowSpan: 1, badge: "2024" },
+    { title: "Minimalist", category: "Editorial", colSpan: 3, rowSpan: 1 },
+    { title: "Future Tech", category: "Product", colSpan: 4, rowSpan: 2, badge: "Award" },
+    { title: "Abstract", category: "Art Direction", colSpan: 4, rowSpan: 2 },
+    { title: "Concrete", category: "Architecture", colSpan: 4, rowSpan: 2, badge: "Featured" },
+  ];
+
+  return (
+    <section className="py-20">
+      <div className="px-4 mb-12 flex items-end justify-between">
+        <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">Selected Works</h2>
+        <span className="bg-[#ccff00] text-black text-xs font-bold uppercase px-3 py-1 rounded-full mb-2">
+          24 Projects
+        </span>
+      </div>
+      <InteractiveGrid>
+        {projects.map((project, i) => (
+          <ProjectCard
+            key={i}
+            {...project}
+            index={i}
+          />
+        ))}
+      </InteractiveGrid>
+    </section>
+  );
+};
+
+// Services Section - NEW BLOCK
+const ServicesSection = () => {
+  const services = [
+    {
+      title: "Strategy",
+      desc: "Brand positioning, market research, and digital strategy",
+      icon: "target",
+      badge: "Popular"
+    },
+    {
+      title: "Design",
+      desc: "UI/UX, visual identity, and motion graphics",
+      icon: "palette",
+      badge: "New"
+    },
+    {
+      title: "Development",
+      desc: "Frontend, WebGL, and interactive experiences",
+      icon: "code",
+      badge: "Hot"
+    },
+    {
+      title: "Motion",
+      desc: "Animation, 3D, and video production",
+      icon: "video",
+      badge: "2024"
+    },
+  ];
+
+  return (
+    <section className="py-20 border-t border-white/10">
+      <div className="px-4 mb-12">
+        <div className="flex items-center gap-4 mb-4">
+          <span className="bg-[#ccff00] text-black text-xs font-bold uppercase px-3 py-1 rounded-full">
+            What we do
+          </span>
+          <span className="text-white/40 text-sm uppercase tracking-widest">Services</span>
+        </div>
+        <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">
+          Capabilities
+        </h2>
+      </div>
+
+      <InteractiveGrid>
+        {services.map((service, i) => (
+          <Cell key={i} colSpan={3} className="min-h-[280px] p-8 flex flex-col justify-between group">
+            <div className="flex justify-between items-start">
+              <SafeIcon name={service.icon} size={32} className="text-white/60 group-hover:text-black transition-colors" />
+              <span className="bg-[#ccff00] text-black text-[10px] font-bold uppercase px-2 py-1 rounded-full">
+                {service.badge}
+              </span>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold uppercase mb-2">{service.title}</h3>
+              <p className="text-sm text-white/60 group-hover:text-black/70 transition-colors leading-relaxed">
+                {service.desc}
+              </p>
+            </div>
+          </Cell>
+        ))}
+      </InteractiveGrid>
+    </section>
+  );
+};
+
+// Stats Section - NEW BLOCK
+const StatsSection = () => {
+  const stats = [
+    { number: "50+", label: "Projects Completed", suffix: "" },
+    { number: "12", label: "Design Awards", suffix: "" },
+    { number: "8", label: "Years Experience", suffix: "+" },
+    { number: "100", label: "Client Satisfaction", suffix: "%" },
+  ];
+
+  return (
+    <section className="py-20 border-t border-white/10">
+      <InteractiveGrid>
+        <Cell colSpan={12} className="p-8 md:p-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+            {stats.map((stat, i) => (
+              <div key={i} className="text-center md:text-left">
+                <div className="flex items-baseline justify-center md:justify-start gap-1">
+                  <span className="text-5xl md:text-7xl font-black text-white">
+                    {stat.number}
+                  </span>
+                  <span className="text-3xl md:text-5xl font-black text-[#ccff00]">
+                    {stat.suffix}
+                  </span>
+                </div>
+                <p className="text-sm uppercase tracking-widest text-white/60 mt-2">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Cell>
+      </InteractiveGrid>
+    </section>
+  );
+};
+
+// Process Section - NEW BLOCK
+const ProcessSection = () => {
+  const steps = [
+    {
+      number: "01",
+      title: "Discover",
+      desc: "Deep dive into your brand, audience, and goals"
+    },
+    {
+      number: "02",
+      title: "Design",
+      desc: "Crafting visual systems and interactive prototypes"
+    },
+    {
+      number: "03",
+      title: "Deliver",
+      desc: "Development, testing, and launch with precision"
+    },
+  ];
+
+  return (
+    <section className="py-20 border-t border-white/10">
+      <div className="px-4 mb-12">
+        <div className="flex items-center gap-4 mb-4">
+          <span className="bg-[#ccff00] text-black text-xs font-bold uppercase px-3 py-1 rounded-full">
+            How we work
+          </span>
+        </div>
+        <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">
+          Our Process
+        </h2>
+      </div>
+
+      <InteractiveGrid>
+        {steps.map((step, i) => (
+          <Cell key={i} colSpan={4} className="min-h-[350px] p-8 flex flex-col justify-between group relative">
+            <div className="absolute top-6 right-6">
+              <span className="bg-[#ccff00] text-black text-sm font-black px-4 py-2 rounded-full">
+                {step.number}
+              </span>
+            </div>
+
+            <div className="mt-12">
+              <h3 className="text-3xl font-bold uppercase mb-4">{step.title}</h3>
+              <p className="text-white/60 group-hover:text-black/70 transition-colors leading-relaxed">
+                {step.desc}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 mt-8">
+              <div className="w-12 h-px bg-white/20 group-hover:bg-black/20 transition-colors" />
+              <span className="text-xs uppercase tracking-widest text-white/40 group-hover:text-black/60">Step {step.number}</span>
+            </div>
+          </Cell>
+        ))}
+      </InteractiveGrid>
+    </section>
+  );
+};
+
 // Floating Sticker
-const FloatingSticker = ({ children, initialX, initialY, icon: Icon }) => {
+const FloatingSticker = ({ children, initialX, initialY, iconName }) => {
   return (
     <motion.div
       drag
@@ -393,7 +911,7 @@ const FloatingSticker = ({ children, initialX, initialY, icon: Icon }) => {
       className="fixed z-40 bg-[#ccff00] text-black px-6 py-3 rounded-full font-bold uppercase text-sm cursor-grab active:cursor-grabbing shadow-2xl flex items-center gap-2 select-none"
       data-hover
     >
-      {Icon && <Icon className="w-4 h-4" />}
+      {iconName && <SafeIcon name={iconName} size={16} />}
       {children}
     </motion.div>
   );
@@ -418,15 +936,15 @@ const FloatingElements = () => {
 
   return (
     <>
-      <FloatingSticker initialX={50} initialY={100} icon={Briefcase}>
+      <FloatingSticker initialX={50} initialY={100} iconName="briefcase">
         Available for work
       </FloatingSticker>
 
-      <FloatingSticker initialX={window.innerWidth - 250} initialY={150} icon={MapPin}>
+      <FloatingSticker initialX={typeof window !== 'undefined' ? window.innerWidth - 250 : 500} initialY={150} iconName="map-pin">
         San Francisco
       </FloatingSticker>
 
-      <FloatingSticker initialX={100} initialY={window.innerHeight - 150} icon={Clock}>
+      <FloatingSticker initialX={100} initialY={typeof window !== 'undefined' ? window.innerHeight - 150 : 500} iconName="clock">
         {formatTime(time)}
       </FloatingSticker>
     </>
@@ -469,24 +987,40 @@ function App() {
 
       <ProjectGallery />
 
+      <ServicesSection />
+
+      <StatsSection />
+
+      <ProcessSection />
+
       {/* Footer */}
       <footer className="py-20 px-4 border-t border-white/10 mt-20">
         <InteractiveGrid>
           <Cell colSpan={6} className="p-8">
-            <h3 className="text-2xl font-bold uppercase mb-4">Get in Touch</h3>
+            <div className="flex items-center gap-3 mb-6">
+              <h3 className="text-2xl font-bold uppercase">Get in Touch</h3>
+              <span className="bg-[#ccff00] text-black text-[10px] font-bold uppercase px-2 py-1 rounded-full">
+                Open
+              </span>
+            </div>
             <p className="text-white/60 mb-6">hello@studio.design</p>
             <button className="bg-white text-black px-8 py-3 rounded-full font-bold uppercase hover:bg-[#ccff00] transition-colors">
               Start a Project
             </button>
           </Cell>
           <Cell colSpan={6} className="p-8 flex flex-col justify-between">
-            <div className="flex gap-8 text-sm uppercase text-white/60">
+            <div className="flex gap-8 text-sm uppercase text-white/60 flex-wrap">
               <a href="#" className="hover:text-white transition-colors">Instagram</a>
               <a href="#" className="hover:text-white transition-colors">Twitter</a>
               <a href="#" className="hover:text-white transition-colors">LinkedIn</a>
               <a href="#" className="hover:text-white transition-colors">Behance</a>
             </div>
-            <p className="text-white/40 text-sm mt-8">© 2024 Studio. All rights reserved.</p>
+            <div className="flex items-center gap-2 mt-8">
+              <p className="text-white/40 text-sm">© 2024 Studio. All rights reserved.</p>
+              <span className="bg-[#ccff00] text-black text-[10px] font-bold uppercase px-2 py-1 rounded-full">
+                v2.0
+              </span>
+            </div>
           </Cell>
         </InteractiveGrid>
       </footer>

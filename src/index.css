@@ -412,7 +412,7 @@ input[type="range"]::-moz-range-thumb {
   }
 
   /* Ensure modals don't overflow on small screens */
-  .max-h-\\[95vh] {
+  .max-h-\\[95vh\\] {
     max-height: 95vh;
   }
 

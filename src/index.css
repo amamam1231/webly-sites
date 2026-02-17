@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply antialiased;
+  }
+}
+
+@layer components {
+  .weather-card {
+    @apply bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20
+           hover:bg-white/15 hover:scale-105 transition-all duration-300
+           hover:shadow-xl hover:shadow-blue-500/20 cursor-pointer;
+  }
+
+  .glass-panel {
+    @apply bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile optimizations */
+.mobile-safe-container {
+  @apply w-full max-w-full overflow-x-hidden;
+}
+
+.telegram-safe-bottom {
+  @apply pb-24;
+}

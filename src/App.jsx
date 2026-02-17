@@ -7,8 +7,15 @@ import { twMerge } from 'tailwind-merge';
 
 // Utility for Tailwind class merging
 function cn(...inputs) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(...inputs));
 }
+
+// Bitcoin SVG Icon Component
+const BitcoinIcon = ({ className }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M23.638 14.904c-1.602 6.43-8.113 10.34-14.542 8.736C2.67 22.05-1.244 15.525.362 9.105 1.962 2.67 8.475-1.243 14.9.358c6.43 1.605 10.342 8.115 8.738 14.546zm-6.35-4.613c.24-1.59-.974-2.45-2.64-3.03l.54-2.153-1.315-.33-.52 2.1c-.347-.087-.7-.167-1.05-.247l.53-2.12-1.32-.33-.54 2.15c-.285-.065-.565-.13-.84-.2l-1.815-.45-.35 1.406s.975.224.955.238c.535.136.63.486.615.766l-.617 2.473c.037.01.085.025.138.048l-.14-.035-.865 3.47c-.066.164-.234.41-.61.316.014.02-.956-.238-.956-.238L8.1 17.5l1.71.426c.318.08.63.164.935.243l-.545 2.19 1.32.33.54-2.16c.36.1.705.19 1.045.27l-.54 2.14 1.32.33.545-2.18c2.24.424 3.926.252 4.635-1.77.57-1.63-.025-2.57-1.21-3.18.86-.2 1.508-.77 1.68-1.95h.01zm-3.01 4.25c-.405 1.63-3.145.75-4.035.53l.72-2.89c.89.22 3.74.66 3.315 2.36zm.405-4.24c-.37 1.48-2.645.73-3.385.55l.654-2.64c.74.18 3.115.52 2.73 2.09z" fill="currentColor"/>
+  </svg>
+);
 
 // Ethereum SVG Icon Component
 const EthereumIcon = ({ className }) => (
@@ -28,454 +35,58 @@ const SolanaIcon = ({ className }) => (
   <img src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-svg-1770697184-7363.svg?" alt="Solana" className={className} />
 );
 
-// Bitcoin Icon Component
-const BitcoinIcon = ({ className }) => (
-  <svg viewBox="0 0 32 32" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="16" cy="16" r="16" fill="#F7931A" />
-    <path d="M22.7 14.2c0.4-2.6-1.6-4-4.1-4.9l0.8-3.3-2.1-0.5-0.8 3.2c-0.5-0.1-1.1-0.3-1.6-0.4l0.8-3.3-2.1-0.5-0.8 3.3c-0.4-0.1-0.8-0.2-1.2-0.3l0-0-2.9-0.7-0.5 2.2s1.6 0.4 1.6 0.4c0.9 0.2 1.1 0.7 1 1.2l-1 4.1c0.1 0 0.2 0.1 0.3 0.1l-0.3-0.1-1.4 5.7c-0.1 0.3-0.4 0.7-1.1 0.5 0 0-1.6-0.4-1.6-0.4l-0.9 2.1 2.7 0.7c0.5 0.1 1 0.2 1.4 0.3l-0.9 3.4 2.1 0.5 0.8-3.3c0.5 0.1 1.1 0.3 1.6 0.4l-0.8 3.3 2.1 0.5 0.9-3.4c3.3 0.6 5.8-0.4 6.8-3.1 0.8-2.3 0-3.6-1.4-4.4 1-0.2 1.8-0.8 2-2.2zM20.6 18c-0.5 2.1-4.2 1-5.4 0.7l1-4c1.2 0.3 5.1 0.9 4.4 3.3zM21.1 14.1c-0.5 1.9-3.5 0.9-4.5 0.7l0.9-3.7c0.9 0.2 4 0.6 3.6 3z" fill="white" />
-  </svg>
-);
-
 // Custom Cursor Component
 const CustomCursor = () => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
+  const cursorRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
-    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
-    if (isTouchDevice) return;
+    const cursor = cursorRef.current;
+    if (!cursor) return;
 
-    const updatePosition = (e) => {
-      setPosition({ x: e.clientX, y: e.clientY });
+    const moveCursor = (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
       setIsVisible(true);
     };
 
-    const handleMouseOver = (e) => {
-      if (e.target.closest('button, a, [role="button"], input, textarea, select, .cursor-pointer')) {
-        setIsHovering(true);
-      }
-    };
+    const handleMouseEnter = () => setIsVisible(true);
+    const handleMouseLeave = () => setIsVisible(false);
 
-    const handleMouseOut = () => {
-      setIsHovering(false);
-    };
+    const handleHoverStart = () => setIsHovering(true);
+    const handleHoverEnd = () => setIsHovering(false);
 
-    window.addEventListener('mousemove', updatePosition);
-    document.addEventListener('mouseover', handleMouseOver);
-    document.addEventListener('mouseout', handleMouseOut);
+    document.addEventListener('mousemove', moveCursor);
+    document.addEventListener('mouseenter', handleMouseEnter);
+    document.addEventListener('mouseleave', handleMouseLeave);
+
+    const interactiveElements = document.querySelectorAll('button, a, [role="button"], input, textarea, select, .cursor-pointer');
+    interactiveElements.forEach(el => {
+      el.addEventListener('mouseenter', handleHoverStart);
+      el.addEventListener('mouseleave', handleHoverEnd);
+    });
 
     return () => {
-      window.removeEventListener('mousemove', updatePosition);
-      document.removeEventListener('mouseover', handleMouseOver);
-      document.removeEventListener('mouseout', handleMouseOut);
+      document.removeEventListener('mousemove', moveCursor);
+      document.removeEventListener('mouseenter', handleMouseEnter);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      interactiveElements.forEach(el => {
+        el.removeEventListener('mouseenter', handleHoverStart);
+        el.removeEventListener('mouseleave', handleHoverEnd);
+      });
     };
   }, []);
 
-  const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
-  if (isTouchDevice) return null;
-
   return (
     <div
+      ref={cursorRef}
       className={cn(
         "custom-cursor",
+        !isVisible && "opacity-0",
         isHovering && "scaled"
       )}
-      style={{
-        left: position.x,
-        top: position.y,
-        opacity: isVisible ? 1 : 0,
-      }}
     />
-  );
-};
-
-// Tier Selection Modal Component
-const TierSelectionModal = ({ isOpen, onClose, tier }) => {
-  const [amount, setAmount] = useState('');
-  const [agreed, setAgreed] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-
-  if (!tier) return null;
-
-  const minStake = tier.minStake || 1000;
-  const maxStake = tier.maxStake || 100000;
-
-  const handleStake = () => {
-    if (!agreed || !amount || parseFloat(amount) < minStake) return;
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setIsSuccess(true);
-    }, 2000);
-  };
-
-  const handleClose = () => {
-    setIsSuccess(false);
-    setAmount('');
-    setAgreed(false);
-    onClose();
-  };
-
-  const getTierColor = () => {
-    if (tier.name === 'Flare') return 'from-orange-500 via-orange-600 to-orange-700';
-    if (tier.name === 'Chrome') return 'from-gray-300 via-gray-400 to-gray-500';
-    return 'from-gray-700 via-gray-800 to-gray-900';
-  };
-
-  const getTierAccentColor = () => {
-    if (tier.name === 'Flare') return '#FF4D00';
-    if (tier.name === 'Chrome') return '#E5E5E5';
-    return '#525252';
-  };
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-4 modal-overlay overflow-hidden"
-          onClick={handleClose}
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 40 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 40 }}
-            transition={{ duration: 0.4, type: "spring", bounce: 0.3 }}
-            className="relative w-full max-w-lg max-h-[85vh] md:max-h-[90vh] overflow-hidden rounded-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FF4D00] via-transparent to-[#E5E5E5] opacity-20 blur-xl" />
-
-            <div className={cn(
-              "relative glass-card rounded-2xl p-3 md:p-8 border-2 overflow-y-auto max-h-[85vh] md:max-h-[90vh]",
-              tier.name === 'Chrome' ? "border-[#E5E5E5]/30" : "border-[#FF4D00]/30"
-            )}>
-              <div className={cn(
-                "absolute inset-0 bg-gradient-to-br opacity-10",
-                getTierColor()
-              )} />
-
-              <button
-                onClick={handleClose}
-                className="absolute top-2 right-2 md:top-4 md:right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-[#FF4D00]/20 border border-white/10 transition-all z-20 group"
-              >
-                <SafeIcon name="x" size={16} className="text-[#E5E5E5] group-hover:text-[#FF4D00] transition-colors" />
-              </button>
-
-              {!isSuccess ? (
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-6">
-                    <div className={cn(
-                      "w-9 h-9 md:w-12 md:h-12 rounded-xl flex items-center justify-center border-2 flex-shrink-0",
-                      tier.name === 'Chrome' ? "border-[#E5E5E5] bg-gradient-to-br from-gray-200 to-gray-400" :
-                      tier.name === 'Flare' ? "border-[#FF4D00] bg-gradient-to-br from-orange-500 to-orange-700" :
-                      "border-[#525252] bg-gradient-to-br from-gray-700 to-gray-900"
-                    )}>
-                      <SafeIcon
-                        name={tier.name === 'Flare' ? "flame" : tier.name === 'Chrome' ? "hexagon" : "shield"}
-                        size={18}
-                        className={cn("md:w-6 md:h-6", tier.name === 'Chrome' ? "text-gray-900" : "text-white")}
-                      />
-                    </div>
-                    <div>
-                      <div className="font-mono text-[10px] text-[#E5E5E5]/40 tracking-widest uppercase">
-                        Membership Tier
-                      </div>
-                      <h3 className={cn(
-                        "font-serif text-xl md:text-3xl font-black tracking-tight",
-                        tier.name === 'Chrome' ? "text-[#E5E5E5]" : "text-white"
-                      )}>
-                        {tier.name}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 mb-3 md:mb-8 p-2.5 md:p-4 rounded-xl bg-white/5 border border-white/10">
-                    <div className={cn(
-                      "text-2xl md:text-4xl font-black font-mono",
-                      tier.name === 'Chrome' ? "text-[#E5E5E5]" : "text-[#FF4D00]"
-                    )}>
-                      {tier.apy}
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-mono text-[10px] md:text-sm text-[#E5E5E5]/60">Annual Percentage Yield</div>
-                      <div className="font-mono text-[9px] md:text-xs text-[#E5E5E5]/40 hidden md:block">Auto-compounding every block</div>
-                    </div>
-                  </div>
-
-                  <div className="mb-3 md:mb-6">
-                    <div className="font-mono text-[9px] md:text-xs text-[#E5E5E5]/40 mb-2 tracking-widest uppercase">
-                      Tier Privileges
-                    </div>
-                    <div className="space-y-1.5 md:space-y-3 max-h-28 md:max-h-none overflow-y-auto md:overflow-visible pr-1">
-                      {tier.features.map((feature, i) => (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: i * 0.1 }}
-                          className="flex items-center gap-2 md:gap-3 p-1.5 md:p-3 rounded-lg bg-white/5 border border-white/5"
-                        >
-                          <div className={cn(
-                            "w-4 h-4 md:w-6 md:h-6 rounded-full flex items-center justify-center flex-shrink-0",
-                            tier.name === 'Chrome' ? "bg-[#E5E5E5]/20" : "bg-[#FF4D00]/20"
-                          )}>
-                            <SafeIcon name="check" size={10} className={cn("md:w-[14px] md:h-[14px]", tier.name === 'Chrome' ? "text-[#E5E5E5]" : "text-[#FF4D00]")} />
-                          </div>
-                          <span className="font-mono text-[11px] md:text-sm text-[#E5E5E5]/80">{feature}</span>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mb-3 md:mb-6">
-                    <div className="flex justify-between mb-1.5 md:mb-2">
-                      <label className="font-mono text-[9px] md:text-xs text-[#E5E5E5]/60 tracking-wider uppercase">
-                        Stake Amount
-                      </label>
-                      <span className="font-mono text-[9px] md:text-xs text-[#E5E5E5]/40">
-                        Min: {minStake.toLocaleString()} AETH
-                      </span>
-                    </div>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        placeholder={minStake.toString()}
-                        min={minStake}
-                        className={cn(
-                          "w-full px-3 md:px-4 py-2.5 md:py-4 bg-white/5 border-2 rounded-xl text-white font-mono text-sm md:text-lg placeholder-[#E5E5E5]/30 focus:outline-none focus:border-[#FF4D00]/50 transition-all",
-                          tier.name === 'Chrome' ? "border-[#E5E5E5]/20 focus:border-[#E5E5E5]/50" : "border-[#FF4D00]/20 focus:border-[#FF4D00]/50"
-                        )}
-                      />
-                      <span className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 font-mono text-[10px] md:text-sm text-[#E5E5E5]/40">
-                        AETH
-                      </span>
-                    </div>
-                    <div className="flex justify-between mt-1.5">
-                      <span className="font-mono text-[9px] md:text-xs text-[#E5E5E5]/30">Balance: 0.00 AETH</span>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setAmount(minStake.toString())}
-                          className="font-mono text-[9px] md:text-xs text-[#FF4D00] hover:text-[#ff6a2b] transition-colors px-2 py-0.5 rounded bg-white/5 flex items-center gap-1"
-                        >
-                          <SafeIcon name="arrow-down" size={10} /> MIN
-                        </button>
-                        <button
-                          onClick={() => setAmount(maxStake.toString())}
-                          className="font-mono text-[9px] md:text-xs text-[#FF4D00] hover:text-[#ff6a2b] transition-colors px-2 py-0.5 rounded bg-white/5 flex items-center gap-1"
-                        >
-                          <SafeIcon name="arrow-up" size={10} /> MAX
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2 mb-3 md:mb-6 p-2 md:p-3 rounded-lg bg-white/5 border border-white/5">
-                    <input
-                      type="checkbox"
-                      id="terms"
-                      checked={agreed}
-                      onChange={(e) => setAgreed(e.target.checked)}
-                      className="mt-0.5 w-3.5 h-3.5 md:w-4 md:h-4 rounded border-[#E5E5E5]/30 bg-transparent text-[#FF4D00] focus:ring-[#FF4D00] focus:ring-offset-0 cursor-pointer flex-shrink-0"
-                    />
-                    <label htmlFor="terms" className="font-mono text-[9px] md:text-xs text-[#E5E5E5]/60 leading-relaxed cursor-pointer">
-                      I understand that staking requires a 30-day lockup period and early withdrawal carries a 5% penalty fee.
-                    </label>
-                  </div>
-
-                  <button
-                    onClick={handleStake}
-                    disabled={!agreed || !amount || parseFloat(amount) < minStake || isLoading}
-                    className={cn(
-                      "w-full py-2.5 md:py-4 rounded-xl font-mono font-bold text-sm md:text-lg transition-all transform relative overflow-hidden group flex items-center justify-center gap-2",
-                      agreed && amount && parseFloat(amount) >= minStake && !isLoading
-                        ? tier.name === 'Chrome'
-                          ? "bg-[#E5E5E5] text-[#050505] hover:bg-white hover:scale-[1.02]"
-                          : "bg-[#FF4D00] text-[#050505] hover:bg-[#ff6a2b] hover:scale-[1.02]"
-                        : "bg-white/10 text-[#E5E5E5]/40 cursor-not-allowed"
-                    )}
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <div className={cn(
-                          "w-4 h-4 border-2 border-t-transparent rounded-full animate-spin",
-                          tier.name === 'Chrome' ? "border-gray-900" : "border-[#050505]"
-                        )} />
-                        <span className="text-xs md:text-base">Processing...</span>
-                      </div>
-                    ) : (
-                      <span className="relative z-10 flex items-center justify-center gap-2">
-                        <SafeIcon name="lock" size={14} className="md:w-[18px] md:h-[18px]" />
-                        CONFIRM STAKE
-                      </span>
-                    )}
-
-                    {!isLoading && agreed && amount && parseFloat(amount) >= minStake && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                    )}
-                  </button>
-
-                  <p className="text-center font-mono text-[8px] md:text-[10px] text-[#E5E5E5]/30 mt-2 md:mt-4 flex items-center justify-center gap-1">
-                    <SafeIcon name="fuel" size={10} /> Gas fees will be deducted • Network: Aether Mainnet
-                  </p>
-                </div>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="relative z-10 text-center py-4 md:py-8"
-                >
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", bounce: 0.5 }}
-                    className={cn(
-                      "w-14 h-14 md:w-24 md:h-24 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-6 border-4",
-                      tier.name === 'Chrome' ? "border-[#E5E5E5] bg-[#E5E5E5]/10" : "border-[#FF4D00] bg-[#FF4D00]/10"
-                    )}
-                  >
-                    <SafeIcon name="check" size={28} className={cn("md:w-12 md:h-12", tier.name === 'Chrome' ? "text-[#E5E5E5]" : "text-[#FF4D00]")} />
-                  </motion.div>
-
-                  <h3 className="font-serif text-xl md:text-3xl font-bold text-white mb-2">
-                    Stake Confirmed
-                  </h3>
-                  <p className="font-mono text-[11px] md:text-sm text-[#E5E5E5]/60 mb-3 md:mb-6 max-w-xs mx-auto">
-                    You have successfully joined the {tier.name} tier. Your assets are now generating yield.
-                  </p>
-
-                  <div className="bg-white/5 rounded-xl p-2.5 md:p-4 mb-3 md:mb-6 border border-white/10">
-                    <div className="font-mono text-[9px] md:text-xs text-[#E5E5E5]/40 mb-1">TRANSACTION HASH</div>
-                    <div className="font-mono text-xs md:text-sm text-[#FF4D00] truncate flex items-center justify-center gap-2">
-                      <SafeIcon name="link" size={12} /> 0x7f8a9b2c...3d4e5f6a
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={handleClose}
-                    className="bg-white/10 hover:bg-white/20 text-white px-5 md:px-8 py-2 md:py-3 rounded-lg font-mono font-bold transition-all text-xs md:text-base flex items-center gap-2 mx-auto"
-                  >
-                    <SafeIcon name="x" size={16} /> CLOSE
-                  </button>
-                </motion.div>
-              )}
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-};
-
-// Transmute Modal Component
-const TransmuteModal = ({ isOpen, onClose, asset }) => {
-  const [amount, setAmount] = useState('');
-  const [slippage, setSlippage] = useState(0.5);
-
-  if (!isOpen || !asset) return null;
-
-  return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-3 md:p-4 modal-overlay"
-        onClick={onClose}
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          transition={{ duration: 0.3 }}
-          className="glass-card rounded-2xl p-5 md:p-8 max-w-md w-full max-h-[85vh] overflow-y-auto relative"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 md:top-4 md:right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-[#FF4D00]/20 transition-colors"
-          >
-            <SafeIcon name="x" size={18} className="text-[#E5E5E5]" />
-          </button>
-
-          <div className="mb-4 md:mb-6">
-            <div className="font-mono text-[10px] md:text-xs text-[#E5E5E5]/40 mb-2 tracking-widest uppercase">
-              Transmute Configuration
-            </div>
-            <h3 className="font-serif text-2xl md:text-3xl font-bold text-white tracking-tight flex items-center gap-3">
-              {asset.symbol} <SafeIcon name="arrow-right" size={20} className="text-[#FF4D00]" /> AETH
-            </h3>
-          </div>
-
-          <div className="space-y-4 md:space-y-6">
-            <div>
-              <label className="font-mono text-[10px] md:text-xs text-[#E5E5E5]/60 mb-2 block tracking-wider uppercase">
-                Amount to Transmute
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0.00"
-                  className="w-full px-3 md:px-4 py-3 bg-white/5 border border-[#E5E5E5]/20 rounded-lg text-white font-mono placeholder-[#E5E5E5]/30 focus:outline-none focus:border-[#FF4D00]/50 transition-colors"
-                />
-                <span className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 font-mono text-xs text-[#E5E5E5]/40">
-                  {asset.symbol}
-                </span>
-              </div>
-              <div className="flex justify-between mt-2">
-                <span className="font-mono text-[10px] md:text-xs text-[#E5E5E5]/30">Balance: 0.00</span>
-                <button className="font-mono text-[10px] md:text-xs text-[#FF4D00] hover:text-[#ff6a2b] transition-colors flex items-center gap-1">
-                  <SafeIcon name="arrow-up" size={10} /> MAX
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="font-mono text-[10px] md:text-xs text-[#E5E5E5]/60 mb-2 block tracking-wider uppercase">
-                Max Slippage: {slippage}%
-              </label>
-              <input
-                type="range"
-                min="0.1"
-                max="5"
-                step="0.1"
-                value={slippage}
-                onChange={(e) => setSlippage(parseFloat(e.target.value))}
-                className="w-full"
-              />
-              <div className="flex justify-between mt-1">
-                <span className="font-mono text-[10px] md:text-xs text-[#E5E5E5]/30">0.1%</span>
-                <span className="font-mono text-[10px] md:text-xs text-[#E5E5E5]/30">5%</span>
-              </div>
-            </div>
-
-            <div className="p-3 md:p-4 rounded-lg bg-white/5 border border-white/10">
-              <div className="flex justify-between mb-2">
-                <span className="font-mono text-[10px] md:text-xs text-[#E5E5E5]/60">Exchange Rate</span>
-                <span className="font-mono text-[10px] md:text-xs text-[#E5E5E5]">1 {asset.symbol} = {asset.price} AETH</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-mono text-[10px] md:text-xs text-[#E5E5E5]/60">Network Fee</span>
-                <span className="font-mono text-[10px] md:text-xs text-[#E5E5E5]">~0.004 AETH</span>
-              </div>
-            </div>
-
-            <button className="w-full py-3 md:py-4 bg-[#FF4D00] hover:bg-[#ff6a2b] text-[#050505] rounded-xl font-mono font-bold transition-colors flex items-center justify-center gap-2">
-              <SafeIcon name="zap" size={18} />
-              TRANSMUTE NOW
-            </button>
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
   );
 };
 
@@ -500,69 +111,71 @@ const ParticleWave = ({ onRipple }) => {
     resize();
     window.addEventListener('resize', resize);
 
-    const particleCount = 50;
+    // Create particles
+    const particleCount = 100;
     for (let i = 0; i < particleCount; i++) {
       particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 2 + 1,
+        x: (canvas.width / particleCount) * i,
+        y: canvas.height / 2,
+        baseY: canvas.height / 2,
+        speed: 0.02 + Math.random() * 0.02,
+        amplitude: 20 + Math.random() * 30,
+        offset: Math.random() * Math.PI * 2
       });
     }
 
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const animate = (time) => {
+      ctx.fillStyle = 'rgba(5, 5, 5, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      particles.forEach((p, i) => {
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 77, 0, 0.6)';
-        ctx.fill();
-
-        particles.forEach((p2, j) => {
-          if (i === j) return;
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 100) {
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(255, 77, 0, ${0.2 * (1 - distance / 100)})`;
-            ctx.stroke();
-          }
-        });
+      // Update and draw ripples
+      setRipples(prev => {
+        const updated = prev.map(r => ({ ...r, radius: r.radius + 5, opacity: r.opacity - 0.02 }))
+          .filter(r => r.opacity > 0);
+        return updated;
       });
 
-      ripples.forEach((ripple, index) => {
+      ripples.forEach(ripple => {
         ctx.beginPath();
         ctx.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255, 77, 0, ${1 - ripple.radius / 200})`;
+        ctx.strokeStyle = `rgba(255, 77, 0, ${ripple.opacity})`;
         ctx.lineWidth = 2;
         ctx.stroke();
+      });
 
-        ripple.radius += 2;
-        if (ripple.radius > 200) {
-          ripples.splice(index, 1);
+      // Draw particles
+      ctx.beginPath();
+      ctx.moveTo(0, canvas.height / 2);
+
+      particles.forEach((p, i) => {
+        p.y = p.baseY + Math.sin(time * p.speed + p.offset) * p.amplitude;
+
+        if (i === 0) {
+          ctx.moveTo(p.x, p.y);
+        } else {
+          ctx.lineTo(p.x, p.y);
         }
       });
+
+      ctx.strokeStyle = '#FF4D00';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Draw glow
+      ctx.save();
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = '#FF4D00';
+      ctx.stroke();
+      ctx.restore();
 
       animationId = requestAnimationFrame(animate);
     };
 
-    animate();
+    animationId = requestAnimationFrame(animate);
 
     return () => {
-      window.removeEventListener('resize', resize);
       cancelAnimationFrame(animationId);
+      window.removeEventListener('resize', resize);
     };
   }, [ripples]);
 
@@ -571,8 +184,8 @@ const ParticleWave = ({ onRipple }) => {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    setRipples(prev => [...prev, { x, y, radius: 0 }]);
-    onRipple && onRipple();
+    setRipples(prev => [...prev, { x, y, radius: 0, opacity: 1 }]);
+    onRipple();
   };
 
   return (
@@ -580,60 +193,187 @@ const ParticleWave = ({ onRipple }) => {
       ref={canvasRef}
       onClick={handleClick}
       className="w-full h-64 md:h-96 cursor-pointer"
-      style={{ background: 'transparent' }}
     />
   );
 };
 
-// Main App Component
+// Modal Components
+const TierSelectionModal = ({ isOpen, onClose, tier }) => {
+  if (!isOpen || !tier) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          className="glass-card rounded-2xl p-6 md:p-8 max-w-md w-full border border-[#E5E5E5]/20"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="flex justify-between items-start mb-6">
+            <h3 className="font-serif text-2xl md:text-3xl font-bold text-[#E5E5E5]">{tier.name} Tier</h3>
+            <button onClick={onClose} className="text-[#E5E5E5]/60 hover:text-[#E5E5E5]">
+              <SafeIcon name="x" size={24} />
+            </button>
+          </div>
+
+          <div className="mb-6">
+            <span className="text-4xl font-black font-mono text-[#FF4D00]">{tier.apy}</span>
+            <span className="font-mono text-sm ml-2 text-[#E5E5E5]/60">APY</span>
+          </div>
+
+          <div className="space-y-3 mb-8">
+            {tier.features.map((feature, i) => (
+              <div key={i} className="flex items-center gap-3 font-mono text-sm text-[#E5E5E5]/70">
+                <SafeIcon name="check" size={16} className="text-[#FF4D00]" />
+                {feature}
+              </div>
+            ))}
+          </div>
+
+          <div className="font-mono text-xs text-[#E5E5E5]/40 mb-6">
+            Min: {tier.minStake.toLocaleString()} AETH | Max: {tier.maxStake.toLocaleString()} AETH
+          </div>
+
+          <button className="w-full py-3 bg-[#FF4D00] text-[#050505] rounded-xl font-mono font-bold hover:bg-[#ff6a2b] transition-colors">
+            Confirm Selection
+          </button>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+const TransmuteModal = ({ isOpen, onClose, asset }) => {
+  const [amount, setAmount] = useState('');
+
+  if (!isOpen || !asset) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          className="glass-card rounded-2xl p-6 md:p-8 max-w-md w-full border border-[#E5E5E5]/20"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="flex justify-between items-start mb-6">
+            <h3 className="font-serif text-2xl md:text-3xl font-bold text-[#E5E5E5]">Transmute {asset.symbol}</h3>
+            <button onClick={onClose} className="text-[#E5E5E5]/60 hover:text-[#E5E5E5]">
+              <SafeIcon name="x" size={24} />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-4 mb-6 p-4 bg-white/5 rounded-xl">
+            <asset.icon className={cn("w-10 h-10", asset.color)} />
+            <div>
+              <div className="font-serif text-lg font-bold">{asset.name}</div>
+              <div className="font-mono text-sm text-[#E5E5E5]/60">${asset.price}</div>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <label className="font-mono text-xs text-[#E5E5E5]/40 mb-2 block">Amount to Transmute</label>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="0.00"
+              className="w-full bg-white/5 border border-[#E5E5E5]/20 rounded-xl px-4 py-3 font-mono text-[#E5E5E5] placeholder-[#E5E5E5]/30 focus:outline-none focus:border-[#FF4D00]/50"
+            />
+          </div>
+
+          <div className="flex justify-between font-mono text-xs text-[#E5E5E5]/40 mb-6">
+            <span>Receive AETH</span>
+            <span>{amount ? (parseFloat(amount) * 0.95).toFixed(2) : '0.00'}</span>
+          </div>
+
+          <button className="w-full py-3 bg-[#FF4D00] text-[#050505] rounded-xl font-mono font-bold hover:bg-[#ff6a2b] transition-colors">
+            Transmute Asset
+          </button>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+// === MAIN APP COMPONENT ===
 function App() {
-  const [mouseVelocity, setMouseVelocity] = useState({ x: 0, y: 0 });
-  const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
   const [sphereScale, setSphereScale] = useState(1);
+  const [distortText, setDistortText] = useState(false);
+  const [footerProgress, setFooterProgress] = useState(0);
   const [tierModalOpen, setTierModalOpen] = useState(false);
   const [selectedTier, setSelectedTier] = useState(null);
   const [transmuteModalOpen, setTransmuteModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
-  const [distortText, setDistortText] = useState(false);
-  const [footerProgress, setFooterProgress] = useState(0);
 
+  const footerRef = useRef(null);
+
+  // Mouse velocity tracking for sphere
   useEffect(() => {
+    let lastX = 0;
+    let lastY = 0;
     let lastTime = Date.now();
 
     const handleMouseMove = (e) => {
-      const currentTime = Date.now();
-      const dt = currentTime - lastTime;
+      const now = Date.now();
+      const dt = now - lastTime;
 
-      if (dt > 0) {
-        const vx = (e.clientX - lastMousePos.x) / dt;
-        const vy = (e.clientY - lastMousePos.y) / dt;
-        const velocity = Math.sqrt(vx * vx + vy * vy);
+      if (dt > 50) {
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        const velocity = Math.sqrt(dx * dx + dy * dy) / dt;
 
-        const newScale = 1 + Math.min(velocity * 0.5, 0.3);
+        const newScale = Math.min(1.3, 1 + velocity * 0.5);
         setSphereScale(newScale);
 
-        setTimeout(() => setSphereScale(1), 200);
+        lastX = e.clientX;
+        lastY = e.clientY;
+        lastTime = now;
       }
-
-      setLastMousePos({ x: e.clientX, y: e.clientY });
-      lastTime = currentTime;
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [lastMousePos]);
+  }, []);
 
+  // Footer scroll progress
   useEffect(() => {
     const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = scrollTop / docHeight;
-      setFooterProgress(scrollPercent);
+      if (!footerRef.current) return;
+
+      const rect = footerRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+
+      if (rect.top < windowHeight) {
+        const progress = Math.min(1, (windowHeight - rect.top) / (windowHeight * 0.5));
+        setFooterProgress(progress);
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleRipple = () => {
+    setDistortText(true);
+    setTimeout(() => setDistortText(false), 300);
+  };
 
   const handleOpenTierModal = (tier) => {
     setSelectedTier(tier);
@@ -655,22 +395,17 @@ function App() {
     setSelectedAsset(null);
   };
 
-  const handleRipple = () => {
-    setDistortText(true);
-    setTimeout(() => setDistortText(false), 300);
-  };
-
   const tiers = [
     {
       name: 'Iron',
-      apy: '12.5%',
+      apy: '12.4%',
       minStake: 1000,
       maxStake: 10000,
       features: [
-        'Basic yield generation',
+        'Base yield generation',
+        'Standard security',
         'Community access',
-        'Monthly reports',
-        'Standard support'
+        'Monthly reports'
       ]
     },
     {
@@ -821,7 +556,7 @@ function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="group relative card-gradient-border rounded-2xl p-6 md:p-8 overflow-hidden"
+                className="group relative rounded-2xl p-6 md:p-8 overflow-hidden"
               >
                 <div className="blueprint-overlay absolute inset-0" />
 
@@ -840,8 +575,6 @@ function App() {
                     {feature.description}
                   </p>
                 </div>
-
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#FF4D00] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               </motion.div>
             ))}
           </div>
@@ -870,7 +603,7 @@ function App() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 onClick={() => handleOpenTransmuteModal(asset)}
-                className="group card-gradient-border rounded-xl p-4 md:p-6 flex items-center justify-between cursor-pointer transition-all hover:border-[#FF4D00]/50"
+                className="group rounded-xl p-4 md:p-6 flex items-center justify-between cursor-pointer transition-all hover:border-[#FF4D00]/50"
               >
                 <div className="flex items-center gap-4 md:gap-6">
                   <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-white/5 flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform duration-500">
@@ -1021,6 +754,7 @@ function App() {
 
       {/* Section 7: Footer - The Core Integration */}
       <section
+        ref={footerRef}
         className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden"
         style={{
           background: `linear-gradient(to top, #FF4D00 0%, #050505 ${Math.max(0, 100 - footerProgress * 200)}%)`

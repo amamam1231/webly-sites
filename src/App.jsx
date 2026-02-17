@@ -1,4 +1,3 @@
-// === IMPORTS ===
 import { SafeIcon } from './components/SafeIcon';
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,97 +17,60 @@ const EthereumIcon = ({ className }) => (
   </svg>
 );
 
-// Gold SVG Icon Component
+// Gold SVG Icon Component - Using user provided SVG with updated URL
 const GoldIcon = ({ className }) => (
   <img src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-svg-1770689487-6284.svg?" alt="Gold" className={className} />
 );
 
-// Solana SVG Icon Component
+// Solana SVG Icon Component - Using user provided SVG with NEW URL
 const SolanaIcon = ({ className }) => (
   <img src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-svg-1770697184-7363.svg?" alt="Solana" className={className} />
 );
 
-// Bitcoin Icon Component
-const BitcoinIcon = ({ className }) => (
-  <svg viewBox="0 0 32 32" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="16" cy="16" r="16" fill="#F7931A" />
-    <path d="M22.7 14.2c0.4-2.6-1.6-4-4.1-4.9l0.8-3.3-2.1-0.5-0.8 3.2c-0.5-0.1-1.1-0.3-1.6-0.4l0.8-3.3-2.1-0.5-0.8 3.3c-0.4-0.1-0.8-0.2-1.2-0.3l0-0-2.9-0.7-0.5 2.2s1.6 0.4 1.6 0.4c0.9 0.2 1.1 0.7 1 1.2l-1 4.1c0.1 0 0.2 0.1 0.3 0.1l-0.3-0.1-1.4 5.7c-0.1 0.3-0.4 0.7-1.1 0.5 0 0-1.6-0.4-1.6-0.4l-0.9 2.1 2.7 0.7c0.5 0.1 1 0.2 1.4 0.3l-0.9 3.4 2.1 0.5 0.8-3.3c0.5 0.1 1.1 0.3 1.6 0.4l-0.8 3.3 2.1 0.5 0.9-3.4c3.3 0.6 5.8-0.4 6.8-3.1 0.8-2.3 0-3.6-1.4-4.4 1-0.2 1.8-0.8 2-2.2zM20.6 18c-0.5 2.1-4.2 1-5.4 0.7l1-4c1.2 0.3 5.1 0.9 4.4 3.3zM21.1 14.1c-0.5 1.9-3.5 0.9-4.5 0.7l0.9-3.7c0.9 0.2 4 0.6 3.6 3z" fill="white" />
-  </svg>
-);
-
-// Custom Cursor Component
+// Custom Cursor Component - ALWAYS WHITE, SCALES ON BUTTONS
 const CustomCursor = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isScaled, setIsScaled] = useState(false);
 
   useEffect(() => {
-    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
-    if (isTouchDevice) return;
-
-    const updatePosition = (e) => {
+    const handleMouseMove = (e) => {
       setPosition({ x: e.clientX, y: e.clientY });
-      setIsVisible(true);
-    };
-
-    const handleMouseOver = (e) => {
-      if (e.target.closest('button, a, [role="button"], input, textarea, select, .cursor-pointer')) {
-        setIsHovering(true);
+      const element = document.elementFromPoint(e.clientX, e.clientY);
+      if (element) {
+        const isButton = element.closest('button') || element.closest('a') || element.closest('[role="button"]') || element.closest('.cursor-pointer');
+        setIsScaled(!!isButton);
       }
     };
 
-    const handleMouseOut = () => {
-      setIsHovering(false);
-    };
-
-    window.addEventListener('mousemove', updatePosition);
-    document.addEventListener('mouseover', handleMouseOver);
-    document.addEventListener('mouseout', handleMouseOut);
-
-    return () => {
-      window.removeEventListener('mousemove', updatePosition);
-      document.removeEventListener('mouseover', handleMouseOver);
-      document.removeEventListener('mouseout', handleMouseOut);
-    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
-  if (isTouchDevice) return null;
-
   return (
-    <div
-      className={cn(
-        "custom-cursor",
-        isHovering && "scaled"
-      )}
-      style={{
-        left: position.x,
-        top: position.y,
-        opacity: isVisible ? 1 : 0,
-      }}
-    />
+    <div className={cn("custom-cursor", isScaled && "scaled")} style={{ left: position.x, top: position.y }} />
   );
 };
 
-// Tier Selection Modal Component
+// ENHANCED Tier Selection Modal Component with Chrome Alchemy Design - MOBILE OPTIMIZED
 const TierSelectionModal = ({ isOpen, onClose, tier }) => {
   const [amount, setAmount] = useState('');
   const [agreed, setAgreed] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  if (!tier) return null;
+  if (!isOpen || !tier) return null;
 
-  const minStake = tier.minStake || 1000;
-  const maxStake = tier.maxStake || 100000;
+  const minStake = tier.name === 'Iron' ? 1000 : tier.name === 'Chrome' ? 10000 : 100000;
+  const maxStake = minStake * 100;
 
-  const handleStake = () => {
+  const handleStake = async () => {
     if (!agreed || !amount || parseFloat(amount) < minStake) return;
+
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setIsSuccess(true);
-    }, 2000);
+    // Simulate blockchain transaction
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setIsLoading(false);
+    setIsSuccess(true);
   };
 
   const handleClose = () => {
@@ -148,17 +110,20 @@ const TierSelectionModal = ({ isOpen, onClose, tier }) => {
             className="relative w-full max-w-lg max-h-[85vh] md:max-h-[90vh] overflow-hidden rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Chrome border glow effect */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#FF4D00] via-transparent to-[#E5E5E5] opacity-20 blur-xl" />
 
             <div className={cn(
               "relative glass-card rounded-2xl p-3 md:p-8 border-2 overflow-y-auto max-h-[85vh] md:max-h-[90vh]",
               tier.name === 'Chrome' ? "border-[#E5E5E5]/30" : "border-[#FF4D00]/30"
             )}>
+              {/* Animated background gradient */}
               <div className={cn(
                 "absolute inset-0 bg-gradient-to-br opacity-10",
                 getTierColor()
               )} />
 
+              {/* Close button */}
               <button
                 onClick={handleClose}
                 className="absolute top-2 right-2 md:top-4 md:right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-[#FF4D00]/20 border border-white/10 transition-all z-20 group"
@@ -168,6 +133,7 @@ const TierSelectionModal = ({ isOpen, onClose, tier }) => {
 
               {!isSuccess ? (
                 <div className="relative z-10">
+                  {/* Tier Badge - Compact on mobile */}
                   <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-6">
                     <div className={cn(
                       "w-9 h-9 md:w-12 md:h-12 rounded-xl flex items-center justify-center border-2 flex-shrink-0",
@@ -194,6 +160,7 @@ const TierSelectionModal = ({ isOpen, onClose, tier }) => {
                     </div>
                   </div>
 
+                  {/* APY Display - Compact */}
                   <div className="flex items-center gap-3 mb-3 md:mb-8 p-2.5 md:p-4 rounded-xl bg-white/5 border border-white/10">
                     <div className={cn(
                       "text-2xl md:text-4xl font-black font-mono",
@@ -207,6 +174,7 @@ const TierSelectionModal = ({ isOpen, onClose, tier }) => {
                     </div>
                   </div>
 
+                  {/* Benefits List - Scrollable if too long on mobile */}
                   <div className="mb-3 md:mb-6">
                     <div className="font-mono text-[9px] md:text-xs text-[#E5E5E5]/40 mb-2 tracking-widest uppercase">
                       Tier Privileges
@@ -232,6 +200,7 @@ const TierSelectionModal = ({ isOpen, onClose, tier }) => {
                     </div>
                   </div>
 
+                  {/* Stake Input - Compact */}
                   <div className="mb-3 md:mb-6">
                     <div className="flex justify-between mb-1.5 md:mb-2">
                       <label className="font-mono text-[9px] md:text-xs text-[#E5E5E5]/60 tracking-wider uppercase">
@@ -276,6 +245,7 @@ const TierSelectionModal = ({ isOpen, onClose, tier }) => {
                     </div>
                   </div>
 
+                  {/* Terms Checkbox - Compact */}
                   <div className="flex items-start gap-2 mb-3 md:mb-6 p-2 md:p-3 rounded-lg bg-white/5 border border-white/5">
                     <input
                       type="checkbox"
@@ -289,6 +259,7 @@ const TierSelectionModal = ({ isOpen, onClose, tier }) => {
                     </label>
                   </div>
 
+                  {/* Stake Button */}
                   <button
                     onClick={handleStake}
                     disabled={!agreed || !amount || parseFloat(amount) < minStake || isLoading}
@@ -316,16 +287,19 @@ const TierSelectionModal = ({ isOpen, onClose, tier }) => {
                       </span>
                     )}
 
+                    {/* Button shine effect */}
                     {!isLoading && agreed && amount && parseFloat(amount) >= minStake && (
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                     )}
                   </button>
 
+                  {/* Gas Info */}
                   <p className="text-center font-mono text-[8px] md:text-[10px] text-[#E5E5E5]/30 mt-2 md:mt-4 flex items-center justify-center gap-1">
                     <SafeIcon name="fuel" size={10} /> Gas fees will be deducted • Network: Aether Mainnet
                   </p>
                 </div>
               ) : (
+                /* Success State - Compact */
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -373,7 +347,7 @@ const TierSelectionModal = ({ isOpen, onClose, tier }) => {
   );
 };
 
-// Transmute Modal Component
+// Transmute Modal Component - MOBILE OPTIMIZED
 const TransmuteModal = ({ isOpen, onClose, asset }) => {
   const [amount, setAmount] = useState('');
   const [slippage, setSlippage] = useState(0.5);
@@ -457,20 +431,25 @@ const TransmuteModal = ({ isOpen, onClose, asset }) => {
               </div>
             </div>
 
-            <div className="p-3 md:p-4 rounded-lg bg-white/5 border border-white/10">
-              <div className="flex justify-between mb-2">
-                <span className="font-mono text-[10px] md:text-xs text-[#E5E5E5]/60">Exchange Rate</span>
-                <span className="font-mono text-[10px] md:text-xs text-[#E5E5E5]">1 {asset.symbol} = {asset.price} AETH</span>
+            <div className="bg-white/5 rounded-lg p-3 md:p-4 space-y-2">
+              <div className="flex justify-between">
+                <span className="font-mono text-[10px] md:text-xs text-[#E5E5E5]/50 uppercase">Exchange Rate</span>
+                <span className="font-mono text-xs md:text-sm text-[#E5E5E5]">1 {asset.symbol} = 1,000 AETH</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-mono text-[10px] md:text-xs text-[#E5E5E5]/60">Network Fee</span>
-                <span className="font-mono text-[10px] md:text-xs text-[#E5E5E5]">~0.004 AETH</span>
+                <span className="font-mono text-[10px] md:text-xs text-[#E5E5E5]/50 uppercase">Network Fee</span>
+                <span className="font-mono text-xs md:text-sm text-[#E5E5E5]">~$2.45</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-mono text-[10px] md:text-xs text-[#E5E5E5]/50 uppercase">Route</span>
+                <span className="font-mono text-[10px] md:text-xs text-[#FF4D00] flex items-center gap-1">
+                  <SafeIcon name="route" size={10} /> Quantum Bonding Curve
+                </span>
               </div>
             </div>
 
-            <button className="w-full py-3 md:py-4 bg-[#FF4D00] hover:bg-[#ff6a2b] text-[#050505] rounded-xl font-mono font-bold transition-colors flex items-center justify-center gap-2">
-              <SafeIcon name="zap" size={18} />
-              TRANSMUTE NOW
+            <button className="w-full py-3.5 md:py-4 bg-[#FF4D00] hover:bg-[#ff6a2b] text-[#050505] rounded-lg font-mono font-bold transition-all transform hover:scale-[1.02] text-sm md:text-base flex items-center justify-center gap-2">
+              <SafeIcon name="zap" size={18} /> EXECUTE TRANSMUTATION
             </button>
           </div>
         </motion.div>
@@ -479,173 +458,1146 @@ const TransmuteModal = ({ isOpen, onClose, asset }) => {
   );
 };
 
-// Particle Wave Component
-const ParticleWave = ({ onRipple }) => {
-  const canvasRef = useRef(null);
-  const [ripples, setRipples] = useState([]);
+// App Coming Soon Modal - MOBILE OPTIMIZED
+const AppComingSoonModal = ({ isOpen, onClose }) => {
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  if (!isOpen) return null;
 
-    const ctx = canvas.getContext('2d');
-    let animationId;
-    let particles = [];
-
-    const resize = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    };
-
-    resize();
-    window.addEventListener('resize', resize);
-
-    const particleCount = 50;
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 2 + 1,
-      });
-    }
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      particles.forEach((p, i) => {
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 77, 0, 0.6)';
-        ctx.fill();
-
-        particles.forEach((p2, j) => {
-          if (i === j) return;
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 100) {
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(255, 77, 0, ${0.2 * (1 - distance / 100)})`;
-            ctx.stroke();
-          }
-        });
-      });
-
-      ripples.forEach((ripple, index) => {
-        ctx.beginPath();
-        ctx.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255, 77, 0, ${1 - ripple.radius / 200})`;
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ripple.radius += 2;
-        if (ripple.radius > 200) {
-          ripples.splice(index, 1);
-        }
-      });
-
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => {
-      window.removeEventListener('resize', resize);
-      cancelAnimationFrame(animationId);
-    };
-  }, [ripples]);
-
-  const handleClick = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    setRipples(prev => [...prev, { x, y, radius: 0 }]);
-    onRipple && onRipple();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSubmitted(true);
+    setTimeout(() => {
+      onClose();
+      setSubmitted(false);
+      setEmail('');
+    }, 2000);
   };
 
   return (
-    <canvas
-      ref={canvasRef}
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[100] flex items-center justify-center p-3 md:p-4 modal-overlay"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          transition={{ duration: 0.3 }}
+          className="glass-card rounded-2xl p-6 md:p-8 max-w-md w-full relative text-center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 md:top-4 md:right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-[#FF4D00]/20 transition-colors"
+          >
+            <SafeIcon name="x" size={18} className="text-[#E5E5E5]" />
+          </button>
+
+          {!submitted ? (
+            <>
+              <div className="w-16 h-16 rounded-full bg-[#FF4D00]/20 flex items-center justify-center mx-auto mb-4">
+                <SafeIcon name="rocket" size={32} className="text-[#FF4D00]" />
+              </div>
+              <h3 className="font-serif text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">
+                App in Development
+              </h3>
+              <p className="font-mono text-xs md:text-sm text-[#E5E5E5]/60 mb-6 md:mb-8 leading-relaxed">
+                The AETHER Protocol app is currently under construction. Join the waitlist to be among the first to access the future of decentralized finance.
+              </p>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="relative">
+                  <SafeIcon name="mail" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#E5E5E5]/40" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    required
+                    className="w-full pl-10 pr-3 md:px-4 py-3 bg-white/5 border border-[#E5E5E5]/20 rounded-lg text-white font-mono placeholder-[#E5E5E5]/30 focus:outline-none focus:border-[#FF4D00]/50 transition-colors text-sm md:text-base"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full py-3.5 md:py-4 bg-[#FF4D00] hover:bg-[#ff6a2b] text-[#050505] rounded-lg font-mono font-bold transition-all transform hover:scale-[1.02] text-sm md:text-base flex items-center justify-center gap-2"
+                >
+                  <SafeIcon name="send" size={18} /> JOIN WHITELIST
+                </button>
+              </form>
+            </>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="py-6 md:py-8"
+            >
+              <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4 md:mb-6">
+                <SafeIcon name="check" size={28} className="text-green-500 md:w-8 md:h-8" />
+              </div>
+              <h3 className="font-serif text-xl md:text-2xl font-bold text-white mb-2">You're on the list!</h3>
+              <p className="font-mono text-xs md:text-sm text-[#E5E5E5]/60">We'll notify you when the protocol launches.</p>
+            </motion.div>
+          )}
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+// SECTION 1: HERO - The Singularity
+const MercurySphere = () => {
+  const sphereRef = useRef(null);
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const targetRef = useRef({ x: 0, y: 0 });
+  const rafRef = useRef(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      const rect = sphereRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      targetRef.current = {
+        x: (e.clientX - centerX) / 30,
+        y: (e.clientY - centerY) / 30
+      };
+    };
+
+    const animate = () => {
+      mouseRef.current.x += (targetRef.current.x - mouseRef.current.x) * 0.08;
+      mouseRef.current.y += (targetRef.current.y - mouseRef.current.y) * 0.08;
+
+      if (sphereRef.current) {
+        sphereRef.current.style.transform = `
+          translate(${mouseRef.current.x}px, ${mouseRef.current.y}px)
+        `;
+      }
+
+      rafRef.current = requestAnimationFrame(animate);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    rafRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  return (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <motion.div
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
+        ref={sphereRef}
+        className="mercury-sphere w-64 h-64 md:w-[28rem] md:h-[28rem] lg:w-[36rem] lg:h-[36rem] animate-morph"
+      />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 3, repeat: Infinity }}
+          className="w-72 h-72 md:w-[32rem] md:h-[32rem] lg:w-[40rem] lg:h-[40rem] rounded-full bg-[#E5E5E5]/10 blur-3xl"
+        />
+      </div>
+    </div>
+  );
+};
+
+// SECTION 2: TICKER - The Velocity Tape
+const Ticker = () => {
+  const [isPaused, setIsPaused] = useState(false);
+
+  const tickerItems = [
+    { label: "AETHER_STABLE", value: "1.0002", change: "+0.02%" },
+    { label: "TOTAL_VALUE_LOCKED", value: "$2.4B", change: "+12.5%" },
+    { label: "PROTOCOL_REVENUE", value: "$847K", change: "+8.3%" },
+    { label: "STAKING_APY", value: "14.7%", change: "+2.1%" },
+    { label: "LIQUIDITY_DEPTH", value: "$890M", change: "+5.7%" },
+    { label: "GOVERNANCE_POWER", value: "89.2%", change: "+1.2%" },
+    { label: "INSTANT_SWAPS_24H", value: "142.8K", change: "+23.1%" },
+    { label: "TRANSMUTATION_FEE", value: "0.03%", change: "-0.01%" },
+  ];
+
+  return (
+    <div
+      className="w-full overflow-hidden border-y border-[#FF4D00]/20 bg-[#0a0a0a] py-3"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      data-cursor="orange"
+    >
+      <div
+        className="flex whitespace-nowrap animate-ticker"
+        style={{ animationPlayState: isPaused ? 'paused' : 'running' }}
+      >
+        {[...tickerItems, ...tickerItems, ...tickerItems, ...tickerItems, ...tickerItems, ...tickerItems].map((item, index) => (
+          <div key={index} className="flex items-center gap-3 px-6">
+            <div className="ticker-item flex items-center gap-2 border border-transparent hover:border-[#FF4D00]/40 rounded-lg px-4 py-2 transition-all duration-300">
+              <SafeIcon name="activity" size={12} className="text-[#E5E5E5]/30" />
+              <span className="font-mono text-xs text-[#E5E5E5]/50 tracking-wider uppercase">
+                {item.label}
+              </span>
+              <span className="font-mono text-base text-[#E5E5E5] font-bold">
+                {item.value}
+              </span>
+              <span className={cn(
+                "font-mono text-xs px-2 py-0.5 rounded flex items-center gap-1",
+                item.change.startsWith('+') ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
+              )}>
+                <SafeIcon name={item.change.startsWith('+') ? "trending-up" : "trending-down"} size={10} />
+                {item.change}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// SECTION 3: BENTO - The Alchemical Triad
+const BentoFeatures = () => {
+  const features = [
+    {
+      icon: "refresh-cw",
+      title: "Instant Transmutation",
+      subtitle: "Exchange",
+      description: "Convert any asset to any other in milliseconds. Zero slippage, infinite liquidity through quantum bonding curves.",
+      blueprint: "LIQUIDITY_POOL_V3 // ATOMIC_SWAPS // MEV_PROTECTION"
+    },
+    {
+      icon: "shield",
+      title: "Neural Security",
+      subtitle: "Protection",
+      description: "AI-powered threat detection monitors every transaction. Self-healing smart contracts with automatic exploit patching.",
+      blueprint: "NEURAL_NET_V9 // PREDICTIVE_ANALYSIS // AUTO_PATCH"
+    },
+    {
+      icon: "trending-up",
+      title: "Infinite Yield",
+      subtitle: "Staking",
+      description: "Dynamic yield optimization across 47 protocols. Your assets work 24/7, compounding every block.",
+      blueprint: "YIELD_ROUTER_V4 // AUTO_COMPOUND // RISK_ENGINE"
+    }
+  ];
+
+  return (
+    <div className="container mx-auto px-4 md:px-6 py-20">
+      <motion.h2
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="font-serif text-5xl md:text-8xl font-black text-white mb-16 text-center tracking-tighter"
+      >
+        The Alchemical <span className="text-white">Triad</span>
+      </motion.h2>
+
+      <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        {features.map((feature, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: index * 0.1 }}
+            className="glass-card rounded-2xl p-8 relative overflow-hidden group min-h-[290px] flex flex-col"
+            data-cursor="orange"
+          >
+            <div className="blueprint-overlay absolute inset-0 pointer-events-none rounded-2xl" />
+
+            <div className="relative z-10 flex-1">
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <span className="font-mono text-xs text-[#E5E5E5]/40 tracking-widest block">
+                    {feature.subtitle.toUpperCase()}
+                  </span>
+                </div>
+                <div className="w-10 h-10 rounded-lg bg-[#FF4D00]/10 border border-[#FF4D00]/20 flex items-center justify-center group-hover:bg-[#FF4D00]/20 transition-colors">
+                  <SafeIcon name={feature.icon} size={20} className="text-[#FF4D00]" />
+                </div>
+              </div>
+
+              <h3 className="font-serif text-2xl md:text-3xl font-bold text-white mb-4 group-hover:text-[#FF4D00] transition-colors">
+                {feature.title}
+              </h3>
+
+              <p className="font-mono text-sm text-[#E5E5E5]/70 leading-relaxed mb-6">
+                {feature.description}
+              </p>
+
+              <div className="mt-auto opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="font-mono text-xs text-[#FF4D00]/60 border border-[#FF4D00]/30 rounded p-3 bg-[#FF4D00]/5">
+                  {feature.blueprint}
+                </div>
+              </div>
+            </div>
+
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#FF4D00] to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-b-2xl" />
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// SECTION 4: THE ALCHEMICAL VAULT
+const AlchemicalVault = ({ onTransmuteClick }) => {
+  const assets = [
+    { symbol: 'ETH', name: 'ETHEREUM', fullName: 'Ethereum 2.0', price: '$3,247.82', change: '+12.4%', icon: 'diamond', isEthereum: true },
+    { symbol: 'BTC', name: 'BITCOIN', fullName: 'Bitcoin', price: '$67,432.18', change: '+8.2%', icon: 'bitcoin' },
+    { symbol: 'AU', name: 'GOLD', fullName: 'Digital Gold', price: '$2,145.30', change: '+3.1%', icon: 'coins', isGold: true },
+    { symbol: 'USD', name: 'DOLLAR', fullName: 'USDC Stable', price: '$1.00', change: '+0.01%', icon: 'dollar-sign' },
+    { symbol: 'SOL', name: 'SOLANA', fullName: 'Solana', price: '$178.45', change: '+24.7%', icon: 'zap', isSolana: true },
+    { symbol: 'AVAX', name: 'AVALANCHE', fullName: 'Avalanche', price: '$42.18', change: '+15.3%', icon: 'triangle' },
+  ];
+
+  const duplicatedAssets = [...assets, ...assets, ...assets, ...assets, ...assets, ...assets, ...assets, ...assets];
+
+  return (
+    <div className="py-20 overflow-visible">
+      <div className="container mx-auto px-4 md:px-6 mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center"
+        >
+          <h2 className="font-serif text-5xl md:text-8xl font-black text-white mb-6 tracking-tighter">
+            The Alchemical <span className="text-white">Vault</span>
+          </h2>
+          <p className="font-mono text-[#E5E5E5]/60 text-lg mt-6 max-w-2xl mx-auto">
+            Assets in perpetual motion
+          </p>
+        </motion.div>
+      </div>
+
+      <div className="relative h-[450px] overflow-visible hidden lg:block py-4">
+        <div className="vault-scroll-container absolute flex gap-8 items-center h-full px-4 overflow-visible">
+          {duplicatedAssets.map((asset, index) => (
+            <VaultCardNoGlow key={`${asset.symbol}-${index}`} asset={asset} onTransmuteClick={onTransmuteClick} />
+          ))}
+        </div>
+      </div>
+
+      <div className="lg:hidden overflow-x-auto pb-4 overflow-visible">
+        <div className="flex gap-4 px-4 overflow-visible" style={{ width: 'max-content' }}>
+          {assets.map((asset, index) => (
+            <VaultCardNoGlow key={`mobile-${asset.symbol}-${index}`} asset={asset} onTransmuteClick={onTransmuteClick} />
+          ))}
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 md:px-6 mt-20">
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {[
+            { label: 'TOTAL_LOCKED', value: '$2.4B', subtext: 'Across all assets', icon: 'lock' },
+            { label: 'YIELD_RATE', value: '12.8%', subtext: 'APY average', icon: 'percent' },
+            { label: 'LIQUIDITY', value: 'INSTANT', subtext: 'Zero slippage', icon: 'droplets' },
+          ].map((stat, index) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              className="card-gradient-border p-6 rounded-xl hover:border-[#FF4D00]/30 transition-all duration-500 group overflow-visible"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <SafeIcon name={stat.icon} size={14} className="text-[#E5E5E5]/40 group-hover:text-[#FF4D00] transition-colors" />
+                <div className="font-mono text-[10px] text-gray-500 tracking-widest">
+                  {stat.label}
+                </div>
+              </div>
+              <div className="font-serif text-4xl font-bold text-white mb-1 group-hover:text-[#FF4D00] transition-colors">
+                {stat.value}
+              </div>
+              <div className="font-mono text-[10px] text-gray-600">
+                {stat.subtext}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Vault Card Component
+const VaultCardNoGlow = ({ asset, onTransmuteClick }) => {
+  return (
+    <motion.div
+      className="relative w-72 h-[400px] flex-shrink-0 group vault-card-no-glow overflow-visible"
+      transition={{ duration: 0.3 }}
+      style={{ transform: 'none' }}
+    >
+      <div
+        className="glass-card absolute inset-0 rounded-2xl overflow-hidden transition-all duration-500"
+        style={{ transform: 'none' }}
+      >
+        {/* Top gradient accent line */}
+        <div className="vault-top-line absolute top-0 left-4 right-4 h-1 bg-[#E5E5E5]/20 opacity-60 transition-all duration-500 rounded-full" />
+
+        {/* Metallic sheen overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none" />
+
+        <div className="relative h-full flex flex-col p-6">
+          <div className="flex items-start justify-between mb-8">
+            <div>
+              <div className="font-mono text-[10px] text-[#E5E5E5]/40 mb-1 tracking-widest">
+                ASSET_CLASS
+              </div>
+              <div className="font-serif text-3xl font-black text-white tracking-tight vault-title transition-colors duration-500">
+                {asset.symbol}
+              </div>
+              <div className="font-mono text-[11px] text-[#E5E5E5]/50 mt-1 uppercase tracking-wide">
+                {asset.fullName}
+              </div>
+            </div>
+
+            {/* Icon container */}
+            <div className="vault-icon-box w-14 h-14 rounded-xl flex items-center justify-center border border-white/10 shadow-lg transition-all duration-500 bg-[#E5E5E5]/5 overflow-hidden">
+              {asset.isEthereum ? (
+                <EthereumIcon className="w-8 h-8 text-[#E5E5E5]/60 opacity-60 group-hover:opacity-100 transition-all duration-500 group-hover:text-[#FF4D00]" />
+              ) : asset.isGold ? (
+                <GoldIcon className="w-8 h-8 gold-icon opacity-60 group-hover:opacity-100 transition-all duration-500" />
+              ) : asset.isSolana ? (
+                <SolanaIcon className="w-8 h-8 object-contain opacity-60 group-hover:opacity-100 transition-all duration-500 solana-icon" />
+              ) : (
+                <SafeIcon name={asset.icon} size={24} className="vault-icon text-[#E5E5E5]/60 transition-colors duration-500" />
+              )}
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <div className="font-mono text-[10px] text-[#E5E5E5]/40 mb-2 tracking-widest">
+              CURRENT_PRICE
+            </div>
+            <div className="flex items-baseline gap-3">
+              <span className="font-mono text-3xl font-bold text-white tracking-tight">
+                {asset.price}
+              </span>
+              <span className={cn(
+                "font-mono text-sm font-bold px-2 py-0.5 rounded bg-opacity-20 flex items-center gap-1",
+                asset.change.startsWith('+') ? 'text-green-400 bg-green-500' : 'text-red-400 bg-red-500'
+              )}>
+                <SafeIcon name={asset.change.startsWith('+') ? "trending-up" : "trending-down"} size={10} />
+                {asset.change}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex-1 flex flex-col justify-end">
+            <div className="font-mono text-[10px] text-[#E5E5E5]/40 mb-3 tracking-widest">
+              VOLATILITY_INDEX
+            </div>
+            <div className="flex gap-[3px] h-16 items-end">
+              {[...Array(24)].map((_, i) => {
+                const height = 25 + Math.random() * 75;
+                return (
+                  <motion.div
+                    key={i}
+                    className="flex-1 rounded-t-sm transition-all duration-500 bg-[#E5E5E5]/20 opacity-40 vault-bars"
+                    style={{ height: `${height}%` }}
+                    initial={{ scaleY: 0 }}
+                    whileInView={{ scaleY: 1 }}
+                    transition={{ delay: i * 0.03, duration: 0.4 }}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          <button
+            onClick={() => onTransmuteClick(asset)}
+            className="mt-6 w-full py-3.5 rounded-lg bg-white/5 hover:bg-[#FF4D00]/20 border border-white/10 hover:border-[#FF4D00]/50 transition-all duration-300 font-mono text-xs tracking-widest text-[#E5E5E5]/60 hover:text-white uppercase relative z-20 flex items-center justify-center gap-2"
+          >
+            <SafeIcon name="refresh-cw" size={14} /> Transmute_{asset.symbol}
+          </button>
+        </div>
+
+        {/* Fixed semicircle */}
+        <div className="absolute bottom-0 right-0 w-24 h-24 overflow-hidden opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none z-0">
+          <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-to-tl from-[#FF4D00] to-[#ff6a2b] rounded-tl-full" />
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// SECTION 5: THE FORGE
+const Forge = () => {
+  const assets = [
+    {
+      id: 'eth',
+      subtitle: 'LIQUID ETHER',
+      title: 'Staked Ethereum',
+      description: 'Staked ETH that flows like water through DeFi. Convert any asset to any other in milliseconds with zero slippage through quantum bonding curves.',
+      blueprint: 'STETH_V2 // LIQUID_STAKING // YIELD_AGGREGATOR',
+      isEthereum: true
+    },
+    {
+      id: 'btc',
+      subtitle: 'WRAPPED BITCOIN',
+      title: 'Bitcoin Unleashed',
+      description: 'Bitcoin freed from its blockchain constraints. AI-powered threat detection monitors every transaction with self-healing smart contracts.',
+      blueprint: 'WBTC_V3 // CROSS_CHAIN // BRIDGE_PROTOCOL',
+      icon: 'bitcoin',
+    },
+    {
+      id: 'gold',
+      subtitle: 'TOKENIZED GOLD',
+      title: 'Digital Gold',
+      description: 'Physical gold tokenized and liquified for instant transfers. Dynamic yield optimization across 47 protocols, compounding every block.',
+      blueprint: 'PAXG_V1 // GOLD_BACKED // ASSET_TOKENIZATION',
+      isGold: true,
+    },
+  ];
+
+  return (
+    <div className="container mx-auto px-4 md:px-6 py-20">
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="text-center mb-16"
+      >
+        <h2 className="font-serif text-5xl md:text-8xl font-black text-white mb-6 tracking-tighter">
+          The <span className="text-white">Forge</span>
+        </h2>
+        <p className="font-mono text-[#E5E5E5]/60 text-lg max-w-2xl mx-auto">
+          Hard assets turned into liquid opportunities
+        </p>
+      </motion.div>
+
+      <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        {assets.map((asset, index) => (
+          <motion.div
+            key={asset.id}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: index * 0.1 }}
+            className="glass-card rounded-2xl p-8 relative overflow-hidden group min-h-[400px] flex flex-col"
+            data-cursor="orange"
+          >
+            <div className="blueprint-overlay absolute inset-0 pointer-events-none rounded-2xl" />
+
+            <div className="relative z-10 flex-1">
+              <div className="mb-6">
+                <span className="font-mono text-xs text-[#E5E5E5]/40 tracking-widest block">
+                  {asset.subtitle}
+                </span>
+              </div>
+
+              <div className="flex items-start justify-between mb-6">
+                <h3 className="font-serif text-2xl md:text-3xl font-bold text-white group-hover:text-[#FF4D00] transition-colors">
+                  {asset.title}
+                </h3>
+                <div className="w-14 h-14 rounded-xl flex items-center justify-center border border-white/10 bg-[#E5E5E5]/5 ml-4 flex-shrink-0 overflow-hidden">
+                  {asset.isEthereum ? (
+                    <EthereumIcon className="w-8 h-8 text-[#E5E5E5]/60 group-hover:text-[#FF4D00] transition-colors duration-500" />
+                  ) : asset.isGold ? (
+                    <GoldIcon className="w-8 h-8 gold-icon opacity-60 group-hover:opacity-100 transition-all duration-500" />
+                  ) : (
+                    <SafeIcon name={asset.icon} size={24} className="text-[#E5E5E5]/60 group-hover:text-[#FF4D00] transition-colors" />
+                  )}
+                </div>
+              </div>
+
+              <p className="font-mono text-sm text-[#E5E5E5]/70 leading-relaxed mb-6">
+                {asset.description}
+              </p>
+
+              <div className="mt-auto opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="font-mono text-xs text-[#FF4D00]/60 border border-[#FF4D00]/30 rounded p-3 bg-[#FF4D00]/5">
+                  {asset.blueprint}
+                </div>
+              </div>
+            </div>
+
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#FF4D00] to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-b-2xl" />
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// SECTION 6: THE PULSE - Heartbeat of the Protocol
+const Pulse = () => {
+  const containerRef = useRef(null);
+  const [ripples, setRipples] = useState([]);
+  const [distortSection, setDistortSection] = useState(false);
+
+  const handleClick = (e) => {
+    if (!containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const newRipple = { id: Date.now(), x, y };
+    setRipples(prev => [...prev, newRipple]);
+    setDistortSection(true);
+
+    setTimeout(() => {
+      setRipples(prev => prev.filter(r => r.id !== newRipple.id));
+    }, 1000);
+
+    setTimeout(() => setDistortSection(false), 300);
+  };
+
+  return (
+    <div
+      ref={containerRef}
       onClick={handleClick}
-      className="w-full h-64 md:h-96 cursor-pointer"
-      style={{ background: 'transparent' }}
-    />
+      className="relative py-32 overflow-hidden select-none"
+    >
+      <div className="absolute inset-0 flex items-center justify-center">
+        {[...Array(50)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="particle-wave"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: i * 0.02 }}
+          >
+            <motion.div
+              className="absolute w-1 bg-[#FF4D00]/30 rounded-full"
+              style={{
+                left: `${(i / 50) * 100}%`,
+                height: '200px',
+                top: '50%',
+                transformOrigin: 'center',
+              }}
+              animate={{
+                scaleY: [0.3, 1, 0.3],
+                opacity: [0.3, 0.8, 0.3],
+              }}
+              transition={{
+                duration: 2 + Math.random(),
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: i * 0.05,
+              }}
+            />
+          </motion.div>
+        ))}
+      </div>
+
+      {ripples.map(ripple => (
+        <div
+          key={ripple.id}
+          className="ripple"
+          style={{ left: ripple.x, top: ripple.y, transform: 'translate(-50%, -50%)' }}
+        />
+      ))}
+
+      <div className={cn(
+        "container mx-auto px-4 md:px-6 relative z-10 text-center",
+        distortSection && "text-distort"
+      )}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+        >
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <SafeIcon name="activity" size={32} className="text-[#FF4D00]" />
+            <h2 className="font-serif text-5xl md:text-8xl font-black text-white tracking-tighter">
+              The <span className="text-white">Pulse</span>
+            </h2>
+            <SafeIcon name="activity" size={32} className="text-[#FF4D00]" />
+          </div>
+          <p className="font-mono text-[#E5E5E5]/60 text-lg md:text-xl max-w-2xl mx-auto mb-8">
+            Heartbeat of the Protocol
+          </p>
+          <p className="font-mono text-[#E5E5E5]/40 text-sm flex items-center justify-center gap-2">
+            <SafeIcon name="mouse-pointer-click" size={14} /> Click anywhere to create ripples • Real-time network activity visualization
+          </p>
+        </motion.div>
+      </div>
+
+      <div className="container mx-auto px-4 md:px-6 mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 relative z-10">
+        {[
+          { label: 'BLOCKS_MINED', value: '14,892,401', icon: 'box' },
+          { label: 'GAS_OPTIMIZED', value: '99.97%', icon: 'fuel' },
+          { label: 'UPTIME', value: '99.999%', icon: 'check-circle' },
+          { label: 'NODES_ACTIVE', value: '4,721', icon: 'network' },
+        ].map((stat, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+            className="text-center"
+          >
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <SafeIcon name={stat.icon} size={14} className="text-[#E5E5E5]/30" />
+              <div className="font-mono text-xs text-[#E5E5E5]/40 tracking-widest">
+                {stat.label}
+              </div>
+            </div>
+            <div className="font-mono text-3xl md:text-4xl font-bold text-white mb-2">
+              {stat.value}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// SECTION 7: THE VAULT TIERS - Membership Evolution
+const VaultTiers = ({ onSelectTier }) => {
+  const tiers = [
+    {
+      name: 'Iron',
+      stake: '1,000 AETH',
+      apy: '12%',
+      features: ['Basic Yield', 'Standard Swaps', 'Community Access'],
+      color: '#525252',
+      bgColor: 'from-gray-800 to-gray-900',
+      isIron: true
+    },
+    {
+      name: 'Chrome',
+      stake: '10,000 AETH',
+      apy: '18%',
+      features: ['Enhanced Yield', 'Zero Fees', 'Priority Support', 'Governance Vote'],
+      color: '#E5E5E5',
+      bgColor: 'from-gray-300 to-gray-400',
+      isChrome: true
+    },
+    {
+      name: 'Flare',
+      stake: '100,000 AETH',
+      apy: '27%',
+      features: ['Maximum Yield', 'Negative Fees', 'Dedicated Manager', 'Protocol Revenue Share', 'Early Access'],
+      color: '#FF4D00',
+      bgColor: 'from-orange-500 to-orange-700',
+      isFlare: true
+    }
+  ];
+
+  return (
+    <div className="py-20 px-4 md:px-6">
+      <div className="container mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h2 className="font-serif text-5xl md:text-8xl font-black text-white mb-6 tracking-tighter">
+            Vault <span className="text-white">Tiers</span>
+          </h2>
+          <p className="font-mono text-[#E5E5E5]/60 text-lg">
+            Membership Evolution
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto" style={{ perspective: '1000px' }}>
+          {tiers.map((tier, index) => (
+            <motion.div
+              key={tier.name}
+              initial={{ opacity: 0, rotateY: -30 }}
+              whileInView={{ opacity: 1, rotateY: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.2 }}
+              whileHover={{ rotateY: 10, rotateX: 5, z: 50 }}
+              className={cn(
+                "card-3d relative rounded-2xl p-8 overflow-hidden",
+                tier.isChrome ? "card-chrome" :
+                tier.isFlare ? "bg-gradient-to-b from-orange-500 via-orange-600 to-orange-700" :
+                `bg-gradient-to-b ${tier.bgColor}`
+              )}
+              data-cursor={tier.isChrome ? "chrome" : tier.isFlare ? "orange" : "dark"}
+            >
+              <div className="relative z-10 mb-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <SafeIcon
+                    name={tier.name === 'Flare' ? "flame" : tier.name === 'Chrome' ? "hexagon" : "shield"}
+                    size={20}
+                    className={tier.isChrome ? "text-gray-900" : "text-white"}
+                  />
+                  <h3 className={cn(
+                    "font-serif text-3xl font-black",
+                    tier.isChrome ? "text-gray-900" : "text-white"
+                  )}>
+                    {tier.name}
+                  </h3>
+                </div>
+                <div className={cn(
+                  "font-mono text-sm",
+                  tier.isChrome ? "text-gray-700" : tier.isFlare ? "text-white/80" : "text-[#E5E5E5]/60"
+                )}>
+                  Stake: {tier.stake}
+                </div>
+              </div>
+
+              <div className={cn(
+                "relative z-10 inline-block px-6 py-3 rounded-full mb-8 border-2",
+                tier.isChrome ? "border-gray-900 bg-gray-900/10" :
+                tier.isFlare ? "border-white bg-white/20" :
+                "border-[#FF4D00] bg-[#FF4D00]/10"
+              )}>
+                <span className={cn(
+                  "font-mono text-3xl font-bold",
+                  tier.isChrome ? "text-gray-900" : tier.isFlare ? "text-white" : "text-white"
+                )}>
+                  {tier.apy}
+                </span>
+                <span className={cn(
+                  "font-mono text-sm ml-1",
+                  tier.isChrome ? "text-gray-700" : tier.isFlare ? "text-white/80" : "text-[#FF4D00]/70"
+                )}>
+                  APY
+                </span>
+              </div>
+
+              <ul className="relative z-10 space-y-4">
+                {tier.features.map((feature, i) => (
+                  <li key={i} className={cn(
+                    "flex items-center gap-3 font-mono text-sm",
+                    tier.isChrome ? "text-gray-800" : tier.isFlare ? "text-white/90" : "text-[#E5E5E5]/80"
+                  )}>
+                    <SafeIcon name="check" size={16} className={tier.isChrome ? "text-gray-900" : tier.isFlare ? "text-white" : "text-[#FF4D00]"} />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => onSelectTier(tier)}
+                className={cn(
+                  "relative z-10 w-full mt-8 py-4 rounded-xl font-mono font-bold transition-all transform hover:scale-105 flex items-center justify-center gap-2",
+                  tier.isChrome ? "bg-gray-900 text-[#E5E5E5] hover:bg-gray-800" :
+                  tier.isFlare ? "bg-white text-orange-600 hover:bg-gray-100" :
+                  "bg-[#E5E5E5] text-[#050505] hover:bg-white"
+                )}
+              >
+                <SafeIcon name="chevron-right" size={18} /> Select {tier.name}
+              </button>
+
+              {tier.isChrome && (
+                <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent pointer-events-none" />
+              )}
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// SECTION 8: FAQ
+const FAQ = () => {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const faqItems = [
+    {
+      question: "What is AETHER PROTOCOL?",
+      answer: "AETHER PROTOCOL is a next-generation decentralized finance platform that combines liquid chrome alchemy with high-end brutalist design principles. We enable instant asset transmutation, neural-level security, and infinite yield optimization across multiple chains."
+    },
+    {
+      question: "How does Instant Transmutation work?",
+      answer: "Our quantum bonding curve technology allows for atomic swaps between any assets with zero slippage. The protocol maintains deep liquidity pools that enable millisecond-level conversions, backed by AI-powered market making algorithms."
+    },
+    {
+      question: "What are the Vault Tiers and how do I join?",
+      answer: "Vault Tiers (Iron, Chrome, Flare) represent membership levels based on your AETH stake. Each tier unlocks enhanced yield rates, reduced fees, and exclusive governance rights. Simply stake the required AETH amount to automatically upgrade your tier."
+    },
+    {
+      question: "Is my capital safe with Neural Security?",
+      answer: "Absolutely. Our Neural Security system uses predictive AI to monitor all transactions in real-time, detecting and preventing exploits before they occur. Smart contracts are self-healing and automatically patch vulnerabilities without manual intervention."
+    },
+    {
+      question: "How are yields generated in the protocol?",
+      answer: "Yields come from multiple sources: liquidity provision fees, staking rewards, protocol revenue sharing, and cross-chain arbitrage. Our Yield Router V4 automatically allocates capital across 47 protocols to maximize returns while managing risk."
+    },
+    {
+      question: "When will the protocol launch?",
+      answer: "The AETHER PROTOCOL mainnet is scheduled for Q2 2024. Early adopters who join our waitlist will receive exclusive Iron tier benefits and airdrop allocations. Follow our social channels for exact launch dates."
+    }
+  ];
+
+  const toggleItem = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
+  return (
+    <div className="py-20 px-4 md:px-6 bg-[#050505]">
+      <div className="container mx-auto max-w-4xl">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h2 className="font-serif text-5xl md:text-8xl font-black text-white mb-6 tracking-tighter">
+            Protocol <span className="text-white">FAQ</span>
+          </h2>
+          <p className="font-mono text-[#E5E5E5]/60 text-lg">
+            Common inquiries about the system
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="glass-card rounded-2xl overflow-hidden"
+        >
+          {faqItems.map((item, index) => (
+            <div key={index} className={cn(
+              "faq-item",
+              openIndex === index && "open"
+            )}>
+              <button
+                onClick={() => toggleItem(index)}
+                className="w-full flex items-center justify-between p-6 text-left hover:bg-white/5 transition-colors group"
+              >
+                <span className="font-serif text-lg md:text-xl font-bold text-white pr-8 group-hover:text-[#FF4D00] transition-colors flex items-center gap-3">
+                  <SafeIcon name="help-circle" size={20} className="text-[#E5E5E5]/40 group-hover:text-[#FF4D00] transition-colors flex-shrink-0" />
+                  {item.question}
+                </span>
+                <div className="faq-icon flex-shrink-0 w-8 h-8 rounded-full border border-[#E5E5E5]/20 flex items-center justify-center group-hover:border-[#FF4D00] transition-colors">
+                  <SafeIcon name="plus" size={16} className="text-[#E5E5E5] group-hover:text-[#FF4D00] transition-colors" />
+                </div>
+              </button>
+              <div className="faq-answer px-6 pb-6">
+                <p className="font-mono text-sm text-[#E5E5E5]/70 leading-relaxed pl-8">
+                  {item.answer}
+                </p>
+              </div>
+            </div>
+          ))}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="text-center mt-12"
+        >
+          <p className="font-mono text-sm text-[#E5E5E5]/50 mb-4">
+            Still have questions?
+          </p>
+          <button className="bg-[#FF4D00] hover:bg-[#ff6a2b] text-[#050505] px-8 py-4 rounded-xl font-mono font-bold transition-all transform hover:scale-105 flex items-center gap-2 mx-auto">
+            <SafeIcon name="mail" size={18} /> Contact Support
+          </button>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+// SECTION 9: FOOTER - The Core Integration
+const Footer = () => {
+  const footerRef = useRef(null);
+  const [isFlooded, setIsFlooded] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+          setIsFlooded(true);
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (footerRef.current) {
+      observer.observe(footerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <footer
+      ref={footerRef}
+      className={cn(
+        "relative min-h-screen flex flex-col items-center justify-center px-4 overflow-hidden transition-all duration-1000",
+        isFlooded ? "bg-[#FF4D00]" : "bg-[#050505]"
+      )}
+    >
+      <div className={cn(
+        "absolute inset-0 pointer-events-none transition-all duration-1000 ease-out",
+        isFlooded ? "opacity-100" : "opacity-0"
+      )}>
+        <svg className="absolute bottom-0 left-0 right-0 w-full" viewBox="0 0 1440 320" preserveAspectRatio="none">
+          <path fill="#FF4D00" fillOpacity="1" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,138.7C672,128,768,160,864,181.3C960,203,1056,213,1152,192C1248,171,1344,117,1392,90.7L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+        </svg>
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1 }}
+        className="relative z-10 text-center"
+      >
+        <h2 className={cn(
+          "font-serif text-6xl md:text-9xl font-black mb-8 tracking-tighter transition-colors duration-500",
+          isFlooded ? "text-[#050505]" : "text-white"
+        )}>
+          JACK INTO<br />
+          <span className={isFlooded ? "text-white" : "text-white"}>
+            AETHER
+          </span>
+        </h2>
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className={cn(
+            "px-12 py-6 rounded-full font-mono text-xl font-bold transition-all duration-300 flex items-center gap-3",
+            isFlooded ? "bg-[#050505] text-[#FF4D00] hover:bg-[#1a1a1a]" : "bg-[#FF4D00] text-[#050505] hover:bg-[#ff6a2b]"
+          )}
+        >
+          <SafeIcon name="plug" size={24} /> Initialize Connection
+        </motion.button>
+
+        <div className={cn(
+          "mt-16 font-mono text-sm transition-colors duration-500",
+          isFlooded ? "text-[#050505]/60" : "text-[#E5E5E5]/40"
+        )}>
+          <div className="flex items-center justify-center gap-8 mb-8 flex-wrap">
+            <a href="#" className="hover:text-[#FF4D00] transition-colors flex items-center gap-2">
+              <SafeIcon name="file-text" size={16} /> Documentation
+            </a>
+            <a href="#" className="hover:text-[#FF4D00] transition-colors flex items-center gap-2">
+              <SafeIcon name="github" size={16} /> GitHub
+            </a>
+            <a href="#" className="hover:text-[#FF4D00] transition-colors flex items-center gap-2">
+              <SafeIcon name="message-circle" size={16} /> Discord
+            </a>
+            <a href="#" className="hover:text-[#FF4D00] transition-colors flex items-center gap-2">
+              <SafeIcon name="twitter" size={16} /> Twitter
+            </a>
+          </div>
+          <p className="flex items-center justify-center gap-2">
+            <SafeIcon name="shield" size={14} /> © 2024 AETHER PROTOCOL. All rights reserved.
+          </p>
+          <p className="mt-2 text-xs flex items-center justify-center gap-2">
+            <SafeIcon name="flame" size={10} /> Liquid Chrome Alchemy • High-End Brutalism
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Subtle floating dots */}
+      {[...Array(15)].map((_, i) => (
+        <motion.div
+          key={i}
+          className={cn(
+            "absolute w-2 h-2 rounded-full",
+            isFlooded ? "floating-dot-dark-subtle" : "floating-dot-subtle"
+          )}
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+          }}
+          animate={{
+            y: [0, -20, 0],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: 4 + Math.random() * 2,
+            repeat: Infinity,
+            delay: Math.random() * 2,
+          }}
+        />
+      ))}
+    </footer>
+  );
+};
+
+// Navigation - Hide on scroll down, show on scroll up
+const Navigation = ({ onLaunchAppClick }) => {
+  const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Determine if scrolled past threshold for background
+      setScrolled(currentScrollY > 100);
+
+      // Determine scroll direction for hide/show
+      if (currentScrollY > lastScrollY.current && currentScrollY > 150) {
+        // Scrolling down - hide header
+        setHidden(true);
+      } else {
+        // Scrolling up - show header
+        setHidden(false);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <nav className={cn(
+      "fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b border-transparent",
+      scrolled ? "bg-[#050505]/90 backdrop-blur-md border-[#E5E5E5]/10" : "bg-transparent",
+      hidden ? "-translate-y-full" : "translate-y-0"
+    )}>
+      <div className="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
+        <span className="font-serif text-xl font-bold text-white tracking-tight flex items-center gap-2">
+          <SafeIcon name="hexagon" size={24} className="text-[#FF4D00]" /> AETHER
+        </span>
+
+        <div className="hidden md:flex items-center gap-8">
+          {['Triad', 'Vault', 'Forge', 'Pulse', 'FAQ'].map((item) => (
+            <button
+              key={item}
+              onClick={() => scrollToSection(item.toLowerCase())}
+              className="font-mono text-sm text-[#E5E5E5]/60 hover:text-[#FF4D00] transition-colors tracking-wider flex items-center gap-1"
+            >
+              <SafeIcon name="chevron-right" size={12} /> {item.toUpperCase()}
+            </button>
+          ))}
+        </div>
+
+        <button
+          onClick={onLaunchAppClick}
+          className="bg-[#FF4D00] hover:bg-[#ff6a2b] text-[#050505] px-6 py-2 rounded-full font-mono font-bold text-sm transition-all flex items-center gap-2"
+        >
+          <SafeIcon name="rocket" size={16} /> Launch App
+        </button>
+      </div>
+    </nav>
   );
 };
 
 // Main App Component
 function App() {
-  const [mouseVelocity, setMouseVelocity] = useState({ x: 0, y: 0 });
-  const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
-  const [sphereScale, setSphereScale] = useState(1);
-  const [tierModalOpen, setTierModalOpen] = useState(false);
-  const [selectedTier, setSelectedTier] = useState(null);
   const [transmuteModalOpen, setTransmuteModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
-  const [distortText, setDistortText] = useState(false);
-  const [footerProgress, setFooterProgress] = useState(0);
+  const [appModalOpen, setAppModalOpen] = useState(false);
+  const [tierModalOpen, setTierModalOpen] = useState(false);
+  const [selectedTier, setSelectedTier] = useState(null);
 
-  useEffect(() => {
-    let lastTime = Date.now();
-
-    const handleMouseMove = (e) => {
-      const currentTime = Date.now();
-      const dt = currentTime - lastTime;
-
-      if (dt > 0) {
-        const vx = (e.clientX - lastMousePos.x) / dt;
-        const vy = (e.clientY - lastMousePos.y) / dt;
-        const velocity = Math.sqrt(vx * vx + vy * vy);
-
-        const newScale = 1 + Math.min(velocity * 0.5, 0.3);
-        setSphereScale(newScale);
-
-        setTimeout(() => setSphereScale(1), 200);
-      }
-
-      setLastMousePos({ x: e.clientX, y: e.clientY });
-      lastTime = currentTime;
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [lastMousePos]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = scrollTop / docHeight;
-      setFooterProgress(scrollPercent);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const handleOpenTierModal = (tier) => {
-    setSelectedTier(tier);
-    setTierModalOpen(true);
-  };
-
-  const handleCloseTierModal = () => {
-    setTierModalOpen(false);
-    setSelectedTier(null);
-  };
-
-  const handleOpenTransmuteModal = (asset) => {
+  const handleTransmuteClick = (asset) => {
     setSelectedAsset(asset);
     setTransmuteModalOpen(true);
   };
@@ -655,440 +1607,91 @@ function App() {
     setSelectedAsset(null);
   };
 
-  const handleRipple = () => {
-    setDistortText(true);
-    setTimeout(() => setDistortText(false), 300);
+  const handleLaunchAppClick = () => {
+    setAppModalOpen(true);
   };
 
-  const tiers = [
-    {
-      name: 'Iron',
-      apy: '12.5%',
-      minStake: 1000,
-      maxStake: 10000,
-      features: [
-        'Basic yield generation',
-        'Community access',
-        'Monthly reports',
-        'Standard support'
-      ]
-    },
-    {
-      name: 'Chrome',
-      apy: '24.8%',
-      minStake: 10000,
-      maxStake: 50000,
-      features: [
-        'Enhanced yield rates',
-        'Priority transactions',
-        'Advanced analytics',
-        '24/7 premium support',
-        'Exclusive alpha access'
-      ]
-    },
-    {
-      name: 'Flare',
-      apy: '42.0%',
-      minStake: 50000,
-      maxStake: 100000,
-      features: [
-        'Maximum yield generation',
-        'Zero transaction fees',
-        'Governance rights',
-        'Private concierge',
-        'Early protocol features',
-        'Direct team access'
-      ]
-    }
-  ];
+  const handleCloseAppModal = () => {
+    setAppModalOpen(false);
+  };
 
-  const assets = [
-    { symbol: 'GOLD', name: 'Digital Gold', price: '2,847.32', icon: GoldIcon, color: 'text-yellow-500' },
-    { symbol: 'BTC', name: 'Bitcoin', price: '97,245.00', icon: BitcoinIcon, color: 'text-orange-500' },
-    { symbol: 'ETH', name: 'Ethereum', price: '3,847.50', icon: EthereumIcon, color: 'text-blue-400' },
-  ];
+  const handleSelectTier = (tier) => {
+    setSelectedTier(tier);
+    setTierModalOpen(true);
+  };
 
-  const features = [
-    {
-      title: 'Instant Transmutation',
-      subtitle: 'Exchange',
-      description: 'Convert any asset to AETH in milliseconds with zero slippage protection.',
-      icon: 'zap'
-    },
-    {
-      title: 'Neural Security',
-      subtitle: 'Protection',
-      description: 'AI-powered threat detection monitors your assets 24/7 across all chains.',
-      icon: 'shield'
-    },
-    {
-      title: 'Infinite Yield',
-      subtitle: 'Staking',
-      description: 'Auto-compounding rewards with dynamic rebalancing for maximum returns.',
-      icon: 'trending-up'
-    }
-  ];
+  const handleCloseTierModal = () => {
+    setTierModalOpen(false);
+    setSelectedTier(null);
+  };
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#E5E5E5] overflow-x-hidden">
       <CustomCursor />
-
       <div className="grainy-noise" />
 
-      {/* Section 1: Hero - The Singularity */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#050505] pointer-events-none" />
+      <Navigation onLaunchAppClick={handleLaunchAppClick} />
 
-        <div className="relative z-10 text-center">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: sphereScale, opacity: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 rounded-full mercury-sphere mx-auto mb-8 md:mb-12"
-          />
+      <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center pt-20 overflow-hidden">
+        <MercurySphere />
 
-          <motion.h1
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="font-serif text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter mb-4 md:mb-6"
-          >
-            WEALTH IN CONSTANT
-            <span className="block text-[#FF4D00]">MOTION</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="font-mono text-sm md:text-base text-[#E5E5E5]/60 max-w-xl mx-auto mb-8"
-          >
-            The Aether Protocol transforms static assets into liquid opportunities through quantum-grade financial engineering.
-          </motion.p>
-
-          <motion.button
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 bg-[#FF4D00] text-[#050505] font-mono font-bold rounded-full hover:bg-[#ff6a2b] transition-colors flex items-center gap-2 mx-auto"
-          >
-            <SafeIcon name="play" size={18} />
-            ENTER PROTOCOL
-          </motion.button>
-        </div>
-
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <SafeIcon name="chevron-down" size={24} className="text-[#E5E5E5]/40" />
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          className="relative z-20 text-center px-4"
+        >
+          <h1 className="font-serif text-5xl md:text-8xl lg:text-9xl font-black text-white tracking-tighter mb-4 drop-shadow-2xl">
+            WEALTH IN <span className="text-white">CONSTANT</span><br /> MOTION
+          </h1>
+          <p className="font-mono text-[#E5E5E5]/80 text-base md:text-lg lg:text-xl max-w-2xl mx-auto mt-8 drop-shadow-lg px-4">
+            The Singularity. A protocol manifesting liquid chrome alchemy into decentralized finance.
+          </p>
+        </motion.div>
       </section>
 
-      {/* Section 2: Ticker - The Velocity Tape */}
-      <section className="py-4 md:py-6 border-y border-[#E5E5E5]/10 overflow-hidden bg-[#050505]/50 backdrop-blur-sm">
-        <div className="flex whitespace-nowrap animate-marquee">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="flex items-center gap-8 md:gap-16 px-4 md:px-8">
-              <span className="font-mono text-xs md:text-sm text-[#E5E5E5]/40">TVL: <span className="text-[#FF4D00]">$2.4B</span></span>
-              <span className="font-mono text-xs md:text-sm text-[#E5E5E5]/40">AETHER_STABLE: <span className="text-[#E5E5E5]">1.002</span></span>
-              <span className="font-mono text-xs md:text-sm text-[#E5E5E5]/40">24H VOL: <span className="text-[#FF4D00]">$847M</span></span>
-              <span className="font-mono text-xs md:text-sm text-[#E5E5E5]/40">PROTOCOL_REVENUE: <span className="text-[#E5E5E5]">$2.1M</span></span>
-              <span className="font-mono text-xs md:text-sm text-[#E5E5E5]/40">ACTIVE_VALIDATORS: <span className="text-[#FF4D00]">14,847</span></span>
-              <span className="font-mono text-xs md:text-sm text-[#E5E5E5]/40">BLOCK_TIME: <span className="text-[#E5E5E5]">2.1s</span></span>
-            </div>
-          ))}
-        </div>
+      <Ticker />
+
+      <section id="triad">
+        <BentoFeatures />
       </section>
 
-      {/* Section 3: Bento Features - The Alchemical Triad */}
-      <section className="py-20 md:py-32 px-4 md:px-8 lg:px-16">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12 md:mb-16"
-          >
-            <h2 className="font-serif text-3xl md:text-5xl font-bold mb-4">The Alchemical Triad</h2>
-            <p className="font-mono text-sm text-[#E5E5E5]/40">Three pillars of financial transformation</p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="group relative card-gradient-border rounded-2xl p-6 md:p-8 overflow-hidden"
-              >
-                <div className="blueprint-overlay absolute inset-0" />
-
-                <div className="relative z-10">
-                  <div className="w-12 h-12 rounded-xl bg-[#FF4D00]/10 border border-[#FF4D00]/30 flex items-center justify-center mb-6 group-hover:bg-[#FF4D00]/20 transition-colors">
-                    <SafeIcon name={feature.icon} size={24} className="text-[#FF4D00]" />
-                  </div>
-
-                  <div className="font-mono text-xs text-[#E5E5E5]/40 mb-2 uppercase tracking-widest">
-                    {feature.subtitle}
-                  </div>
-                  <h3 className="font-serif text-xl md:text-2xl font-bold mb-3 group-hover:text-[#FF4D00] transition-colors">
-                    {feature.title}
-                  </h3>
-                  <p className="font-mono text-sm text-[#E5E5E5]/60 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#FF4D00] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              </motion.div>
-            ))}
-          </div>
-        </div>
+      <section id="vault">
+        <AlchemicalVault onTransmuteClick={handleTransmuteClick} />
       </section>
 
-      {/* Section 4: The Forge - Interactive Asset Melt */}
-      <section className="py-20 md:py-32 px-4 md:px-8 lg:px-16 bg-gradient-to-b from-transparent to-[#0a0a0a]">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12 md:mb-16"
-          >
-            <h2 className="font-serif text-3xl md:text-5xl font-bold mb-4">The Forge</h2>
-            <p className="font-mono text-sm text-[#E5E5E5]/40">Hard assets turned into liquid opportunities</p>
-          </motion.div>
-
-          <div className="space-y-4">
-            {assets.map((asset, index) => (
-              <motion.div
-                key={asset.symbol}
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                onClick={() => handleOpenTransmuteModal(asset)}
-                className="group card-gradient-border rounded-xl p-4 md:p-6 flex items-center justify-between cursor-pointer transition-all hover:border-[#FF4D00]/50"
-              >
-                <div className="flex items-center gap-4 md:gap-6">
-                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-white/5 flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform duration-500">
-                    <asset.icon className={cn("w-8 h-8 md:w-10 md:h-10", asset.color)} />
-                  </div>
-                  <div>
-                    <h3 className="font-serif text-xl md:text-2xl font-bold group-hover:text-[#FF4D00] transition-colors">
-                      {asset.symbol}
-                    </h3>
-                    <p className="font-mono text-xs md:text-sm text-[#E5E5E5]/40">{asset.name}</p>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <div className="font-mono text-lg md:text-2xl font-bold text-[#E5E5E5]">
-                    ${asset.price}
-                  </div>
-                  <div className="flex items-center gap-2 justify-end mt-1">
-                    <span className="font-mono text-xs text-[#E5E5E5]/40">Available for transmutation</span>
-                    <SafeIcon name="arrow-right" size={14} className="text-[#FF4D00] opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+      <section id="forge">
+        <Forge />
       </section>
 
-      {/* Section 5: The Pulse - Heartbeat of the Protocol */}
-      <section className="py-20 md:py-32 px-4 md:px-8 lg:px-16 relative overflow-hidden">
-        <div className={cn("max-w-7xl mx-auto text-center transition-transform duration-300", distortText && "scale-y-110 skew-x-2")}>
-          <motion.h2
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="font-serif text-3xl md:text-5xl font-bold mb-4"
-          >
-            The Pulse
-          </motion.h2>
-          <p className="font-mono text-sm text-[#E5E5E5]/40 mb-12">Heartbeat of the Protocol</p>
-        </div>
-
-        <ParticleWave onRipple={handleRipple} />
-
-        <p className="text-center font-mono text-xs text-[#E5E5E5]/30 mt-4">
-          Click anywhere on the wave to create ripples
-        </p>
+      <section id="pulse">
+        <Pulse />
       </section>
 
-      {/* Section 6: The Vault Tiers - Membership Evolution */}
-      <section className="py-20 md:py-32 px-4 md:px-8 lg:px-16 overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12 md:mb-16 text-center"
-          >
-            <h2 className="font-serif text-3xl md:text-5xl font-bold mb-4">Membership Evolution</h2>
-            <p className="font-mono text-sm text-[#E5E5E5]/40">Choose your tier in the new financial order</p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            {tiers.map((tier, index) => (
-              <motion.div
-                key={tier.name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.15 }}
-                onClick={() => handleOpenTierModal(tier)}
-                className={cn(
-                  "group relative rounded-2xl p-6 md:p-8 cursor-pointer transition-all duration-500 card-3d",
-                  tier.name === 'Chrome' ? "card-chrome" : "glass-card",
-                  tier.name === 'Iron' && "border-gray-600",
-                  tier.name === 'Flare' && "border-[#FF4D00]"
-                )}
-                style={{
-                  transformStyle: 'preserve-3d',
-                  perspective: '1000px'
-                }}
-              >
-                <div className={cn(
-                  "absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500",
-                  tier.name === 'Chrome' ? "bg-gradient-to-br from-white/20 to-gray-400/20" : "bg-gradient-to-br from-[#FF4D00]/10 to-transparent"
-                )} />
-
-                <div className="relative z-10">
-                  <div className={cn(
-                    "w-16 h-16 rounded-2xl flex items-center justify-center mb-6 border-2",
-                    tier.name === 'Chrome' ? "border-gray-400 bg-gradient-to-br from-gray-200 to-gray-400" :
-                    tier.name === 'Flare' ? "border-[#FF4D00] bg-[#FF4D00]/10" :
-                    "border-gray-600 bg-gray-800"
-                  )}>
-                    <SafeIcon
-                      name={tier.name === 'Flare' ? "flame" : tier.name === 'Chrome' ? "hexagon" : "shield"}
-                      size={32}
-                      className={tier.name === 'Chrome' ? "text-gray-900" : tier.name === 'Flare' ? "text-[#FF4D00]" : "text-gray-400"}
-                    />
-                  </div>
-
-                  <h3 className={cn(
-                    "font-serif text-2xl md:text-3xl font-bold mb-2",
-                    tier.name === 'Chrome' ? "text-gray-900" : "text-white"
-                  )}>
-                    {tier.name}
-                  </h3>
-
-                  <div className="mb-6">
-                    <span className={cn(
-                      "text-4xl md:text-5xl font-black font-mono",
-                      tier.name === 'Chrome' ? "text-gray-900" : "text-[#FF4D00]"
-                    )}>
-                      {tier.apy}
-                    </span>
-                    <span className={cn(
-                      "font-mono text-sm ml-2",
-                      tier.name === 'Chrome' ? "text-gray-700" : "text-[#E5E5E5]/60"
-                    )}>APY</span>
-                  </div>
-
-                  <ul className="space-y-3 mb-8">
-                    {tier.features.slice(0, 3).map((feature, i) => (
-                      <li key={i} className={cn(
-                        "flex items-center gap-3 font-mono text-xs md:text-sm",
-                        tier.name === 'Chrome' ? "text-gray-800" : "text-[#E5E5E5]/70"
-                      )}>
-                        <SafeIcon name="check" size={16} className={tier.name === 'Chrome' ? "text-gray-600" : "text-[#FF4D00]"} />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button className={cn(
-                    "w-full py-3 rounded-xl font-mono font-bold transition-all",
-                    tier.name === 'Chrome'
-                      ? "bg-gray-900 text-white hover:bg-gray-800"
-                      : "bg-[#FF4D00] text-[#050505] hover:bg-[#ff6a2b]"
-                  )}>
-                    Select {tier.name}
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+      <section id="tiers">
+        <VaultTiers onSelectTier={handleSelectTier} />
       </section>
 
-      {/* Section 7: Footer - The Core Integration */}
-      <section
-        className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden"
-        style={{
-          background: `linear-gradient(to top, #FF4D00 0%, #050505 ${Math.max(0, 100 - footerProgress * 200)}%)`
-        }}
-      >
-        <div className="relative z-10 text-center max-w-4xl mx-auto">
-          <motion.h2
-            initial={{ scale: 0.9, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            viewport={{ once: true }}
-            className="font-serif text-5xl md:text-7xl lg:text-9xl font-black mb-8 tracking-tighter"
-          >
-            JACK INTO
-            <span className="block text-[#050505] mix-blend-screen">AETHER</span>
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="font-mono text-sm md:text-base text-[#050505]/80 mb-12 max-w-xl mx-auto"
-          >
-            The protocol awaits. Transform your assets. Join the singularity.
-          </motion.p>
-
-          <motion.button
-            initial={{ y: 20, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.5 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-12 py-5 bg-[#050505] text-[#FF4D00] font-mono font-bold rounded-full hover:bg-[#0a0a0a] transition-colors text-lg flex items-center gap-3 mx-auto border-2 border-[#050505]"
-          >
-            <SafeIcon name="plug" size={24} />
-            CONNECT WALLET
-          </motion.button>
-        </div>
-
-        <div className="absolute bottom-8 left-0 right-0 px-4">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 font-mono text-xs text-[#050505]/60">
-            <div className="flex items-center gap-6">
-              <span>© 2024 AETHER PROTOCOL</span>
-              <span className="hidden md:inline">|</span>
-              <a href="#" className="hover:text-[#050505] transition-colors">DOCS</a>
-              <a href="#" className="hover:text-[#050505] transition-colors">AUDIT</a>
-              <a href="#" className="hover:text-[#050505] transition-colors">GOVERNANCE</a>
-            </div>
-            <div className="flex items-center gap-4">
-              <SafeIcon name="twitter" size={18} className="cursor-pointer hover:text-[#050505] transition-colors" />
-              <SafeIcon name="github" size={18} className="cursor-pointer hover:text-[#050505] transition-colors" />
-              <SafeIcon name="message-circle" size={18} className="cursor-pointer hover:text-[#050505] transition-colors" />
-            </div>
-          </div>
-        </div>
+      <section id="faq">
+        <FAQ />
       </section>
 
-      <TierSelectionModal
-        isOpen={tierModalOpen}
-        onClose={handleCloseTierModal}
-        tier={selectedTier}
-      />
+      <Footer />
 
+      {/* Modals */}
       <TransmuteModal
         isOpen={transmuteModalOpen}
         onClose={handleCloseTransmuteModal}
         asset={selectedAsset}
+      />
+      <AppComingSoonModal
+        isOpen={appModalOpen}
+        onClose={handleCloseAppModal}
+      />
+      <TierSelectionModal
+        isOpen={tierModalOpen}
+        onClose={handleCloseTierModal}
+        tier={selectedTier}
       />
     </div>
   );

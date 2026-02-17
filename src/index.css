@@ -59,7 +59,7 @@ body {
   will-change: transform;
 }
 
-/* Glassmorphism - Modified to remove bottom glow */
+/* Glassmorphism */
 .glass-card {
   background: rgba(255, 255, 255, 0.02);
   backdrop-filter: blur(20px);
@@ -69,24 +69,10 @@ body {
 
 .glass-card:hover {
   border-color: #FF4D00;
-  /* Removed outer box-shadow that creates bottom glow, kept only border glow */
+  box-shadow: 0 0 30px rgba(255, 77, 0, 0.3), inset 0 0 30px rgba(255, 77, 0, 0.05);
 }
 
-/* Card Gradient Border - Used for The Forge and The Alchemical Triad to avoid bottom glow */
-.card-gradient-border {
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(229, 229, 229, 0.1);
-  transition: all 0.3s ease;
-}
-
-.card-gradient-border:hover {
-  border-color: rgba(255, 77, 0, 0.5);
-  /* No box-shadow here - removes bottom glow while keeping border glow */
-}
-
-/* Blueprint Overlay - Updated to work with both card types */
+/* Blueprint Overlay - Updated with pointer-events and z-index */
 .blueprint-overlay {
   background-image:
     linear-gradient(rgba(255, 77, 0, 0.1) 1px, transparent 1px),
@@ -98,8 +84,7 @@ body {
   z-index: 1;
 }
 
-.glass-card:hover .blueprint-overlay,
-.card-gradient-border:hover .blueprint-overlay {
+.glass-card:hover .blueprint-overlay {
   opacity: 1;
 }
 
@@ -138,24 +123,6 @@ body {
 
 .card-chrome:hover::after {
   transform: translateX(100%);
-}
-
-/* Marquee Animation */
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-marquee {
-  animation: marquee 30s linear infinite;
-}
-
-.animate-marquee:hover {
-  animation-play-state: paused;
 }
 
 /* Ripple Effect */
@@ -240,6 +207,19 @@ button, a, [role="button"], input, textarea, select, .cursor-pointer {
   padding-bottom: max(24px, env(safe-area-inset-bottom));
 }
 
+/* Card gradient border for vault cards - NO GLOW ON HOVER */
+.card-gradient-border {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(229, 229, 229, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card-gradient-border:hover {
+  border-color: rgba(255, 77, 0, 0.5);
+}
+
 /* Chrome text effect */
 .chrome-text {
   background: linear-gradient(135deg, #e5e5e5 0%, #ffffff 25%, #a3a3a3 50%, #ffffff 75%, #e5e5e5 100%);
@@ -266,6 +246,37 @@ button, a, [role="button"], input, textarea, select, .cursor-pointer {
   justify-content: center;
 }
 
+/* Desktop horizontal scroll - right to left */
+@media (min-width: 1024px) {
+  .vault-scroll-container {
+    display: flex;
+    width: fit-content;
+    animation: infinite-scroll-reverse 35s linear infinite;
+  }
+
+  .vault-scroll-container:hover {
+    animation-play-state: paused;
+  }
+}
+
+/* Mobile - normal layout */
+@media (max-width: 1023px) {
+  .vault-scroll-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 1.5rem;
+    padding: 0 1rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .vault-scroll-container::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -274,7 +285,7 @@ button, a, [role="button"], input, textarea, select, .cursor-pointer {
     transition-duration: 0.01ms !important;
   }
 
-  .animate-marquee {
+  .infinite-scroll-container, .vault-scroll-container {
     animation: none;
   }
 }
@@ -317,6 +328,74 @@ button, a, [role="button"], input, textarea, select, .cursor-pointer {
 .ticker-item:hover {
   background: rgba(255, 77, 0, 0.1);
   border-color: rgba(255, 77, 0, 0.4);
+}
+
+/* Forge icon subtle rotation on card hover */
+.forge-card:hover .forge-icon {
+  animation: icon-subtle 0.6s ease-in-out;
+}
+
+/* Vault card - NO GLOW EFFECT on hover */
+.vault-card-no-glow {
+  transition: all 0.5s ease;
+}
+
+.vault-card-no-glow:hover {
+  transform: none !important;
+}
+
+/* Subtle border color change only - NO glow */
+.vault-card-no-glow:hover .glass-card {
+  border-color: rgba(229, 229, 229, 0.2);
+  box-shadow: none;
+}
+
+.vault-card-no-glow:hover .vault-top-line {
+  background: rgba(229, 229, 229, 0.4);
+  opacity: 0.6;
+}
+
+.vault-card-no-glow:hover .vault-icon-box {
+  background: rgba(255, 77, 0, 0.1);
+  border-color: rgba(255, 77, 0, 0.3);
+}
+
+.vault-card-no-glow:hover .vault-icon {
+  color: #FF4D00;
+}
+
+.vault-card-no-glow:hover .vault-title {
+  color: #FF4D00;
+}
+
+.vault-card-no-glow:hover .vault-bars {
+  background: rgba(255, 77, 0, 0.5);
+  opacity: 0.6;
+}
+
+/* Subtle floating dots in footer - barely visible */
+.floating-dot-subtle {
+  background: rgba(255, 77, 0, 0.15);
+  box-shadow: 0 0 8px rgba(255, 77, 0, 0.1);
+}
+
+.floating-dot-dark-subtle {
+  background: rgba(5, 5, 5, 0.3);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile overflow fix for vault cards */
+.mobile-vault-container {
+  overflow: visible !important;
+}
+
+.mobile-vault-card {
+  overflow: visible !important;
+}
+
+/* Ensure glow doesn't get cut off */
+.glow-safe {
+  overflow: visible !important;
 }
 
 /* Modal overlay */
@@ -402,11 +481,6 @@ input[type="range"]::-moz-range-thumb {
 /* Mobile modal scroll improvements */
 @media (max-width: 768px) {
   .glass-card {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
-
-  .card-gradient-border {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
   }

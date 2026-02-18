@@ -34,7 +34,7 @@ const generatePositions = () => {
   const positions = []
   const canvasWidth = 8000
   const canvasHeight = 12000
-  const spacing = 600
+  const spacing = 400
   const cols = 12
   const rows = 20
 
@@ -499,7 +499,7 @@ function App() {
                 width: photo.width,
                 transform: `rotate(${photo.rotation}deg) scale(${photo.scale})`,
               }}
-              whileHover={{ scale: photo.scale * 1.05, zIndex: 10 }}
+              whileHover={{ opacity: 0.7, zIndex: 10 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
               onClick={() => handlePhotoClick(photo)}
             >

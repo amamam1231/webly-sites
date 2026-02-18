@@ -122,7 +122,6 @@ function PhotoModal({ photo, onClose }) {
           src={photo.src}
           alt={photo.title}
           className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain grayscale"
-          onClick={(e) => e.stopPropagation()}
         />
       </motion.div>
 
@@ -491,16 +490,15 @@ function App() {
 
           {/* Photos */}
           {PHOTO_POSITIONS.map((photo) => (
-            <motion.div
+            <div
               key={photo.id}
-              className="photo-item absolute cursor-pointer group"
+              className="photo-item absolute cursor-pointer group hover:opacity-50"
               style={{
                 left: photo.x,
                 top: photo.y,
                 width: photo.width,
                 transform: `rotate(${photo.rotation}deg) scale(${photo.scale})`,
               }}
-              whileHover={{ opacity: 0.5 }}
               onClick={() => handlePhotoClick(photo)}
             >
               <div className="relative overflow-hidden bg-zinc-800 shadow-2xl">
@@ -517,7 +515,7 @@ function App() {
                   <p className="font-mono text-white text-xs tracking-wider">{photo.title}</p>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
 
           {/* Canvas center marker */}

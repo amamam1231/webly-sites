@@ -34,12 +34,18 @@ const generatePositions = () => {
   const positions = []
   const canvasWidth = 3000
   const canvasHeight = 3000
+  const spacing = 350
+  const cols = 5
+  const startX = (canvasWidth - (cols - 1) * spacing) / 2
+  const startY = (canvasHeight - (Math.ceil(PHOTOS.length / cols) - 1) * spacing) / 2
 
   PHOTOS.forEach((photo, index) => {
-    const x = Math.random() * (canvasWidth - 400) + 200
-    const y = Math.random() * (canvasHeight - 400) + 200
-    const rotation = (Math.random() - 0.5) * 10
-    const scale = 0.8 + Math.random() * 0.4
+    const col = index % cols
+    const row = Math.floor(index / cols)
+    const x = startX + col * spacing
+    const y = startY + row * spacing
+    const rotation = (index % 2 === 0 ? 2 : -2)
+    const scale = 1
 
     positions.push({
       ...photo,
@@ -47,7 +53,7 @@ const generatePositions = () => {
       y,
       rotation,
       scale,
-      width: 280 + Math.random() * 120,
+      width: 300,
     })
   })
 
@@ -73,7 +79,7 @@ function Navbar({ activeModal, setActiveModal }) {
         </h1>
       </div>
 
-      <div className="flex gap-6 md:gap-10 pointer-events-auto">
+      <div className="flex flex-col gap-4 pointer-events-auto">
         {navItems.map((item) => (
           <button
             key={item.id}
@@ -255,8 +261,8 @@ function ConnectModal({ onClose }) {
     >
       {/* Gradient Background with Noise */}
       <div className="absolute inset-0 bg-gradient-to-br from-orange-950 via-zinc-950 to-black">
-        <div className="absolute inset-0 opacity-20" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+        <div className="absolute inset-0 opacity-40" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
         }} />
       </div>
 
@@ -497,13 +503,7 @@ function App() {
         >
           {/* Grid lines for depth */}
           <div className="absolute inset-0 opacity-5">
-            <div className="w-full h-full" style={{
-              backgroundImage: `
-                linear-gradient(to right, white 1px, transparent 1px),
-                linear-gradient(to bottom, white 1px, transparent 1px)
-              `,
-              backgroundSize: '100px 100px'
-            }} />
+            <div className="w-full h-full" />
           </div>
 
           {/* Photos */}
@@ -546,7 +546,7 @@ function App() {
       {/* Instructions overlay */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
         <p className="font-mono text-zinc-500 text-xs tracking-widest uppercase">
-          Drag to explore • Click photos to view
+          2026 made with Webly AI
         </p>
       </div>
 

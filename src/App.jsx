@@ -44,7 +44,7 @@ const generatePositions = () => {
     const col = i % cols
     const row = Math.floor(i / cols) % rows
     const x = col * spacing + 40
-    const y = row * spacing + 80
+    const y = row * spacing + 40
 
     positions.push({
       ...photo,

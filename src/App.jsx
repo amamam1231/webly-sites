@@ -222,16 +222,6 @@ export default function App() {
           </div>
 
           <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-8 backdrop-blur-sm">
-            <div className="mb-4 p-4 bg-blue-900/30 border border-blue-700 rounded-xl text-sm text-blue-200">
-              <p className="font-semibold mb-2">Инструкция по подключению Google:</p>
-              <ol className="list-decimal list-inside space-y-1">
-                <li>Нажмите кнопку "Войти через Google"</li>
-                <li>Выберите нужный аккаунт Google</li>
-                <li>Разрешите доступ к вашему аккаунту</li>
-                <li>После успешного входа данные будут синхронизированы</li>
-              </ol>
-              <p className="mt-2 text-xs text-blue-300">⚠️ Это временная инструкция, будет удалена позже</p>
-            </div>
             <div className="space-y-4">
               <button
                 onClick={handleGoogleSignIn}

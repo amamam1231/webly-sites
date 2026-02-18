@@ -34,7 +34,7 @@ const generatePositions = () => {
   const positions = []
   const canvasWidth = 8000
   const canvasHeight = 12000
-  const spacing = 600
+  const spacing = 20
   const cols = 12
   const rows = 20
 
@@ -43,8 +43,8 @@ const generatePositions = () => {
     const photo = PHOTOS[i % PHOTOS.length]
     const col = i % cols
     const row = Math.floor(i / cols) % rows
-    const x = col * spacing + 40
-    const y = row * spacing + 40
+    const x = col * spacing + 20
+    const y = row * spacing + 20
 
     positions.push({
       ...photo,

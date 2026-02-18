@@ -31,12 +31,12 @@ function cn(...inputs) {
 
 // Firebase Configuration - REPLACE WITH YOUR CONFIG
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID
+  apiKey: "AIzaSyB7dK7XyG7v4K7Xy7Xy7Xy7Xy7Xy7Xy7Xy7",
+  authDomain: "my-project-12345.firebaseapp.com",
+  projectId: "my-project-12345",
+  storageBucket: "my-project-12345.appspot.com",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abcdef1234567890abcdef"
 }
 
 // Initialize Firebase

@@ -122,6 +122,7 @@ function PhotoModal({ photo, onClose }) {
           src={photo.src}
           alt={photo.title}
           className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain grayscale"
+          onClick={(e) => e.stopPropagation()}
         />
       </motion.div>
 
@@ -499,21 +500,20 @@ function App() {
                 width: photo.width,
                 transform: `rotate(${photo.rotation}deg) scale(${photo.scale})`,
               }}
-              whileHover={{ opacity: 0.7, zIndex: 10 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              whileHover={{ opacity: 0.5 }}
               onClick={() => handlePhotoClick(photo)}
             >
               <div className="relative overflow-hidden bg-zinc-800 shadow-2xl">
                 <img
                   src={photo.src}
                   alt={photo.title}
-                  className="w-full h-auto transition-opacity duration-500 group-hover:opacity-50"
+                  className="w-full h-auto"
                   draggable={false}
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+                <div className="absolute inset-0 bg-black/0" />
 
                 {/* Hover info */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100">
                   <p className="font-mono text-white text-xs tracking-wider">{photo.title}</p>
                 </div>
               </div>

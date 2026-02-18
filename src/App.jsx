@@ -38,22 +38,20 @@ const generatePositions = () => {
   const cols = 12
   const rows = 12
 
-  // Create infinite grid by spreading photos across larger area
+  // Create grid layout without random transformations
   for (let i = 0; i < PHOTOS.length; i++) {
     const photo = PHOTOS[i % PHOTOS.length]
     const col = i % cols
     const row = Math.floor(i / cols) % rows
-    const x = (col * spacing) + (Math.random() - 0.5) * 100
-    const y = (row * spacing) + (Math.random() - 0.5) * 100
-    const rotation = (Math.random() - 0.5) * 8
-    const scale = 0.9 + Math.random() * 0.2
+    const x = col * spacing + 40
+    const y = row * spacing + 40
 
     positions.push({
       ...photo,
       x,
       y,
-      rotation,
-      scale,
+      rotation: 0,
+      scale: 1,
       width: 320,
     })
   }
@@ -108,7 +106,7 @@ function PhotoModal({ photo, onClose }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-40 bg-black/95 flex items-center justify-center p-4 md:p-12"
+      className="fixed inset-0 z-40 bg-black/60 flex items-center justify-center"
       onClick={onClose}
     >
       <button
@@ -123,27 +121,23 @@ function PhotoModal({ photo, onClose }) {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="relative max-w-6xl w-full flex flex-col items-center"
+        className="relative w-full h-full flex items-center justify-center"
         onClick={(e) => e.stopPropagation()}
       >
         <img
           src={photo.src}
           alt={photo.title}
-          className="max-h-[70vh] w-auto object-contain grayscale"
+          className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain grayscale"
         />
-
-        <div className="mt-8 text-center font-mono">
-          <h2 className="text-white text-2xl md:text-3xl font-bold mb-2">{photo.title}</h2>
-          <div className="flex items-center justify-center gap-6 text-zinc-400 text-sm">
-            <span>{photo.date}</span>
-            <span className="w-1 h-1 bg-zinc-600 rounded-full" />
-            <span className="flex items-center gap-2">
-              <SafeIcon name="Camera" size={14} />
-              {photo.camera}
-            </span>
-          </div>
-        </div>
       </motion.div>
+
+      <nav className="absolute top-6 left-6 z-50">
+        <div className="flex gap-6 text-white font-mono text-sm">
+          <a href="#" className="hover:text-zinc-400 transition-colors">WORK</a>
+          <a href="#" className="hover:text-zinc-400 transition-colors">ABOUT</a>
+          <a href="#" className="hover:text-zinc-400 transition-colors">CONTACT</a>
+        </div>
+      </nav>
     </motion.div>
   )
 }
@@ -483,7 +477,7 @@ function App() {
   return (
     <div className="relative w-full h-full overflow-hidden bg-zinc-900">
       {/* Noise Overlay */}
-      <div className="noise-overlay" />
+      <div className="noise-overlay active" />
 
       {/* Navigation */}
       <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />

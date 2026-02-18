@@ -33,18 +33,18 @@ const PHOTOS = [
 const generatePositions = () => {
   const positions = []
   const canvasWidth = 8000
-  const canvasHeight = 8000
-  const spacing = 400
+  const canvasHeight = 12000
+  const spacing = 600
   const cols = 12
-  const rows = 12
+  const rows = 20
 
   // Create grid layout without random transformations
-  for (let i = 0; i < PHOTOS.length; i++) {
+  for (let i = 0; i < PHOTOS.length * 2; i++) {
     const photo = PHOTOS[i % PHOTOS.length]
     const col = i % cols
     const row = Math.floor(i / cols) % rows
     const x = col * spacing + 40
-    const y = row * spacing + 40
+    const y = row * spacing + 80
 
     positions.push({
       ...photo,
@@ -109,12 +109,6 @@ function PhotoModal({ photo, onClose }) {
       className="fixed inset-0 z-40 bg-black/60 flex items-center justify-center"
       onClick={onClose}
     >
-      <button
-        onClick={onClose}
-        className="absolute top-6 right-6 text-zinc-400 hover:text-white transition-colors z-50"
-      >
-        <SafeIcon name="X" size={32} />
-      </button>
 
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
@@ -131,13 +125,6 @@ function PhotoModal({ photo, onClose }) {
         />
       </motion.div>
 
-      <nav className="absolute top-6 left-6 z-50">
-        <div className="flex gap-6 text-white font-mono text-sm">
-          <a href="#" className="hover:text-zinc-400 transition-colors">WORK</a>
-          <a href="#" className="hover:text-zinc-400 transition-colors">ABOUT</a>
-          <a href="#" className="hover:text-zinc-400 transition-colors">CONTACT</a>
-        </div>
-      </nav>
     </motion.div>
   )
 }
@@ -475,10 +462,9 @@ function App() {
   }
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-zinc-900">
+    <div className="relative w-full h-full overflow-hidden bg-zinc-900 select-none">
       {/* Noise Overlay */}
-      <div className="noise-overlay active" />
-
+      <div className="noise-overlay" />
       {/* Navigation */}
       <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />
 
@@ -492,6 +478,7 @@ function App() {
         onTouchStart={handleTouchStart}
       >
         <motion.div
+          className="absolute inset-0 select-none"
           ref={canvasRef}
           style={{ x: springX, y: springY }}
           className="absolute w-[3000px] h-[3000px] bg-zinc-900"
@@ -520,7 +507,7 @@ function App() {
                 <img
                   src={photo.src}
                   alt={photo.title}
-                  className="w-full h-auto transition-all duration-500 group-hover:opacity-80"
+                  className="w-full h-auto transition-opacity duration-500 group-hover:opacity-50"
                   draggable={false}
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />

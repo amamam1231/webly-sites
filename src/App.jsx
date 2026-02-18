@@ -34,7 +34,7 @@ const generatePositions = () => {
   const positions = []
   const canvasWidth = 8000
   const canvasHeight = 12000
-  const spacing = 20
+  const spacing = 40
   const cols = 12
   const rows = 20
 

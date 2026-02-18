@@ -200,7 +200,7 @@ export default function App() {
 
   if (!mounted || loading) {
     return (
-      <div className="min-h-screen bg-blue-900 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="animate-pulse text-slate-400">Загрузка...</div>
       </div>
     )
@@ -208,7 +208,7 @@ export default function App() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-blue-900 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -257,9 +257,9 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-blue-900 text-slate-100 pb-24">
+    <div className="min-h-screen bg-slate-950 text-slate-100 pb-24">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-blue-900/80 backdrop-blur-md border-b border-slate-800/50">
+      <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/50">
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <SafeIcon name="activity" size={28} className="text-indigo-400" />

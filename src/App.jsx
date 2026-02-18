@@ -32,20 +32,21 @@ const PHOTOS = [
 // Generate random positions for photos
 const generatePositions = () => {
   const positions = []
-  const canvasWidth = 3000
-  const canvasHeight = 3000
-  const spacing = 350
-  const cols = 5
-  const startX = (canvasWidth - (cols - 1) * spacing) / 2
-  const startY = (canvasHeight - (Math.ceil(PHOTOS.length / cols) - 1) * spacing) / 2
+  const canvasWidth = 8000
+  const canvasHeight = 8000
+  const spacing = 400
+  const cols = 12
+  const rows = 12
 
-  PHOTOS.forEach((photo, index) => {
-    const col = index % cols
-    const row = Math.floor(index / cols)
-    const x = startX + col * spacing
-    const y = startY + row * spacing
-    const rotation = (index % 2 === 0 ? 2 : -2)
-    const scale = 1
+  // Create infinite grid by spreading photos across larger area
+  for (let i = 0; i < PHOTOS.length; i++) {
+    const photo = PHOTOS[i % PHOTOS.length]
+    const col = i % cols
+    const row = Math.floor(i / cols) % rows
+    const x = (col * spacing) + (Math.random() - 0.5) * 100
+    const y = (row * spacing) + (Math.random() - 0.5) * 100
+    const rotation = (Math.random() - 0.5) * 8
+    const scale = 0.9 + Math.random() * 0.2
 
     positions.push({
       ...photo,
@@ -53,9 +54,9 @@ const generatePositions = () => {
       y,
       rotation,
       scale,
-      width: 300,
+      width: 320,
     })
-  })
+  }
 
   return positions
 }
@@ -74,17 +75,17 @@ function Navbar({ activeModal, setActiveModal }) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none">
       <div className="pointer-events-auto">
-        <h1 className="font-mono text-white text-xl md:text-2xl font-bold leading-tight tracking-tighter">
+        <h1 className="font-serif text-white text-xl md:text-2xl font-bold leading-tight tracking-tight">
           SERGIO<br/>MUSEL
         </h1>
       </div>
 
-      <div className="flex flex-col gap-4 pointer-events-auto">
+      <div className="flex flex-col gap-4 pointer-events-auto items-end">
         {navItems.map((item) => (
           <button
             key={item.id}
             onClick={item.action}
-            className={cn( "font-mono text-xs md:text-sm tracking-widest uppercase transition-colors duration-300 hover:text-orange-500",
+            className={cn( "font-sans text-xs md:text-sm tracking-wide uppercase transition-colors duration-300 hover:text-orange-500",
               (activeModal === item.id || (item.id === 'portfolio' && !activeModal))
                 ? "text-orange-500"
                 : "text-zinc-400"
@@ -525,7 +526,7 @@ function App() {
                 <img
                   src={photo.src}
                   alt={photo.title}
-                  className="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-500"
+                  className="w-full h-auto transition-all duration-500 group-hover:opacity-80"
                   draggable={false}
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />

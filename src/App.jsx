@@ -12,21 +12,21 @@ function cn(...inputs) {
 
 // Photo data
 const PHOTOS = [
-  { id: 1, src: 'https://images.unsplash.com/photo-1493863641943-9b68992a8d07?w=800&q=80&sat=-100', title: 'Urban Solitude', date: '2023.11.15', camera: 'Leica M10-R' },
-  { id: 2, src: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80&sat=-100', title: 'Shadow Play', date: '2023.10.22', camera: 'Leica Q2' },
-  { id: 3, src: 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=800&q=80&sat=-100', title: 'Morning Light', date: '2024.01.08', camera: 'Leica M6' },
-  { id: 4, src: 'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=800&q=80&sat=-100', title: 'Silent Streets', date: '2023.09.14', camera: 'Leica M10-R' },
-  { id: 5, src: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&q=80&sat=-100', title: 'Contrast', date: '2024.02.01', camera: 'Leica Q2 Monochrom' },
-  { id: 6, src: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800&q=80&sat=-100', title: 'Analog Dreams', date: '2023.12.03', camera: 'Leica M6' },
-  { id: 7, src: 'https://images.unsplash.com/photo-1500051638674-ff996a0ec29e?w=800&q=80&sat=-100', title: 'Reflections', date: '2024.01.20', camera: 'Leica M10-R' },
-  { id: 8, src: 'https://images.unsplash.com/photo-1471341971476-ae15ff5dd4ea?w=800&q=80&sat=-100', title: 'Timeless', date: '2023.08.30', camera: 'Leica Q2' },
-  { id: 9, src: 'https://images.unsplash.com/photo-1516961642265-531546e84af2?w=800&q=80&sat=-100', title: 'Raw Emotion', date: '2024.02.15', camera: 'Leica M6' },
-  { id: 10, src: 'https://images.unsplash.com/photo-1495745966610-2a67f2297e5e?w=800&q=80&sat=-100', title: 'Fleeting Moment', date: '2023.11.28', camera: 'Leica M10-R' },
-  { id: 11, src: 'https://images.unsplash.com/photo-1500634245200-e5245c7574ef?w=800&q=80&sat=-100', title: 'Depth', date: '2024.01.12', camera: 'Leica Q2 Monochrom' },
-  { id: 12, src: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800&q=80&sat=-100', title: 'Still Life', date: '2023.10.05', camera: 'Leica M6' },
-  { id: 13, src: 'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=800&q=80&sat=-100', title: 'Geometry', date: '2024.02.20', camera: 'Leica M10-R' },
-  { id: 14, src: 'https://images.unsplash.com/photo-1554080353-a576cf803bda?w=800&q=80&sat=-100', title: 'Light Study', date: '2023.09.22', camera: 'Leica Q2' },
-  { id: 15, src: 'https://images.unsplash.com/photo-1493863641943-9b68992a8d07?w=800&q=80&sat=-100', title: 'Fragments', date: '2024.01.30', camera: 'Leica M6' },
+  { id: 1, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453880-2918.jpg?', title: 'Urban Solitude', date: '2023.11.15', camera: 'Leica M10-R' },
+  { id: 2, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-2291.jpg?', title: 'Shadow Play', date: '2023.10.22', camera: 'Leica Q2' },
+  { id: 3, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-7476.jpg?', title: 'Morning Light', date: '2024.01.08', camera: 'Leica M6' },
+  { id: 4, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-3765.jpg?', title: 'Silent Streets', date: '2023.09.14', camera: 'Leica M10-R' },
+  { id: 5, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8936.jpg?', title: 'Contrast', date: '2024.02.01', camera: 'Leica Q2 Monochrom' },
+  { id: 6, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-7385.jpg?', title: 'Analog Dreams', date: '2023.12.03', camera: 'Leica M6' },
+  { id: 7, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8284.jpg?', title: 'Reflections', date: '2024.01.20', camera: 'Leica M10-R' },
+  { id: 8, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8710.jpg?', title: 'Timeless', date: '2023.08.30', camera: 'Leica Q2' },
+  { id: 9, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-2278.jpg?', title: 'Raw Emotion', date: '2024.02.15', camera: 'Leica M6' },
+  { id: 10, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-1442.jpg?', title: 'Fleeting Moment', date: '2023.11.28', camera: 'Leica M10-R' },
+  { id: 11, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-8417.jpg?', title: 'Depth', date: '2024.01.12', camera: 'Leica Q2 Monochrom' },
+  { id: 12, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9947.jpg?', title: 'Still Life', date: '2023.10.05', camera: 'Leica M6' },
+  { id: 13, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9719.jpg?', title: 'Geometry', date: '2024.02.20', camera: 'Leica M10-R' },
+  { id: 14, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-1425.jpg?', title: 'Light Study', date: '2023.09.22', camera: 'Leica Q2' },
+  { id: 15, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5244.jpg?', title: 'Fragments', date: '2024.01.30', camera: 'Leica M6' },
 ]
 
 // Generate random positions for photos
@@ -155,7 +155,7 @@ function AboutModal({ onClose }) {
           <div className="relative">
             <div className="aspect-[3/4] bg-zinc-900 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80&sat=-100"
+                src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5768.jpg?"
                 alt="Sergio Musel"
                 className="w-full h-full object-cover grayscale"
               />

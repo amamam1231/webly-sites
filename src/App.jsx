@@ -31,12 +31,12 @@ function cn(...inputs) {
 
 // Firebase Configuration - REPLACE WITH YOUR CONFIG
 const firebaseConfig = {
-  apiKey: "AIzaSyB7dK7XyG7v4K7Xy7Xy7Xy7Xy7Xy7Xy7Xy7",
-  authDomain: "my-project-12345.firebaseapp.com",
-  projectId: "my-project-12345",
-  storageBucket: "my-project-12345.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890abcdef"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "000000000",
+  appId: "1:000000000:web:0000000000000"
 }
 
 // Initialize Firebase
@@ -87,18 +87,9 @@ export default function App() {
 
   const handleGoogleSignIn = async () => {
     try {
-      console.log('Attempting Google sign-in...')
-      const result = await signInWithPopup(auth, googleProvider)
-      console.log('Sign-in successful:', result.user.email)
+      await signInWithPopup(auth, googleProvider)
     } catch (error) {
-      console.error('Auth error:', error.code, error.message)
-      if (error.code === 'auth/popup-blocked') {
-        alert('Пожалуйста, разрешите всплывающие окна для этого сайта')
-      } else if (error.code === 'auth/cancelled-popup-request') {
-        console.log('Popup was cancelled')
-      } else {
-        alert('Ошибка авторизации: ' + error.message)
-      }
+      console.error('Auth error:', error)
     }
   }
 

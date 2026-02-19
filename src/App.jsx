@@ -123,7 +123,6 @@ function PhotoModal({ photo, onClose }) {
     >
       <div
         className="relative w-full h-full flex items-center justify-center"
-        onClick={(e) => e.stopPropagation()}
       >
         <img
           src={photo.src}

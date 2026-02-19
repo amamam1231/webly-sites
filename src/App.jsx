@@ -112,7 +112,8 @@ function Navbar({ activeModal, setActiveModal }) {
           <button
             key={item.id}
             onClick={item.action}
-            className={cn( "font-sans text-xs md:text-sm tracking-wide uppercase transition-colors duration-300 hover:text-orange-500",
+            className={cn(
+              "font-sans text-xs md:text-sm tracking-wide uppercase transition-colors duration-300 hover:text-orange-500",
               (activeModal === item.id || (item.id === 'portfolio' && !activeModal))
                 ? "text-orange-500"
                 : "text-zinc-400"
@@ -131,12 +132,16 @@ function PhotoModal({ photo, onClose }) {
   if (!photo) return null
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       className="fixed inset-0 z-40 bg-black/60 flex items-center justify-center"
       onClick={onClose}
     >
       <div
         className="relative w-full h-full flex items-center justify-center"
+        onClick={(e) => e.stopPropagation()}
       >
         <img
           src={photo.src}
@@ -144,7 +149,7 @@ function PhotoModal({ photo, onClose }) {
           className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain grayscale"
         />
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -237,6 +242,7 @@ function AboutModal({ onClose }) {
       </div>
     </motion.div>
   )
+}
 }
 
 // Connect Modal Component
@@ -334,6 +340,7 @@ function ConnectModal({ onClose }) {
       </div>
     </motion.div>
   )
+}
 }
 
 // Main App Component
@@ -490,21 +497,26 @@ function App() {
       {/* Infinite Canvas Container */}
       <div
         ref={containerRef}
-        className={cn( "absolute inset-0 overflow-hidden",
+        className={cn(
+          "absolute inset-0 overflow-hidden",
           isDragging ? "cursor-grabbing" : "cursor-grab"
         )}
         onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
         onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <motion.div
-          className="absolute inset-0 select-none"
           ref={canvasRef}
           style={{ x: springX, y: springY }}
           className="absolute w-[3000px] h-[3000px] bg-zinc-900"
         >
           {/* Grid lines for depth */}
           <div className="absolute inset-0 opacity-5">
-            <div className="w-full h-full" />
+            <div className="w-full h-full bg-[linear-gradient(to_right,theme(colors.zinc.700)_1px,transparent_1px),linear-gradient(to_bottom,theme(colors.zinc.700)_1px,transparent_1px)] bg-[size:50px_50px]" />
           </div>
 
           {/* Photos */}

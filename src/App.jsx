@@ -496,15 +496,10 @@ function App() {
                 <img
                   src={photo.src}
                   alt={photo.title}
-                  className="w-full h-auto"
+                  className="w-full h-auto hover:opacity-50 transition-opacity duration-300"
                   draggable={false}
                 />
                 <div className="absolute inset-0 bg-black/0" />
-
-                {/* Hover info */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100">
-                  <p className="font-mono text-white text-xs tracking-wider">{photo.title}</p>
-                </div>
               </div>
             </div>
           ))}

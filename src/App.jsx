@@ -47,9 +47,9 @@ const PHOTOS = [
 // Generate random positions for photos
 const generatePositions = () => {
   const positions = []
-  const cellWidth = 250
-  const cellHeight = 400
-  const spacing = 20
+  const cellWidth = 300
+  const cellHeight = 450
+  const spacing = 40
   const cols = Math.floor(window.innerWidth / (cellWidth + spacing)) || 6
   const rows = Math.ceil(PHOTOS.length * 3 / cols)
 
@@ -61,6 +61,7 @@ const generatePositions = () => {
     const x = spacing + col * (cellWidth + spacing)
     const y = spacing + row * (cellHeight + spacing)
 
+    const isVertical = photo.height > photo.width
     positions.push({
       ...photo,
       x,
@@ -69,6 +70,7 @@ const generatePositions = () => {
       scale: 1,
       width: cellWidth,
       height: cellHeight,
+      isVertical,
     })
   }
 
@@ -512,7 +514,10 @@ function App() {
                 <img
                   src={photo.src}
                   alt={photo.title}
-                  className="w-full h-auto object-cover object-top hover:opacity-50 transition-opacity duration-300"
+                  className={cn(
+                    'w-full h-full object-center hover:opacity-50 transition-opacity duration-300',
+                    photo.isVertical ? 'object-contain' : 'object-cover'
+                  )}
                   draggable={false}
                 />
                 <div className="absolute inset-0 bg-black/0" />

@@ -96,7 +96,7 @@ const SectionTitle = ({ children, subtitle }) => {
           {subtitle}
         </span>
       )}
-      <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white">
+      <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-normal text-emerald-400">
         {children}
       </h2>
     </motion.div>
@@ -257,9 +257,9 @@ const Hero = () => {
             variants={fadeInUp}
             className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter mb-6"
           >
-            Take your
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400">
-              place!
+            Забери свой
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400">
+              стиль!
             </span>
           </motion.h1>
 
@@ -335,16 +335,15 @@ const About = () => {
             variants={staggerContainer}
           >
             <SectionTitle subtitle="О нас">База — это больше, чем просто стрижка</SectionTitle>
-            <motion.div variants={fadeInUp} className="space-y-6 text-gray-400 leading-relaxed">
+            <motion.div variants={fadeInUp} className="space-y-4 text-gray-300 leading-relaxed">
               <p>
-                Мы создали пространство, где классические барберские традиции встречаются
-                с современными трендами. Наша мастерская — это место для тех, кто ценит
-                внимание к деталям и персональный подход.
+                Это не просто барбершоп — это место, где ты можешь расслабиться,
+                попить кофе и выйти отсюда с новым образом. Без понтов и лишней серьезности.
               </p>
               <p>
-                Каждый клиент для нас — уникальная история. Мы не просто стрижем волосы,
-                мы создаем образ, который подчеркивает ваш характер и стиль жизни.
-                Деловой, креативный или спортивный — мы найдем идеальное решение для вас.
+                Мы не стригем по шаблонам — каждый раз подбираем стрижку под твою
+                личность и настроение. Приходишь как друг, уходишь как брат.
+              </p>
               </p>
               <div className="grid grid-cols-3 gap-6 pt-6">
                 <div>
@@ -425,9 +424,9 @@ const Team = () => {
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80" />
               <div className="absolute bottom-0 left-0 right-0 p-6">
-                <h3 className="text-2xl font-bold text-white mb-1">{member.name}</h3>
-                <p className="text-emerald-500 font-medium mb-2">{member.role}</p>
-                <p className="text-sm text-gray-400">{member.experience}</p>
+                <h3 className="text-xl font-semibold text-white mb-1">{member.name}</h3>
+                <p className="text-emerald-400 text-sm mb-2">{member.role}</p>
+                <p className="text-xs text-gray-500">{member.experience}</p>
               </div>
             </motion.div>
           ))}
@@ -460,16 +459,16 @@ const Pricing = () => {
               className="group flex items-center justify-between py-6 border-b border-gray-800 hover:border-gray-600 transition-colors"
             >
               <div className="flex-1">
-                <h3 className="text-lg md:text-xl font-semibold text-white group-hover:text-emerald-500 transition-colors mb-1">
+                <h3 className="text-md md:text-lg font-medium text-white group-hover:text-emerald-400 transition-colors mb-1">
                   {service.name}
                 </h3>
-                <span className="text-sm text-gray-500 flex items-center gap-2">
+                <span className="text-xs text-gray-500 flex items-center gap-2">
                   <SafeIcon name="clock" size={12} />
                   {service.duration}
                 </span>
               </div>
               <div className="text-right">
-                <span className="text-2xl md:text-3xl font-black text-white">{service.price}</span>
+                <span className="text-xl md:text-2xl font-bold text-white">{service.price}</span>
               </div>
             </motion.div>
           ))}
@@ -539,10 +538,10 @@ const Blog = () => {
                   {post.readTime}
                 </span>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2 group-hover:text-emerald-500 transition-colors line-clamp-2">
+              <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-emerald-400 transition-colors line-clamp-2">
                 {post.title}
               </h3>
-              <p className="text-gray-400 text-sm leading-relaxed line-clamp-2">
+              <p className="text-gray-500 text-sm leading-relaxed line-clamp-2">
                 {post.excerpt}
               </p>
             </motion.article>
@@ -605,38 +604,38 @@ const Location = () => {
           className="grid md:grid-cols-2 gap-8 md:gap-12"
         >
           <motion.div variants={fadeInUp} className="space-y-8">
-            <div className="bg-gray-900 rounded-2xl p-6 md:p-8 border border-gray-800">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                  <SafeIcon name="map-pin" size={24} className="text-emerald-500" />
+            <div className="bg-gray-900/50 rounded-xl p-4 md:p-6 border border-gray-800/50">
+              <div className="flex items-start gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                  <SafeIcon name="map-pin" size={20} className="text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white mb-1">Адрес</h3>
-                  <p className="text-gray-400">Прага 1, ул. Вацлавская 15<br />110 00, Чехия</p>
+                  <h3 className="text-md font-semibold text-white mb-1">Где нас найти</h3>
+                  <p className="text-gray-400 text-sm">Прага 1, ул. Вацлавская 15<br />110 00, Чехия</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                  <SafeIcon name="clock" size={24} className="text-emerald-500" />
+              <div className="flex items-start gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                  <SafeIcon name="clock" size={20} className="text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white mb-1">Часы работы</h3>
-                  <p className="text-gray-400">
+                  <h3 className="text-md font-semibold text-white mb-1">Когда работаем</h3>
+                  <p className="text-gray-400 text-sm">
                     Пн-Пт: 9:00 — 20:00<br />
                     Сб: 10:00 — 18:00<br />
-                    Вс: выходной
+                    Вс: отдыхаем
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                  <SafeIcon name="phone" size={24} className="text-emerald-500" />
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                  <SafeIcon name="phone" size={20} className="text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white mb-1">Телефон</h3>
-                  <a href="tel:+420123456789" className="text-gray-400 hover:text-emerald-500 transition-colors">
+                  <h3 className="text-md font-semibold text-white mb-1">Звони</h3>
+                  <a href="tel:+420123456789" className="text-gray-400 hover:text-emerald-400 transition-colors text-sm">
                     +420 123 456 789
                   </a>
                 </div>

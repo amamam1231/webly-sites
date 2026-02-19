@@ -49,7 +49,7 @@ const generatePositions = () => {
   const positions = []
   const cellWidth = 300
   const cellHeight = 450
-  const spacing = 40
+  const spacing = 60
   const cols = Math.floor(window.innerWidth / (cellWidth + spacing)) || 6
   const rows = Math.ceil(PHOTOS.length * 3 / cols)
 
@@ -510,13 +510,16 @@ function App() {
               }}
               onClick={() => handlePhotoClick(photo)}
             >
-              <div className="relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col">
+              <div className={cn(
+                "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col",
+                !photo.isVertical && "justify-start"
+              )}>
                 <img
                   src={photo.src}
                   alt={photo.title}
                   className={cn(
-                    'w-full h-full object-center hover:opacity-50 transition-opacity duration-300',
-                    photo.isVertical ? 'object-contain' : 'object-cover'
+                    'w-full hover:opacity-50 transition-opacity duration-300',
+                    photo.isVertical ? 'h-full object-contain' : 'h-auto object-contain align-self-start'
                   )}
                   draggable={false}
                 />

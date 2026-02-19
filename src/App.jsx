@@ -11,52 +11,38 @@ function cn(...inputs) {
 }
 
 // Photo data
-const PHOTOS = (() => {
-  const basePhotos = [
-    { id: 1, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453880-2918.jpg?', title: 'Urban Solitude', date: '2023.11.15', camera: 'Leica M10-R' },
-    { id: 2, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-2291.jpg?', title: 'Shadow Play', date: '2023.10.22', camera: 'Leica Q2' },
-    { id: 3, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-7476.jpg?', title: 'Morning Light', date: '2024.01.08', camera: 'Leica M6' },
-    { id: 4, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-3765.jpg?', title: 'Silent Streets', date: '2023.09.14', camera: 'Leica M10-R' },
-    { id: 5, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8936.jpg?', title: 'Contrast', date: '2024.02.01', camera: 'Leica Q2 Monochrom' },
-    { id: 6, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-7385.jpg?', title: 'Analog Dreams', date: '2023.12.03', camera: 'Leica M6' },
-    { id: 7, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8284.jpg?', title: 'Reflections', date: '2024.01.20', camera: 'Leica M10-R' },
-    { id: 8, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8710.jpg?', title: 'Timeless', date: '2023.08.30', camera: 'Leica Q2' },
-    { id: 9, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-2278.jpg?', title: 'Raw Emotion', date: '2024.02.15', camera: 'Leica M6' },
-    { id: 10, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-1442.jpg?', title: 'Fleeting Moment', date: '2023.11.28', camera: 'Leica M10-R' },
-    { id: 11, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-8417.jpg?', title: 'Depth', date: '2024.01.12', camera: 'Leica Q2 Monochrom' },
-    { id: 12, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9947.jpg?', title: 'Still Life', date: '2023.10.05', camera: 'Leica M6' },
-    { id: 13, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9719.jpg?', title: 'Geometry', date: '2024.02.20', camera: 'Leica M10-R' },
-    { id: 14, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-1425.jpg?', title: 'Light Study', date: '2023.09.22', camera: 'Leica Q2' },
-    { id: 15, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5244.jpg?', title: 'Fragments', date: '2024.01.30', camera: 'Leica M6' },
-    { id: 16, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453880-2918.jpg?', title: 'Urban Echo', date: '2023.12.15', camera: 'Leica M10-R' },
-    { id: 17, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-2291.jpg?', title: 'Shadow Dance', date: '2024.03.01', camera: 'Leica Q2' },
-    { id: 18, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-7476.jpg?', title: 'Golden Hour', date: '2023.11.20', camera: 'Leica M6' },
-    { id: 19, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-3765.jpg?', title: 'Night Walk', date: '2024.02.28', camera: 'Leica M10-R' },
-    { id: 20, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8936.jpg?', title: 'Monochrome', date: '2023.10.10', camera: 'Leica Q2 Monochrom' },
-    { id: 21, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-7385.jpg?', title: 'Film Memories', date: '2024.01.25', camera: 'Leica M6' },
-    { id: 22, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8284.jpg?', title: 'Mirror World', date: '2023.09.05', camera: 'Leica M10-R' },
-    { id: 23, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8710.jpg?', title: 'Eternal', date: '2024.03.10', camera: 'Leica Q2' },
-    { id: 24, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-2278.jpg?', title: 'Pure Feeling', date: '2023.12.20', camera: 'Leica M6' },
-    { id: 25, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-1442.jpg?', title: 'Captured Time', date: '2024.02.05', camera: 'Leica M10-R' },
-    { id: 26, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-8417.jpg?', title: 'Deep Focus', date: '2023.11.05', camera: 'Leica Q2 Monochrom' },
-    { id: 27, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9947.jpg?', title: 'Quiet Objects', date: '2024.01.18', camera: 'Leica M6' },
-    { id: 28, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9719.jpg?', title: 'Lines & Curves', date: '2023.10.15', camera: 'Leica M10-R' },
-    { id: 29, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-1425.jpg?', title: 'Luminous Study', date: '2024.03.15', camera: 'Leica Q2' },
-    { id: 30, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5244.jpg?', title: 'Broken Pieces', date: '2023.12.28', camera: 'Leica M6' },
-  ]
-
-  const duplicatedPhotos = []
-  for (let i = 0; i < 10; i++) {
-    basePhotos.forEach((photo, index) => {
-      duplicatedPhotos.push({
-        ...photo,
-        id: photo.id + (i * basePhotos.length)
-      })
-    })
-  }
-
-  return duplicatedPhotos
-})()
+const PHOTOS = [
+  { id: 1, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453880-2918.jpg?', title: 'Urban Solitude', date: '2023.11.15', camera: 'Leica M10-R' },
+  { id: 2, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-2291.jpg?', title: 'Shadow Play', date: '2023.10.22', camera: 'Leica Q2' },
+  { id: 3, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-7476.jpg?', title: 'Morning Light', date: '2024.01.08', camera: 'Leica M6' },
+  { id: 4, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-3765.jpg?', title: 'Silent Streets', date: '2023.09.14', camera: 'Leica M10-R' },
+  { id: 5, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8936.jpg?', title: 'Contrast', date: '2024.02.01', camera: 'Leica Q2 Monochrom' },
+  { id: 6, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-7385.jpg?', title: 'Analog Dreams', date: '2023.12.03', camera: 'Leica M6' },
+  { id: 7, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8284.jpg?', title: 'Reflections', date: '2024.01.20', camera: 'Leica M10-R' },
+  { id: 8, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8710.jpg?', title: 'Timeless', date: '2023.08.30', camera: 'Leica Q2' },
+  { id: 9, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-2278.jpg?', title: 'Raw Emotion', date: '2024.02.15', camera: 'Leica M6' },
+  { id: 10, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-1442.jpg?', title: 'Fleeting Moment', date: '2023.11.28', camera: 'Leica M10-R' },
+  { id: 11, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-8417.jpg?', title: 'Depth', date: '2024.01.12', camera: 'Leica Q2 Monochrom' },
+  { id: 12, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9947.jpg?', title: 'Still Life', date: '2023.10.05', camera: 'Leica M6' },
+  { id: 13, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9719.jpg?', title: 'Geometry', date: '2024.02.20', camera: 'Leica M10-R' },
+  { id: 14, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-1425.jpg?', title: 'Light Study', date: '2023.09.22', camera: 'Leica Q2' },
+  { id: 15, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5244.jpg?', title: 'Fragments', date: '2024.01.30', camera: 'Leica M6' },
+  { id: 16, src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800', title: 'City Lights', date: '2024.03.20', camera: 'Sony A7IV' },
+  { id: 17, src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800', title: 'Forest Path', date: '2024.02.18', camera: 'Canon R5' },
+  { id: 18, src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800', title: 'Mountain Peak', date: '2024.01.05', camera: 'Nikon Z9' },
+  { id: 19, src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800', title: 'Ocean Waves', date: '2023.12.12', camera: 'Fujifilm X-T4' },
+  { id: 20, src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800', title: 'Street Life', date: '2024.03.08', camera: 'Ricoh GR III' },
+  { id: 21, src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800', title: 'Autumn Leaves', date: '2023.11.15', camera: 'Leica M11' },
+  { id: 22, src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800', title: 'Desert Dunes', date: '2024.02.25', camera: 'Hasselblad X2D' },
+  { id: 23, src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800', title: 'Neon Nights', date: '2024.01.22', camera: 'Sony A7RV' },
+  { id: 24, src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800', title: 'Winter Snow', date: '2023.12.30', camera: 'Canon R6' },
+  { id: 25, src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800', title: 'Spring Bloom', date: '2024.03.25', camera: 'Nikon Z8' },
+  { id: 26, src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800', title: 'Summer Heat', date: '2023.07.15', camera: 'Fujifilm X-Pro3' },
+  { id: 27, src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800', title: 'Foggy Morning', date: '2024.02.10', camera: 'Leica Q3' },
+  { id: 28, src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800', title: 'Rainy Day', date: '2023.11.08', camera: 'Ricoh GR IIIx' },
+  { id: 29, src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800', title: 'Sunset Glow', date: '2024.03.18', camera: 'Sony A7C II' },
+  { id: 30, src: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800', title: 'Dawn Light', date: '2024.01.01', camera: 'Canon R8' }
+]
 
 // Generate random positions for photos
 const generatePositions = () => {
@@ -67,6 +53,27 @@ const generatePositions = () => {
   const cellHeight = window.innerHeight / rows
   const spacing = 0
 
+  // Перемешиваем фотографии
+  const shuffledPhotos = [...PHOTOS].sort(() => Math.random() - 0.5)
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const photoIndex = (row * cols + col) % shuffledPhotos.length
+      const photo = shuffledPhotos[photoIndex]
+
+      positions.push({
+        x: col * cellWidth + (Math.random() - 0.5) * (cellWidth * 0.3),
+        y: row * cellHeight + (Math.random() - 0.5) * (cellHeight * 0.3),
+        rotation: (Math.random() - 0.5) * 20,
+        scale: 0.8 + Math.random() * 0.4,
+        photo: photo,
+        zIndex: Math.floor(Math.random() * 100)
+      })
+    }
+  }
+
+  return positions
+}
 const PHOTO_POSITIONS = generatePositions()
 
 // Navbar Component
@@ -481,11 +488,13 @@ function App() {
           style={{ x: springX, y: springY }}
           className="absolute bg-zinc-900"
           style={{
-            width: `${30 * (window.innerWidth / 30)}px`,
-            height: `${30 * (window.innerHeight / 30)}px`
+            width: `${30 * window.innerWidth}px`,
+            height: `${30 * window.innerHeight}px`
           }}
         >
+        >
           {/* Grid lines for depth */}
+          <div className='fixed inset-0 border-8 border-orange-500/30 pointer-events-none z-50' />
           <div className='absolute inset-0 border-4 border-orange-500/20 pointer-events-none' style={{ width: '100%', height: '100%' }} />
 
           {/* Photos */}

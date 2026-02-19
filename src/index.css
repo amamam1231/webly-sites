@@ -1,0 +1,264 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply overflow-x-hidden;
+    -webkit-tap-highlight-color: transparent;
+    background: #000;
+  }
+}
+
+@layer utilities {
+  /* Optimized Noise Texture Background - Tiled PNG */
+  .noise-bg {
+    position: relative;
+    background-color: #000;
+  }
+  
+  .noise-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3OLi4ubm5uVlZWPj4+NjY19fX2JiYl/f39ra2uRkZGZmZlpaWmXl5dvb29xcXGTk5NnZ2c8TV1mAAAAG3RSTlNAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAvEOwtAAAFVklEQVR4XpWWB67c2BUFb3g557T/hRo9/WUMZHlgr4Bg8Z4qQgQJlHI4A8SzFVrapvmTF9O7dmYRFZ60YiBhJRCgh1FYhiLAmdvX0CzTOpNE77ME0Zty/nWWzchDtiqrmQDeuv3powQ5ta2eN0FY0InkqDD73lT9c9lEzwUNqgFHs9VQce3TVClFCQrSTfOiYkVJQBmpbq2L6iZavPnAPcoU0dSw0SUTqz/GtrGuXfbyyBniKykOWQWGqwwMA7QiYAxi+IlPdqo+hYHnUt5ZPfnsHJyNiDtnpJyayNBkF6cWoYGAMY92U2hXHF/C1M8uP/ZtYdiuj26UdAdQQSXQErwSOMzt/XWRWAz5GuSBIkwG1H3FabJ2OsUOUhGC6tK4EMtJO0ttC6IBD3kM0ve0tJwMdSfjZo+EEISaeTr9P3wYrGjXqyC1krcKdhMpxEnt5JetoulscpyzhXN5FRpuPHvbeQaKxFAEB6EN+cYN6xD7RYGpXpNndMmZgM5Dcs3YSNFDHUo2LGfZuukSWyUYirJAdYbF3MfqEKmjM+I2EfhA94iG3L7uKrR+GdWD73ydlIB+6hgref1QTlmgmbM3/LeX5GI1Ux1RWpgxpLuZ2+I+IjzZ8wqE4nilvQdkUdfhzI5QDWy+kw5Wgg2pGpeEVeCCA7b85BO3F9DzxB3cdqvBzWcmzbyMiqhzuYqtHRVG2y4x+KOlnyqla8AoWWpuBoYRxzXrfKuILl6SfiWCbjxoZJUaCBj1CjH7GIaDbc9kqBY3W/Rgjda1iqQcOJu2WW+76pZC9QG7M00dffe9hNnseupFL53r8F7YHSwJWUKP2q+k7RdsxyOB11n0xtOvnW4irMMFNV4H0uqwS5ExsmP9AxbDTc9JwgneAT5vTiUSm1E7BSflSt3bfa1tv8Di3R8n3Af7MNWzs49hmauE2wP+ttrq+AsWpFG2awvsuOqbipWHgtuvuaAE+A1Z/7gC9hesnr+7wqCwG8c5yAg3AL1fm8T9AZtp/bbJGwl1pNrE7RuOX7PeMRUERVaPpEs+yqeoSmuOlokqw49pgomjLeh7icHNlG19yjs6XXOMedYm5xH2YxpV2tc0Ro2jJfxC50ApuxGob7lMsxfTbeUv07TyYxpeLucEH1gNd4IKH2LAg5TdVhlCafZvpskfncCfx8pOhJzd76bJWeYFnFciwcYfubRc12Ip/ppIhA1/mSZ/RxjFDrJC5xifFjJpY2Xl5zXdguFqYyTR1zSp1Y9p+tktDYYSNflcxI0iyO4TPBdlRcpeqjK/piF5bklq77VSEaA+z8qmJTFzIWiitbnzR794USKBUaT0NTEsVjZqLaFVqJoPN9ODG70IPbfBHKK+/q/AWR0tJzYHRULOa4MP+W/HfGadZUbfw177G7j/OGbIs8TM+tY7vejmMkOWcWV/uGyOurNm2fBfJidbmNLG/IKMQ4ZkZZ3uo9IfzFVtz5I0P4IwXa8wVEAAAAASUVORK5CYII=");
+    background-repeat: repeat;
+    background-size: 50px 50px;
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  /* Scanlines Effect - Optimized */
+  .scanlines {
+    position: relative;
+  }
+  
+  .scanlines::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.1),
+      rgba(0, 0, 0, 0.1) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+    pointer-events: none;
+    z-index: 2;
+  }
+  
+  /* Softer Neon Text for Hero */
+  .text-soft-neon {
+    color: #FF69B4;
+    text-shadow: 
+      0 0 3px #FF69B4,
+      0 0 6px #FF69B4,
+      0 0 12px #FF1493,
+      0 0 20px #FF1493;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+  
+  /* Extreme Neon Text */
+  .text-mega-neon {
+    color: #FF10F0;
+    text-shadow: 
+      0 0 5px #FF10F0,
+      0 0 10px #FF10F0,
+      0 0 20px #FF10F0,
+      0 0 40px #FF10F0,
+      0 0 80px #FF00FF,
+      0 0 120px #FF00FF,
+      0 0 160px #FF00FF;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+  
+  .text-chrome {
+    background: linear-gradient(180deg, #fff 0%, #FF10F0 50%, #fff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 2px 4px rgba(255, 16, 240, 0.5));
+  }
+  
+  /* Glitch Enhanced - Using transform */
+  .glitch-brutal {
+    animation: glitch-brutal 4s infinite;
+  }
+  
+  @keyframes glitch-brutal {
+    0%, 90%, 100% {
+      transform: translate3d(0, 0, 0);
+      opacity: 1;
+    }
+    91% {
+      transform: translate3d(-3px, 3px, 0);
+      opacity: 0.8;
+      filter: hue-rotate(90deg);
+    }
+    92% {
+      transform: translate3d(3px, -3px, 0);
+      opacity: 0.9;
+    }
+    93% {
+      transform: translate3d(-2px, -2px, 0);
+      opacity: 0.85;
+    }
+    94% {
+      transform: translate3d(2px, 2px, 0);
+      opacity: 1;
+    }
+  }
+  
+  /* Neon Pulse Enhanced */
+  .neon-pulse-brutal {
+    animation: neon-pulse-brutal 1s ease-in-out infinite;
+  }
+  
+  @keyframes neon-pulse-brutal {
+    0%, 100% {
+      box-shadow: 
+        0 0 10px #FF10F0,
+        0 0 20px #FF10F0,
+        0 0 40px #FF10F0,
+        0 0 80px #FF00FF,
+        inset 0 0 20px rgba(255, 16, 240, 0.3);
+    }
+    50% {
+      box-shadow: 
+        0 0 5px #FF10F0,
+        0 0 10px #FF10F0,
+        0 0 20px #FF10F0,
+        0 0 40px #FF00FF,
+        inset 0 0 10px rgba(255, 16, 240, 0.2);
+    }
+  }
+  
+  /* Star Decorations - Using transform */
+  .star-decoration {
+    animation: star-twinkle 2s ease-in-out infinite;
+  }
+  
+  @keyframes star-twinkle {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1) rotate(0deg) translate3d(0, 0, 0);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.2) rotate(180deg) translate3d(0, 0, 0);
+    }
+  }
+  
+  /* Heart Beat - Using transform */
+  .heart-beat {
+    animation: heart-beat 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes heart-beat {
+    0%, 100% {
+      transform: scale(1) translate3d(0, 0, 0);
+    }
+    25% {
+      transform: scale(1.1) translate3d(0, 0, 0);
+    }
+    50% {
+      transform: scale(1) translate3d(0, 0, 0);
+    }
+    75% {
+      transform: scale(1.15) translate3d(0, 0, 0);
+    }
+  }
+  
+  /* Pixel Border Brutal */
+  .pixel-border-brutal {
+    box-shadow: 
+      0 0 0 3px #FF10F0,
+      0 0 0 6px #000,
+      0 0 0 9px #FF10F0,
+      0 0 30px #FF10F0,
+      0 0 60px #FF00FF;
+    border: 3px solid #000;
+  }
+  
+  /* Marquee - Using transform */
+  .marquee {
+    animation: marquee 25s linear infinite;
+  }
+  
+  @keyframes marquee {
+    0% {
+      transform: translate3d(0%, 0, 0);
+    }
+    100% {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+  
+  /* Matrix Glitch Enhanced - Using transform */
+  .matrix-glitch-brutal {
+    animation: matrix-glitch-brutal 0.3s infinite;
+  }
+  
+  @keyframes matrix-glitch-brutal {
+    0%, 90%, 100% {
+      transform: translate3d(0, 0, 0) skew(0deg);
+      filter: hue-rotate(0deg);
+    }
+    10%, 30%, 50%, 70% {
+      transform: translate3d(-4px, 4px, 0) skew(4deg);
+      filter: hue-rotate(120deg);
+    }
+    20%, 40%, 60%, 80% {
+      transform: translate3d(4px, -4px, 0) skew(-4deg);
+      filter: hue-rotate(240deg);
+    }
+  }
+  
+  /* Float Enhanced - Using transform */
+  .float-brutal {
+    animation: float-brutal 4s ease-in-out infinite;
+  }
+  
+  @keyframes float-brutal {
+    0%, 100% {
+      transform: translate3d(0, 0px, 0) rotate(0deg);
+    }
+    25% {
+      transform: translate3d(0, -15px, 0) rotate(5deg);
+    }
+    50% {
+      transform: translate3d(0, -30px, 0) rotate(0deg);
+    }
+    75% {
+      transform: translate3d(0, -15px, 0) rotate(-5deg);
+    }
+  }
+  
+  /* Button Press Effect */
+  .btn-press {
+    transition: all 0.15s ease;
+  }
+  
+  .btn-press:active {
+    transform: scale(0.95) translate3d(0, 0, 0);
+  }
+  
+  .btn-press:hover {
+    background-color: #32CD32 !important;
+    box-shadow: 0 0 20px #32CD32, 0 0 40px #32CD32 !important;
+  }
+}
+
+/* Falling animation - Using transform */
+@keyframes fall {
+  0% {
+    transform: translate3d(0, -100%, 0);
+  }
+  100% {
+    transform: translate3d(0, 100vh, 0);
+  }
+}

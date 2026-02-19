@@ -61,11 +61,35 @@ const PHOTOS = (() => {
 // Generate random positions for photos
 const generatePositions = () => {
   const positions = []
-  const cols = 30
-  const rows = 30
-  const cellWidth = window.innerWidth / cols
-  const cellHeight = window.innerHeight / rows
-  const spacing = 0
+  const cellWidth = 300
+  const cellHeight = 450
+  const spacing = 60
+  const cols = Math.floor(window.innerWidth / (cellWidth + spacing)) || 6
+  const rows = Math.ceil(PHOTOS.length * 3 / cols)
+
+  // Create vertical grid layout
+  for (let i = 0; i < PHOTOS.length * 3; i++) {
+    const photo = PHOTOS[i % PHOTOS.length]
+    const col = Math.floor(i / rows)
+    const row = i % rows
+    const x = spacing + col * (cellWidth + spacing)
+    const y = spacing + row * (cellHeight + spacing)
+
+    const isVertical = photo.height > photo.width
+    positions.push({
+      ...photo,
+      x,
+      y,
+      rotation: 0,
+      scale: 1,
+      width: cellWidth,
+      height: cellHeight,
+      isVertical,
+    })
+  }
+
+  return positions
+}
 
 const PHOTO_POSITIONS = generatePositions()
 
@@ -81,7 +105,7 @@ function Navbar({ activeModal, setActiveModal }) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none">
       <div className="pointer-events-auto">
-        <h1 className="font-sans text-white text-xl md:text-2xl font-bold leading-tight tracking-tight">
+        <h1 className="font-serif text-white text-xl md:text-2xl font-bold leading-tight tracking-tight">
           SERGIO<br/>MUSEL
         </h1>
       </div>
@@ -91,7 +115,7 @@ function Navbar({ activeModal, setActiveModal }) {
           <button
             key={item.id}
             onClick={item.action}
-            className={cn( "font-mono text-xs md:text-sm tracking-wide uppercase transition-colors duration-300 hover:text-orange-500",
+            className={cn( "font-sans text-xs md:text-sm tracking-wide uppercase transition-colors duration-300 hover:text-orange-500",
               (activeModal === item.id || (item.id === 'portfolio' && !activeModal))
                 ? "text-orange-500"
                 : "text-zinc-400"
@@ -479,14 +503,12 @@ function App() {
           className="absolute inset-0 select-none"
           ref={canvasRef}
           style={{ x: springX, y: springY }}
-          className="absolute bg-zinc-900"
-          style={{
-            width: `${30 * (window.innerWidth / 30)}px`,
-            height: `${30 * (window.innerHeight / 30)}px`
-          }}
+          className="absolute w-[3000px] h-[3000px] bg-zinc-900"
         >
           {/* Grid lines for depth */}
-          <div className='absolute inset-0 border-4 border-orange-500/20 pointer-events-none' style={{ width: '100%', height: '100%' }} />
+          <div className="absolute inset-0 opacity-5">
+            <div className="w-full h-full" />
+          </div>
 
           {/* Photos */}
           {PHOTO_POSITIONS.map((photo) => (

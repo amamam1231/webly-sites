@@ -483,7 +483,7 @@ function App() {
           {PHOTO_POSITIONS.map((photo) => (
             <div
               key={photo.id}
-              className="absolute cursor-pointer hover:opacity-50"
+              className="absolute cursor-pointer hover:opacity-70 transition-opacity duration-300"
               style={{
                 left: photo.x,
                 top: photo.y,
@@ -499,16 +499,10 @@ function App() {
                   className="w-full h-auto"
                   draggable={false}
                 />
-                <div className="absolute inset-0 bg-black/0" />
-
-                {/* Hover info */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100">
-                  <p className="font-mono text-white text-xs tracking-wider">{photo.title}</p>
-                </div>
+                <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-opacity duration-300" />
               </div>
             </div>
-          ))}
-          ))}
+          ))
 
           {/* Canvas center marker */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 border border-orange-500/30 rounded-full" />

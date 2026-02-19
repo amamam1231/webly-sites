@@ -363,7 +363,7 @@ function App() {
   // Handle mouse down
   const handleMouseDown = useCallback((e) => {
     if (activeModal) return
-    if (e.target.closest('.cursor-pointer')) return
+    if (e.target.closest('.photo-item')) return
 
     setIsDragging(true)
     dragStart.current = { x: e.clientX, y: e.clientY }
@@ -420,7 +420,7 @@ function App() {
   // Touch events for mobile
   const handleTouchStart = useCallback((e) => {
     if (activeModal) return
-    if (e.target.closest('.cursor-pointer')) return
+    if (e.target.closest('.photo-item')) return
 
     const touch = e.touches[0]
     setIsDragging(true)
@@ -481,30 +481,30 @@ function App() {
   }
 
   return (
-    <div className="relative w-full h-screen bg-zinc-900 select-none">
+    <div className="relative w-full h-full overflow-hidden bg-zinc-900 select-none">
       {/* Noise Overlay */}
-      <div className="noise-overlay pointer-events-none" />
+      <div className="noise-overlay" />
       {/* Navigation */}
       <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />
 
       {/* Infinite Canvas Container */}
       <div
         ref={containerRef}
-        className={cn(
-          "absolute inset-0",
+        className={cn( "absolute inset-0 overflow-hidden",
           isDragging ? "cursor-grabbing" : "cursor-grab"
         )}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
       >
         <motion.div
+          className="absolute inset-0 select-none"
           ref={canvasRef}
           style={{ x: springX, y: springY }}
           className="absolute w-[3000px] h-[3000px] bg-zinc-900"
         >
           {/* Grid lines for depth */}
           <div className="absolute inset-0 opacity-5">
-            <div className="w-full h-full bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:50px_50px]" />
+            <div className="w-full h-full" />
           </div>
 
           {/* Photos */}
@@ -533,10 +533,6 @@ function App() {
                     !photo.isVertical && 'object-contain'
                   )}
                   draggable={false}
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.parentElement.style.background = '#18181b';
-                  }}
                 />
                 <div className="absolute inset-0 bg-black/0" />
               </div>
@@ -557,7 +553,7 @@ function App() {
 
       {/* Modals */}
       <AnimatePresence>
-        {activeModal === 'photo' && selectedPhoto && (
+        {activeModal === 'photo' && (
           <PhotoModal photo={selectedPhoto} onClose={closeModal} />
         )}
         {activeModal === 'about' && (
@@ -565,9 +561,6 @@ function App() {
         )}
         {activeModal === 'connect' && (
           <ConnectModal onClose={closeModal} />
-        )}
-      </AnimatePresence>
-    </div>
         )}
       </AnimatePresence>
     </div>

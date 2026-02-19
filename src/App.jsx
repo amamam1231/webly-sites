@@ -43,8 +43,8 @@ const generatePositions = () => {
     const photo = PHOTOS[i % PHOTOS.length]
     const col = i % cols
     const row = Math.floor(i / cols) % rows
-    const x = col * (200 + spacing)
-    const y = row * (200 + spacing)
+    const x = 20 + col * (320 + spacing)
+    const y = 20 + row * (200 + spacing)
 
     positions.push({
       ...photo,

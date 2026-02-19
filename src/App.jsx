@@ -115,6 +115,7 @@ function PhotoModal({ photo, onClose }) {
           src={photo.src}
           alt={photo.title}
           className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain grayscale"
+          onClick={(e) => e.stopPropagation()}
         />
       </div>
 

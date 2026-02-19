@@ -106,7 +106,6 @@ function PhotoModal({ photo, onClose }) {
       className="fixed inset-0 z-40 bg-black/60 flex items-center justify-center"
       onClick={onClose}
     >
-
       <div
         className="relative w-full h-full flex items-center justify-center"
         onClick={(e) => e.stopPropagation()}
@@ -117,9 +116,7 @@ function PhotoModal({ photo, onClose }) {
           className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain grayscale"
         />
       </div>
-
     </div>
-  )
 }
 
 // About Modal Component
@@ -483,7 +480,7 @@ function App() {
 
           {/* Photos */}
           {PHOTO_POSITIONS.map((photo) => (
-            <div
+              className="photo-item absolute cursor-pointer hover:opacity-50 transition-opacity duration-300"
               key={photo.id}
               className="photo-item absolute cursor-pointer hover:opacity-50"
               style={{

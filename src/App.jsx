@@ -11,21 +11,28 @@ function cn(...inputs) {
 }
 
 // Photo data
-const PHOTOS = (() => {
-  const photos = []
-
-  for (let i = 1; i <= 100; i++) {
-    photos.push({
-      id: i,
-      src: `https://picsum.photos/seed/${i}/600/900`,
-      title: `Photo ${i}`,
-      date: new Date(2023 + Math.floor(Math.random() * 2), Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0].replace(/-/g, '.'),
-      camera: ['Leica M10-R', 'Leica Q2', 'Leica M6', 'Leica Q2 Monochrom'][Math.floor(Math.random() * 4)]
-    })
-  }
-
-  return photos
-})()
+const PHOTOS = [
+  { id: 1, src: '/photos/photo1.jpg', title: 'Photo 1', date: '2023.12.15', camera: 'Leica M10-R', width: 4000, height: 6000 },
+  { id: 2, src: '/photos/photo2.jpg', title: 'Photo 2', date: '2023.11.20', camera: 'Leica Q2', width: 6000, height: 4000 },
+  { id: 3, src: '/photos/photo3.jpg', title: 'Photo 3', date: '2023.10.05', camera: 'Leica M6', width: 4000, height: 6000 },
+  { id: 4, src: '/photos/photo4.jpg', title: 'Photo 4', date: '2023.09.12', camera: 'Leica Q2 Monochrom', width: 6000, height: 4000 },
+  { id: 5, src: '/photos/photo5.jpg', title: 'Photo 5', date: '2023.08.25', camera: 'Leica M10-R', width: 4000, height: 6000 },
+  { id: 6, src: '/photos/photo6.jpg', title: 'Photo 6', date: '2023.07.30', camera: 'Leica Q2', width: 6000, height: 4000 },
+  { id: 7, src: '/photos/photo7.jpg', title: 'Photo 7', date: '2023.06.18', camera: 'Leica M6', width: 4000, height: 6000 },
+  { id: 8, src: '/photos/photo8.jpg', title: 'Photo 8', date: '2023.05.22', camera: 'Leica Q2 Monochrom', width: 6000, height: 4000 },
+  { id: 9, src: '/photos/photo9.jpg', title: 'Photo 9', date: '2023.04.10', camera: 'Leica M10-R', width: 4000, height: 6000 },
+  { id: 10, src: '/photos/photo10.jpg', title: 'Photo 10', date: '2023.03.15', camera: 'Leica Q2', width: 6000, height: 4000 },
+  { id: 11, src: '/photos/photo11.jpg', title: 'Photo 11', date: '2023.02.28', camera: 'Leica M6', width: 4000, height: 6000 },
+  { id: 12, src: '/photos/photo12.jpg', title: 'Photo 12', date: '2023.01.20', camera: 'Leica Q2 Monochrom', width: 6000, height: 4000 },
+  { id: 13, src: '/photos/photo13.jpg', title: 'Photo 13', date: '2023.12.05', camera: 'Leica M10-R', width: 4000, height: 6000 },
+  { id: 14, src: '/photos/photo14.jpg', title: 'Photo 14', date: '2023.11.10', camera: 'Leica Q2', width: 6000, height: 4000 },
+  { id: 15, src: '/photos/photo15.jpg', title: 'Photo 15', date: '2023.10.25', camera: 'Leica M6', width: 4000, height: 6000 },
+  { id: 16, src: '/photos/photo16.jpg', title: 'Photo 16', date: '2023.09.30', camera: 'Leica Q2 Monochrom', width: 6000, height: 4000 },
+  { id: 17, src: '/photos/photo17.jpg', title: 'Photo 17', date: '2023.08.15', camera: 'Leica M10-R', width: 4000, height: 6000 },
+  { id: 18, src: '/photos/photo18.jpg', title: 'Photo 18', date: '2023.07.20', camera: 'Leica Q2', width: 6000, height: 4000 },
+  { id: 19, src: '/photos/photo19.jpg', title: 'Photo 19', date: '2023.06.05', camera: 'Leica M6', width: 4000, height: 6000 },
+  { id: 20, src: '/photos/photo20.jpg', title: 'Photo 20', date: '2023.05.10', camera: 'Leica Q2 Monochrom', width: 6000, height: 4000 }
+]
 
 // Generate random positions for photos
 const generatePositions = () => {
@@ -485,7 +492,7 @@ function App() {
             .map((photo) => (
             <div
               key={photo.id}
-              className="absolute cursor-pointer hover:opacity-50"
+              className="absolute cursor-pointer"
               style={{
                 left: photo.x,
                 top: photo.y,
@@ -496,14 +503,14 @@ function App() {
               onClick={() => handlePhotoClick(photo)}
             >
               <div className={cn(
-                "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col",
+                "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col group",
                 !photo.isVertical && "justify-start"
               )}>
                 <img
                   src={photo.src}
                   alt={photo.title}
                   className={cn(
-                    'w-full hover:opacity-50 transition-opacity duration-300',
+                    'w-full opacity-100 group-hover:opacity-50 transition-opacity duration-300',
                     photo.isVertical ? 'h-full object-cover' : 'h-auto object-contain align-self-start'
                   )}
                   draggable={false}

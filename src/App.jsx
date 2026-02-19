@@ -102,19 +102,12 @@ function PhotoModal({ photo, onClose }) {
   if (!photo) return null
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+    <div
       className="fixed inset-0 z-40 bg-black/60 flex items-center justify-center"
       onClick={onClose}
     >
 
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+      <div
         className="relative w-full h-full flex items-center justify-center"
         onClick={(e) => e.stopPropagation()}
       >
@@ -123,9 +116,9 @@ function PhotoModal({ photo, onClose }) {
           alt={photo.title}
           className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain grayscale"
         />
-      </motion.div>
+      </div>
 
-    </motion.div>
+    </div>
   )
 }
 
@@ -492,7 +485,7 @@ function App() {
           {PHOTO_POSITIONS.map((photo) => (
             <div
               key={photo.id}
-              className="photo-item absolute cursor-pointer group hover:opacity-50"
+              className="photo-item absolute cursor-pointer hover:opacity-50"
               style={{
                 left: photo.x,
                 top: photo.y,
@@ -511,7 +504,7 @@ function App() {
                 <div className="absolute inset-0 bg-black/0" />
 
                 {/* Hover info */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100">
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100">
                   <p className="font-mono text-white text-xs tracking-wider">{photo.title}</p>
                 </div>
               </div>

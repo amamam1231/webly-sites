@@ -117,6 +117,7 @@ function PhotoModal({ photo, onClose }) {
         />
       </div>
     </div>
+  )
 }
 
 // About Modal Component
@@ -480,9 +481,9 @@ function App() {
 
           {/* Photos */}
           {PHOTO_POSITIONS.map((photo) => (
-              className="photo-item absolute cursor-pointer hover:opacity-50 transition-opacity duration-300"
+            <div
               key={photo.id}
-              className="photo-item absolute cursor-pointer hover:opacity-50"
+              className="absolute cursor-pointer hover:opacity-50"
               style={{
                 left: photo.x,
                 top: photo.y,
@@ -506,6 +507,7 @@ function App() {
                 </div>
               </div>
             </div>
+          ))}
           ))}
 
           {/* Canvas center marker */}

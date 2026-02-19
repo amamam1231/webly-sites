@@ -47,19 +47,19 @@ const PHOTOS = [
 // Generate random positions for photos
 const generatePositions = () => {
   const positions = []
-  const canvasWidth = 16000
-  const canvasHeight = 24000
-  const spacing = 80
-  const cols = 20
-  const rows = 40
+  const cellWidth = 250
+  const cellHeight = 400
+  const spacing = 20
+  const cols = Math.floor(window.innerWidth / (cellWidth + spacing)) || 6
+  const rows = Math.ceil(PHOTOS.length * 3 / cols)
 
-  // Create grid layout without random transformations
+  // Create vertical grid layout
   for (let i = 0; i < PHOTOS.length * 3; i++) {
     const photo = PHOTOS[i % PHOTOS.length]
-    const col = i % cols
-    const row = Math.floor(i / cols) % rows
-    const x = 20 + col * (320 + spacing)
-    const y = 20 + row * (200 + spacing)
+    const col = Math.floor(i / rows)
+    const row = i % rows
+    const x = spacing + col * (cellWidth + spacing)
+    const y = spacing + row * (cellHeight + spacing)
 
     positions.push({
       ...photo,
@@ -67,7 +67,8 @@ const generatePositions = () => {
       y,
       rotation: 0,
       scale: 1,
-      width: 320,
+      width: cellWidth,
+      height: cellHeight,
     })
   }
 
@@ -502,15 +503,16 @@ function App() {
                 left: photo.x,
                 top: photo.y,
                 width: photo.width,
+                height: photo.height,
                 transform: `rotate(${photo.rotation}deg) scale(${photo.scale})`,
               }}
               onClick={() => handlePhotoClick(photo)}
             >
-              <div className="relative overflow-hidden bg-zinc-800 shadow-2xl">
+              <div className="relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col">
                 <img
                   src={photo.src}
                   alt={photo.title}
-                  className="w-full h-auto hover:opacity-50 transition-opacity duration-300"
+                  className="w-full h-auto object-cover object-top hover:opacity-50 transition-opacity duration-300"
                   draggable={false}
                 />
                 <div className="absolute inset-0 bg-black/0" />

@@ -499,6 +499,7 @@ function App() {
                   className="w-full h-auto"
                   draggable={false}
                 />
+                <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-opacity duration-300" />
               </div>
             </div>
           ))

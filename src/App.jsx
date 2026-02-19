@@ -67,25 +67,6 @@ const generatePositions = () => {
   const cellHeight = window.innerHeight / rows
   const spacing = 0
 
-  // Создаем массив всех возможных позиций
-  const allPositions = []
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      allPositions.push({
-        x: col * cellWidth + spacing,
-        y: row * cellHeight + spacing,
-        width: cellWidth - spacing * 2,
-        height: cellHeight - spacing * 2
-      })
-    }
-  }
-
-  // Перемешиваем позиции случайным образом
-  const shuffledPositions = allPositions.sort(() => Math.random() - 0.5)
-
-  return shuffledPositions
-}
-
 const PHOTO_POSITIONS = generatePositions()
 
 // Navbar Component
@@ -498,12 +479,10 @@ function App() {
           className="absolute inset-0 select-none"
           ref={canvasRef}
           style={{ x: springX, y: springY }}
-          className="absolute bg-zinc-900 cursor-grab active:cursor-grabbing"
+          className="absolute bg-zinc-900"
           style={{
             width: `${30 * (window.innerWidth / 30)}px`,
-            height: `${30 * (window.innerHeight / 30)}px`,
-            border: '2px solid #3f3f46',
-            boxShadow: '0 0 20px rgba(0,0,0,0.5)'
+            height: `${30 * (window.innerHeight / 30)}px`
           }}
         >
           {/* Grid lines for depth */}

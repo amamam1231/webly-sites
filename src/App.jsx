@@ -50,38 +50,32 @@ const PHOTOS = shuffleArray([
 ]);
 
 // Generate random positions for photos
-const generatePositions = () => {
-  const positions = []
-  const isMobile = window.innerWidth < 768
-  const cellWidth = isMobile ? 200 : 500
-  const cellHeight = isMobile ? 300 : 700
-  const spacing = isMobile ? 20 : 80
-  const cols = isMobile ? 4 : 16
-  const rows = isMobile ? 30 : Math.ceil(PHOTOS.length * 5 / cols)
+  const generatePositions = useCallback(() => {
+    const positions = [];
+    const gridSize = 8; // Увеличено в 2 раза (было 4)
+    const spacing = 600;
 
-  // Create vertical grid layout
-  for (let i = 0; i < PHOTOS.length * 5; i++) {
-    const photo = PHOTOS[i % PHOTOS.length]
-    const col = Math.floor(i / rows)
-    const row = i % rows
-    const x = spacing + col * (cellWidth + spacing)
-    const y = spacing + row * (cellHeight + spacing)
+    // Вычисляем смещение чтобы центр сетки был в (0, 0)
+    const offset = -(gridSize - 1) * spacing / 2;
 
-    const isVertical = photo.height > photo.width
-    positions.push({
-      ...photo,
-      x,
-      y,
-      rotation: 0,
-      scale: 1,
-      width: cellWidth,
-      height: cellHeight,
-      isVertical,
-    })
-  }
+    for (let row = 0; row < gridSize; row++) {
+      for (let col = 0; col < gridSize; col++) {
+        positions.push({
+          x: col * spacing + offset,
+          y: row * spacing + offset,
+          z: 0,
+          originalX: col * spacing + offset,
+          originalY: row * spacing + offset,
+          originalZ: 0,
+          id: `${row}-${col}`,
+          row,
+          col
+        });
+      }
+    }
 
-  return positions
-}
+    return positions;
+  }, []);
 
 const PHOTO_POSITIONS = generatePositions()
 
@@ -332,265 +326,252 @@ function ConnectModal({ onClose }) {
 }
 
 // Main App Component
-function App() {
-  const [activeModal, setActiveModal] = useState(null)
-  const [selectedPhoto, setSelectedPhoto] = useState(null)
-  const [isDragging, setIsDragging] = useState(false)
-  const [canvasSize, setCanvasSize] = useState({ width: 4000, height: 4000 })
-
-  const containerRef = useRef(null)
-  const canvasRef = useRef(null)
-  const positionRef = useRef({ x: 0, y: 0 })
-
-  // Motion values for smooth dragging with inertia
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-
-  // Spring physics for inertia
-  const springX = useSpring(x, { stiffness: 300, damping: 30, mass: 0.5 })
-  const springY = useSpring(y, { stiffness: 300, damping: 30, mass: 0.5 })
-
-  // Update position ref when spring values change
+  // Инициализация камеры и сцены
   useEffect(() => {
-    const unsubscribeX = springX.onChange(value => {
-      positionRef.current.x = value
-      checkAndExpandCanvas(value, positionRef.current.y)
-    })
-    const unsubscribeY = springY.onChange(value => {
-      positionRef.current.y = value
-      checkAndExpandCanvas(positionRef.current.x, value)
-    })
-    return () => {
-      unsubscribeX()
-      unsubscribeY()
-    }
-  }, [springX, springY])
+    if (!canvasRef.current || !positions.length) return;
 
-  // Drag state refs
-  const dragStart = useRef({ x: 0, y: 0 })
-  const canvasStart = useRef({ x: 0, y: 0 })
-  const velocity = useRef({ x: 0, y: 0 })
-  const lastPos = useRef({ x: 0, y: 0 })
-  const rafId = useRef(null)
+    // Создаем сцену
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0a0a);
 
-  // Handle mouse down
-  const checkAndExpandCanvas = useCallback((currentX, currentY) => {
-    const threshold = 0.8
-    const expansionStep = 1000
+    // Создаем камеру с начальной позицией в центре сетки
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
 
-    const shouldExpandWidth = Math.abs(currentX) > canvasSize.width * threshold / 2
-    const shouldExpandHeight = Math.abs(currentY) > canvasSize.height * threshold / 2
+    // Устанавливаем камеру в центр сетки (0, 0, 1200)
+    camera.position.set(0, 0, 1200);
 
-    if (shouldExpandWidth || shouldExpandHeight) {
-      setCanvasSize(prev => ({
-        width: shouldExpandWidth ? prev.width + expansionStep : prev.width,
-        height: shouldExpandHeight ? prev.height + expansionStep : prev.height
-      }))
-    }
-  }, [canvasSize])
+    // Создаем renderer
+    const renderer = new THREE.WebGLRenderer({
+      canvas: canvasRef.current,
+      antialias: true,
+      alpha: true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  const handleMouseDown = useCallback((e) => {
-    if (activeModal) return
-    if (e.target.closest('.photo-item')) return
+    // Добавляем ambient light
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+    scene.add(ambientLight);
 
-    setIsDragging(true)
-    dragStart.current = { x: e.clientX, y: e.clientY }
-    canvasStart.current = { x: springX.get(), y: springY.get() }
-    lastPos.current = { x: e.clientX, y: e.clientY }
-    velocity.current = { x: 0, y: 0 }
+    // Добавляем directional light
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(1000, 1000, 1000);
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
+    scene.add(directionalLight);
 
-    if (rafId.current) cancelAnimationFrame(rafId.current)
-  }, [activeModal, springX, springY])
+    // Добавляем point lights для драматичности
+    const pointLight1 = new THREE.PointLight(0xff6b6b, 0.5, 2000);
+    pointLight1.position.set(500, 500, 500);
+    scene.add(pointLight1);
 
-  // Handle mouse move
-  const handleMouseMove = useCallback((e) => {
-    if (!isDragging || activeModal) return
+    const pointLight2 = new THREE.PointLight(0x6b6bff, 0.5, 2000);
+    pointLight2.position.set(-500, -500, 500);
+    scene.add(pointLight2);
 
-    const dx = e.clientX - dragStart.current.x
-    const dy = e.clientY - dragStart.current.y
+    // Создаем группу для всех фото
+    const photosGroup = new THREE.Group();
+    scene.add(photosGroup);
 
-    // Calculate velocity for inertia
-    velocity.current = {
-      x: e.clientX - lastPos.current.x,
-      y: e.clientY - lastPos.current.y
-    }
-    lastPos.current = { x: e.clientX, y: e.clientY }
+    // Создаем фото
+    const photoMeshes = [];
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
 
-    // Update position directly for immediate response
-    x.set(canvasStart.current.x + dx)
-    y.set(canvasStart.current.y + dy)
-  }, [isDragging, activeModal, x, y])
+    positions.forEach((position, index) => {
+      // Создаем плоскость для фото
+      const geometry = new THREE.PlaneGeometry(400, 300);
 
-  // Handle mouse up with inertia
-  const handleMouseUp = useCallback(() => {
-    if (!isDragging) return
-    setIsDragging(false)
+      // Создаем material с заглушкой
+      const material = new THREE.MeshLambertMaterial({
+        color: 0x333333,
+        transparent: true,
+        opacity: 0.9
+      });
 
-    // Apply inertia
-    const decay = 0.95
-    const minVelocity = 0.5
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(position.x, position.y, position.z);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      mesh.userData = {
+        index,
+        id: position.id,
+        originalPosition: { ...position },
+        isPhoto: true
+      };
 
-    const animate = () => {
-      if (Math.abs(velocity.current.x) > minVelocity || Math.abs(velocity.current.y) > minVelocity) {
-        x.set(x.get() + velocity.current.x)
-        y.set(y.get() + velocity.current.y)
+      // Добавляем рамку
+      const frameGeometry = new THREE.PlaneGeometry(420, 320);
+      const frameMaterial = new THREE.MeshLambertMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.8
+      });
+      const frame = new THREE.Mesh(frameGeometry, frameMaterial);
+      frame.position.z = -1;
+      mesh.add(frame);
 
-        velocity.current.x *= decay
-        velocity.current.y *= decay
+      photosGroup.add(mesh);
+      photoMeshes.push(mesh);
+    });
 
-        rafId.current = requestAnimationFrame(animate)
+    // Загружаем реальные изображения
+    photoMeshes.forEach((mesh, index) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const texture = new THREE.Texture(img);
+        texture.needsUpdate = true;
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+
+        const material = new THREE.MeshLambertMaterial({
+          map: texture,
+          transparent: true,
+          opacity: 0.95
+        });
+
+        mesh.material.dispose();
+        mesh.material = material;
+
+        // Добавляем небольшую случайную задержку для эффекта загрузки
+        setTimeout(() => {
+          mesh.material.opacity = 1;
+        }, index * 100);
+      };
+
+      img.onerror = () => {
+        // Если изображение не загрузилось, используем цветную заглушку
+        const colors = [0xff6b6b, 0x4ecdc4, 0x45b7d1, 0xf9ca24, 0xf0932b, 0xeb4d4b, 0x6c5ce7, 0xa29bfe];
+        const material = new THREE.MeshLambertMaterial({
+          color: colors[index % colors.length],
+          transparent: true,
+          opacity: 0.8
+        });
+
+        mesh.material.dispose();
+        mesh.material = material;
+      };
+
+      // Используем изображения с picsum.photos для демонстрации
+      img.src = `https://picsum.photos/400/300?random=${index + 1}`;
+    });
+
+    // Обработка мыши
+    const handleMouseMove = (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      // Проверяем наведение на фото
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(photoMeshes);
+
+      // Сбрасываем все фото
+      photoMeshes.forEach(mesh => {
+        mesh.scale.set(1, 1, 1);
+        mesh.position.z = mesh.userData.originalPosition.z;
+      });
+
+      // Подсвечиваем наведенное фото
+      if (intersects.length > 0) {
+        const hoveredMesh = intersects[0].object;
+        hoveredMesh.scale.set(1.1, 1.1, 1.1);
+        hoveredMesh.position.z = 50;
+        document.body.style.cursor = 'pointer';
+      } else {
+        document.body.style.cursor = 'default';
       }
-    }
+    };
 
-    animate()
-  }, [isDragging, x, y])
+    const handleClick = (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-  // Touch events for mobile
-  const handleTouchStart = useCallback((e) => {
-    if (activeModal) return
-    if (e.target.closest('.photo-item')) return
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(photoMeshes);
 
-    const touch = e.touches[0]
-    setIsDragging(true)
-    dragStart.current = { x: touch.clientX, y: touch.clientY }
-    canvasStart.current = { x: springX.get(), y: springY.get() }
-    lastPos.current = { x: touch.clientX, y: touch.clientY }
-    velocity.current = { x: 0, y: 0 }
-  }, [activeModal, springX, springY])
+      if (intersects.length > 0) {
+        const clickedMesh = intersects[0].object;
+        const photoIndex = clickedMesh.userData.index;
+        setSelectedPhoto(photoIndex);
+      }
+    };
 
-  const handleTouchMove = useCallback((e) => {
-    if (!isDragging || activeModal) return
+    // Добавляем обработчики событий
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('click', handleClick);
 
-    const touch = e.touches[0]
-    const dx = touch.clientX - dragStart.current.x
-    const dy = touch.clientY - dragStart.current.y
+    // Обработка колеса мыши для зума
+    const handleWheel = (event) => {
+      event.preventDefault();
+      const zoomSpeed = 0.1;
+      const delta = event.deltaY > 0 ? 1 + zoomSpeed : 1 - zoomSpeed;
 
-    velocity.current = {
-      x: touch.clientX - lastPos.current.x,
-      y: touch.clientY - lastPos.current.y
-    }
-    lastPos.current = { x: touch.clientX, y: touch.clientY }
+      camera.position.z *= delta;
+      camera.position.z = Math.max(500, Math.min(3000, camera.position.z));
+    };
 
-    x.set(canvasStart.current.x + dx)
-    y.set(canvasStart.current.y + dy)
-  }, [isDragging, activeModal, x, y])
+    window.addEventListener('wheel', handleWheel, { passive: false });
 
-  const handleTouchEnd = useCallback(() => {
-    handleMouseUp()
-  }, [handleMouseUp])
+    // Анимация
+    let animationId;
+    const animate = () => {
+      animationId = requestAnimationFrame(animate);
 
-  // Global event listeners
-  useEffect(() => {
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('mouseup', handleMouseUp)
-    window.addEventListener('touchmove', handleTouchMove, { passive: false })
-    window.addEventListener('touchend', handleTouchEnd)
+      // Вращаем группу фото медленно
+      photosGroup.rotation.y += 0.001;
 
+      // Обновляем позиции фото с учетом вращения группы
+      photoMeshes.forEach((mesh, index) => {
+        const position = positions[index];
+        mesh.lookAt(camera.position);
+      });
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
+
+    // Обработка изменения размера окна
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Сохраняем ссылки для очистки
+    sceneRef.current = { scene, camera, renderer, photoMeshes, photosGroup };
+
+    // Очистка
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-      window.removeEventListener('touchmove', handleTouchMove)
-      window.removeEventListener('touchend', handleTouchEnd)
-      if (rafId.current) cancelAnimationFrame(rafId.current)
-    }
-  }, [handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('click', handleClick);
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animationId);
 
-  // Handle photo click
-  const handlePhotoClick = (photo) => {
-    if (isDragging) return
-    setSelectedPhoto(photo)
-    setActiveModal('photo')
-  }
+      if (renderer) {
+        renderer.dispose();
+      }
 
-  // Close modal
-  const closeModal = () => {
-    setActiveModal(null)
-    setSelectedPhoto(null)
-  }
-
-  return (
-    <div className="relative w-full h-full overflow-hidden bg-zinc-900 select-none">
-      {/* Noise Overlay */}
-      <div className="noise-overlay" />
-      {/* Navigation */}
-      <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />
-
-      {/* Infinite Canvas Container */}
-      <div
-        ref={containerRef}
-        className={cn( "absolute inset-0 overflow-hidden",
-          isDragging ? "cursor-grabbing" : "cursor-grab"
-        )}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
-      >
-        <motion.div
-          className="absolute inset-0 select-none"
-          ref={canvasRef}
-          style={{ x: springX, y: springY, width: canvasSize.width, height: canvasSize.height }}
-        >
-          {/* Grid lines for depth */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="w-full h-full" />
-          </div>
-
-          {/* Photos */}
-          {PHOTO_POSITIONS.map((photo) => (
-            <div
-              key={photo.id}
-              className="absolute cursor-pointer hover:opacity-50 transition-all duration-300 photo-item"
-              style={{
-                left: photo.x,
-                top: photo.y,
-                width: photo.width,
-                height: photo.height,
-                transform: `rotate(${photo.rotation}deg) scale(${photo.scale})`,
-              }}
-              onClick={() => handlePhotoClick(photo)}
-            >
-              <div className={cn(
-                "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col",
-                !photo.isVertical && "justify-start"
-              )}>
-                <img
-                  src={photo.src}
-                  alt={photo.title}
-                  className={cn(
-                    'w-full hover:opacity-50 transition-opacity duration-300',
-                    photo.isVertical ? 'h-full object-cover' : 'h-auto object-contain align-self-start'
-                  )}
-                  draggable={false}
-                />
-                <div className="absolute inset-0 bg-black/0" />
-              </div>
-            </div>
-          ))}
-
-          {/* Canvas center marker */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 border border-orange-500/30 rounded-full" />
-        </motion.div>
-
-      {/* Instructions overlay */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-        <p className="font-mono text-zinc-500 text-xs tracking-widest uppercase">
-          2026 made with Webly AI
-        </p>
-      </div>
-
-      {/* Modals */}
-      <AnimatePresence>
-        {activeModal === 'photo' && (
-          <PhotoModal photo={selectedPhoto} onClose={closeModal} />
-        )}
-        {activeModal === 'about' && (
-          <AboutModal onClose={closeModal} />
-        )}
-        {activeModal === 'connect' && (
-          <ConnectModal onClose={closeModal} />
-        )}
-      </AnimatePresence>
-    </div>
-  )
-}
+      photoMeshes.forEach(mesh => {
+        if (mesh.material.map) {
+          mesh.material.map.dispose();
+        }
+        mesh.material.dispose();
+        mesh.geometry.dispose();
+      });
+    };
+  }, [positions]);
 
 export default App

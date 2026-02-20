@@ -1,8 +1,7 @@
 import { SafeIcon } from './components/SafeIcon';
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
-import { X, Instagram, Twitter, Mail, MapPin, Calendar, Award, Camera, Aperture } from 'lucide-react'
-import { clsx, ClassValue } from 'clsx'
+import { clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
 // Utility for tailwind class merging
@@ -44,27 +43,29 @@ const PHOTOS = [
   { id: 30, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5244.jpg?', title: 'Broken Pieces', date: '2023.12.28', camera: 'Leica M6' },
 ]
 
-// Generate random positions for photos
+// Generate random positions for photos - 2x rows and 2x cols
 const generatePositions = () => {
   const positions = []
   const isMobile = window.innerWidth < 768
   const cellWidth = isMobile ? 160 : 400
   const cellHeight = isMobile ? 240 : 600
   const spacing = isMobile ? 20 : 80
-  const cols = isMobile ? 2 : 8
-  const rows = isMobile ? 15 : Math.ceil(PHOTOS.length * 3 / cols)
+  const cols = isMobile ? 4 : 16  // Doubled from 2/8
+  const rows = isMobile ? 30 : 24 // Doubled from roughly 15/12
 
-  // Create vertical grid layout
-  for (let i = 0; i < PHOTOS.length * 3; i++) {
+  const totalItems = cols * rows // 4x more items than original
+
+  for (let i = 0; i < totalItems; i++) {
     const photo = PHOTOS[i % PHOTOS.length]
-    const col = Math.floor(i / rows)
-    const row = i % rows
+    const col = i % cols
+    const row = Math.floor(i / cols)
     const x = spacing + col * (cellWidth + spacing)
     const y = spacing + row * (cellHeight + spacing)
 
-    const isVertical = photo.height > photo.width
+    const isVertical = true
     positions.push({
       ...photo,
+      uniqueId: `${photo.id}-${i}`, // Ensure unique keys for duplicated photos
       x,
       y,
       rotation: 0,
@@ -75,10 +76,13 @@ const generatePositions = () => {
     })
   }
 
-  return positions
+  const gridWidth = cols * (cellWidth + spacing) + spacing
+  const gridHeight = rows * (cellHeight + spacing) + spacing
+
+  return { positions, gridWidth, gridHeight }
 }
 
-const PHOTO_POSITIONS = generatePositions()
+const { positions: PHOTO_POSITIONS, gridWidth: GRID_WIDTH, gridHeight: GRID_HEIGHT } = generatePositions()
 
 // Navbar Component
 function Navbar({ activeModal, setActiveModal }) {
@@ -350,6 +354,20 @@ function App() {
   const lastPos = useRef({ x: 0, y: 0 })
   const rafId = useRef(null)
 
+  // Calculate and set center position on mount
+  useEffect(() => {
+    const centerCanvas = () => {
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
+      const centerX = -(GRID_WIDTH / 2 - viewportWidth / 2)
+      const centerY = -(GRID_HEIGHT / 2 - viewportHeight / 2)
+      x.set(centerX)
+      y.set(centerY)
+    }
+
+    centerCanvas()
+  }, [x, y])
+
   // Handle mouse down
   const handleMouseDown = useCallback((e) => {
     if (activeModal) return
@@ -474,6 +492,7 @@ function App() {
     <div className="relative w-full h-full overflow-hidden bg-zinc-900 select-none">
       {/* Noise Overlay */}
       <div className="noise-overlay" />
+
       {/* Navigation */}
       <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />
 
@@ -487,10 +506,14 @@ function App() {
         onTouchStart={handleTouchStart}
       >
         <motion.div
-          className="absolute inset-0 select-none"
           ref={canvasRef}
-          style={{ x: springX, y: springY }}
-          className="absolute w-[4000px] h-[4000px] bg-zinc-900"
+          style={{
+            x: springX,
+            y: springY,
+            width: GRID_WIDTH,
+            height: GRID_HEIGHT
+          }}
+          className="absolute bg-zinc-900"
         >
           {/* Grid lines for depth */}
           <div className="absolute inset-0 opacity-5">
@@ -500,8 +523,8 @@ function App() {
           {/* Photos */}
           {PHOTO_POSITIONS.map((photo) => (
             <div
-              key={photo.id}
-              className="absolute cursor-pointer hover:opacity-50 transition-all duration-300"
+              key={photo.uniqueId}
+              className="absolute cursor-pointer hover:opacity-50 transition-all duration-300 photo-item"
               style={{
                 left: photo.x,
                 top: photo.y,
@@ -511,8 +534,7 @@ function App() {
               }}
               onClick={() => handlePhotoClick(photo)}
             >
-              <div className={cn(
-                "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col",
+              <div className={cn( "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col",
                 !photo.isVertical && "justify-start"
               )}>
                 <img
@@ -527,7 +549,6 @@ function App() {
                 <div className="absolute inset-0 bg-black/0" />
               </div>
             </div>
-          ))}
           ))}
 
           {/* Canvas center marker */}

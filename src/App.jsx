@@ -524,7 +524,7 @@ function App() {
           {PHOTO_POSITIONS.map((photo) => (
             <div
               key={`${photo.id}-${photo.x}-${photo.y}`}
-              className="absolute cursor-pointer photo-item"
+              className="absolute cursor-pointer hover:opacity-50 transition-all duration-300 photo-item"
               style={{
                 left: photo.x,
                 top: photo.y,
@@ -541,7 +541,7 @@ function App() {
                   src={photo.src}
                   alt={photo.title}
                   className={cn(
-                    'w-full',
+                    'w-full hover:opacity-50 transition-opacity duration-300',
                     photo.isVertical ? 'h-full object-cover' : 'h-auto object-contain align-self-start'
                   )}
                   draggable={false}

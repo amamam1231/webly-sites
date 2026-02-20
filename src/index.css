@@ -19,7 +19,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Living TV Noise Effect - Animated Film Grain */
+/* TV Noise Effect */
 .tv-noise {
   /* Фиксируем на весь экран поверх всего */
   position: fixed;
@@ -27,37 +27,37 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 9999;
+  z-index: 9999; /* Убедитесь, что он выше контента */
 
   /* КРИТИЧНО ВАЖНО: чтобы через шум можно было кликать по сайту */
   pointer-events: none;
 
-  /* Прозрачность эффекта пленочного зерна */
-  opacity: 0.12;
+  /* Прозрачность эффекта. Для телевизора ставьте 0.1 - 0.3.
+     Если хотите еле заметный шум — 0.05 */
+  opacity: 0.15;
 
-  /* Монохромная текстура шума (Film Grain) - seamless/repeatable */
+  /* Вставляем текстуру шума (Data URI) */
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAGFBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAdOgFgAAAACHRSTlMABD1pcYuPl6VysV0AAAAJcEhZcwAADsQAAA7EAZUrDhsAAAFPSURBVDjLdZTLdcQgDEUziwoguRA3YF43EFKBFmC2QEsFUoA3cQW2AMvnt4dguTjJiS+9WSAjApxlF14U7jE8+JmN+1jU2v80y3D/dOb48Tz0+uJ28g9UeU9b8a77cE7X14fJ60h+nJ9nB6bU1rZ/D2nL71m7R/1s0t5+Uv04b6d/E6lF4m6M42/7N9A2E2nL71n1s0l7+0n140j+nJ9nB6bU1rZ/D2nL71n1s0l7+0n140j+nJ9nB6bU1rZ/D2nL71n1s0l7+0n140j+nJ9nB6bU1rZ/D2nL71n1s0l7+0n140j+nJ9nB6bU1rZ/D2nL71n1s0l7+0n140j+nJ9nB6bU1rZ/D2nL71n1s0l7+0n140j+nJ9nB6bU1rZ/D2nL71n1s0l7+0n140j+nJ9nB6bU1rZ/D2nL71n1s0l7+0n140j+nJ9nB6bU1rZ/D2nL71n1s0l7+0n140j+nJ9nB6bU1rZ/D2nL71n1s0l7+0n140j+nJ9nB6bU1rZ/D2nL71n1s0l7+0n140j+nJ9nB6bU1rZ/D2nL71n1s0l7+0n142wM/j37/w+p0o2hI/1e0AAAAABJRU5ErkJggg==");
 
-  /* Заставляем фон повторяться по всем осям (seamless) */
+  /* Заставляем фон повторяться */
   background-repeat: repeat;
-  background-size: 200px 200px;
 
-  /* Высокочастотная анимация трансформации текстуры */
-  /* Цикл из 8 кадров со случайным смещением background-position */
-  animation: living-noise 0.15s steps(8) infinite;
+  /* Применяем анимацию:
+     - noise-shift: имя анимации
+     - 0.2s: очень быстрая длительность цикла
+     - steps(6): делит 0.2сек на 6 резких кадров (эффект мерцания)
+     - infinite: бесконечно */
+  animation: noise-shift 0.2s steps(6) infinite;
 }
 
-/* Ключевые кадры анимации живого шума */
-@keyframes living-noise {
-  0%   { background-position: 0% 0%; }
-  12.5%  { background-position: -5% 10%; }
-  25%  { background-position: 15% -5%; }
-  37.5%  { background-position: -10% 15%; }
-  50%  { background-position: 20% 5%; }
-  62.5%  { background-position: -15% -10%; }
-  75%  { background-position: 10% 20%; }
-  87.5%  { background-position: -20% -15%; }
-  100% { background-position: 0% 0%; }
+/* Ключевые кадры анимации - просто резко дергаем фон */
+@keyframes noise-shift {
+  0%   { background-position: 0 0; }
+  20%  { background-position: -10% 10%; }
+  40%  { background-position: 5% -15%; }
+  60%  { background-position: 15% 5%; }
+  80%  { background-position: -5% 20%; }
+  100% { background-position: 20% -10%; }
 }
 
 /* Custom scrollbar hide */

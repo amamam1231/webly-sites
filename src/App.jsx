@@ -48,14 +48,14 @@ const PHOTOS = [
 const generatePositions = () => {
   const positions = []
   const isMobile = window.innerWidth < 768
-  const cellWidth = isMobile ? 160 : 400
-  const cellHeight = isMobile ? 240 : 600
+  const cellWidth = isMobile ? 200 : 500
+  const cellHeight = isMobile ? 300 : 700
   const spacing = isMobile ? 20 : 80
-  const cols = isMobile ? 2 : 8
-  const rows = isMobile ? 15 : Math.ceil(PHOTOS.length * 3 / cols)
+  const cols = isMobile ? 4 : 16
+  const rows = isMobile ? 30 : Math.ceil(PHOTOS.length * 5 / cols)
 
   // Create vertical grid layout
-  for (let i = 0; i < PHOTOS.length * 3; i++) {
+  for (let i = 0; i < PHOTOS.length * 5; i++) {
     const photo = PHOTOS[i % PHOTOS.length]
     const col = Math.floor(i / rows)
     const row = i % rows
@@ -331,9 +331,11 @@ function App() {
   const [activeModal, setActiveModal] = useState(null)
   const [selectedPhoto, setSelectedPhoto] = useState(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [canvasSize, setCanvasSize] = useState({ width: 4000, height: 4000 })
 
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
+  const positionRef = useRef({ x: 0, y: 0 })
 
   // Motion values for smooth dragging with inertia
   const x = useMotionValue(0)
@@ -343,6 +345,22 @@ function App() {
   const springX = useSpring(x, { stiffness: 300, damping: 30, mass: 0.5 })
   const springY = useSpring(y, { stiffness: 300, damping: 30, mass: 0.5 })
 
+  // Update position ref when spring values change
+  useEffect(() => {
+    const unsubscribeX = springX.onChange(value => {
+      positionRef.current.x = value
+      checkAndExpandCanvas(value, positionRef.current.y)
+    })
+    const unsubscribeY = springY.onChange(value => {
+      positionRef.current.y = value
+      checkAndExpandCanvas(positionRef.current.x, value)
+    })
+    return () => {
+      unsubscribeX()
+      unsubscribeY()
+    }
+  }, [springX, springY])
+
   // Drag state refs
   const dragStart = useRef({ x: 0, y: 0 })
   const canvasStart = useRef({ x: 0, y: 0 })
@@ -351,6 +369,21 @@ function App() {
   const rafId = useRef(null)
 
   // Handle mouse down
+  const checkAndExpandCanvas = useCallback((currentX, currentY) => {
+    const threshold = 0.8
+    const expansionStep = 1000
+
+    const shouldExpandWidth = Math.abs(currentX) > canvasSize.width * threshold / 2
+    const shouldExpandHeight = Math.abs(currentY) > canvasSize.height * threshold / 2
+
+    if (shouldExpandWidth || shouldExpandHeight) {
+      setCanvasSize(prev => ({
+        width: shouldExpandWidth ? prev.width + expansionStep : prev.width,
+        height: shouldExpandHeight ? prev.height + expansionStep : prev.height
+      }))
+    }
+  }, [canvasSize])
+
   const handleMouseDown = useCallback((e) => {
     if (activeModal) return
     if (e.target.closest('.photo-item')) return
@@ -489,8 +522,7 @@ function App() {
         <motion.div
           className="absolute inset-0 select-none"
           ref={canvasRef}
-          style={{ x: springX, y: springY }}
-          className="absolute w-[4000px] h-[4000px] bg-zinc-900"
+          style={{ x: springX, y: springY, width: canvasSize.width, height: canvasSize.height }}
         >
           {/* Grid lines for depth */}
           <div className="absolute inset-0 opacity-5">
@@ -501,7 +533,7 @@ function App() {
           {PHOTO_POSITIONS.map((photo) => (
             <div
               key={photo.id}
-              className="absolute cursor-pointer hover:opacity-50 transition-all duration-300"
+              className="absolute cursor-pointer hover:opacity-50 transition-all duration-300 photo-item"
               style={{
                 left: photo.x,
                 top: photo.y,
@@ -528,12 +560,10 @@ function App() {
               </div>
             </div>
           ))}
-          ))}
 
           {/* Canvas center marker */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 border border-orange-500/30 rounded-full" />
         </motion.div>
-      </div>
 
       {/* Instructions overlay */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">

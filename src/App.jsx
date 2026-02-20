@@ -1,8 +1,7 @@
 import { SafeIcon } from './components/SafeIcon';
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
-import { X, Instagram, Twitter, Mail, MapPin, Calendar, Award, Camera, Aperture } from 'lucide-react'
-import { clsx, ClassValue } from 'clsx'
+import { clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
 // Utility for tailwind class merging
@@ -10,7 +9,10 @@ function cn(...inputs) {
   return twMerge(clsx(inputs))
 }
 
-// Photo data
+// Canvas size - increased for larger grid
+const CANVAS_SIZE = 12000
+
+// Photo data (unchanged)
 const PHOTOS = [
   { id: 1, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453880-2918.jpg?', title: 'Urban Solitude', date: '2023.11.15', camera: 'Leica M10-R' },
   { id: 2, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-2291.jpg?', title: 'Shadow Play', date: '2023.10.22', camera: 'Leica Q2' },
@@ -44,18 +46,21 @@ const PHOTOS = [
   { id: 30, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5244.jpg?', title: 'Broken Pieces', date: '2023.12.28', camera: 'Leica M6' },
 ]
 
-// Generate random positions for photos
+// Generate random positions for photos - INCREASED GRID SIZE
 const generatePositions = () => {
   const positions = []
   const isMobile = window.innerWidth < 768
   const cellWidth = isMobile ? 160 : 400
   const cellHeight = isMobile ? 240 : 600
   const spacing = isMobile ? 20 : 80
-  const cols = isMobile ? 2 : 8
-  const rows = isMobile ? 15 : Math.ceil(PHOTOS.length * 3 / cols)
+  // Increased columns from 8 to 20 for desktop
+  const cols = isMobile ? 2 : 20
+  // Increased multiplier from 3 to 16 for more photos (480 total)
+  const totalPhotos = PHOTOS.length * 16
+  const rows = Math.ceil(totalPhotos / cols)
 
-  // Create vertical grid layout
-  for (let i = 0; i < PHOTOS.length * 3; i++) {
+  // Create vertical grid layout with more rows and columns
+  for (let i = 0; i < totalPhotos; i++) {
     const photo = PHOTOS[i % PHOTOS.length]
     const col = Math.floor(i / rows)
     const row = i % rows
@@ -125,9 +130,7 @@ function PhotoModal({ photo, onClose }) {
       className="fixed inset-0 z-40 bg-black/60 flex items-center justify-center"
       onClick={onClose}
     >
-      <div
-        className="relative w-full h-full flex items-center justify-center"
-      >
+      <div className="relative w-full h-full flex items-center justify-center">
         <img
           src={photo.src}
           alt={photo.title}
@@ -350,6 +353,19 @@ function App() {
   const lastPos = useRef({ x: 0, y: 0 })
   const rafId = useRef(null)
 
+  // Set initial position to center of canvas on mount
+  useEffect(() => {
+    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight
+
+    // Center the viewport on the canvas
+    const centerX = -(CANVAS_SIZE / 2) + (viewportWidth / 2)
+    const centerY = -(CANVAS_SIZE / 2) + (viewportHeight / 2)
+
+    x.set(centerX)
+    y.set(centerY)
+  }, [])
+
   // Handle mouse down
   const handleMouseDown = useCallback((e) => {
     if (activeModal) return
@@ -487,10 +503,9 @@ function App() {
         onTouchStart={handleTouchStart}
       >
         <motion.div
-          className="absolute inset-0 select-none"
           ref={canvasRef}
           style={{ x: springX, y: springY }}
-          className="absolute w-[4000px] h-[4000px] bg-zinc-900"
+          className="absolute w-[12000px] h-[12000px] bg-zinc-900 select-none"
         >
           {/* Grid lines for depth */}
           <div className="absolute inset-0 opacity-5">
@@ -500,8 +515,8 @@ function App() {
           {/* Photos */}
           {PHOTO_POSITIONS.map((photo) => (
             <div
-              key={photo.id}
-              className="absolute cursor-pointer hover:opacity-50 transition-all duration-300"
+              key={`${photo.id}-${photo.x}-${photo.y}`}
+              className="absolute cursor-pointer hover:opacity-50 transition-all duration-300 photo-item"
               style={{
                 left: photo.x,
                 top: photo.y,
@@ -511,8 +526,7 @@ function App() {
               }}
               onClick={() => handlePhotoClick(photo)}
             >
-              <div className={cn(
-                "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col",
+              <div className={cn( "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col",
                 !photo.isVertical && "justify-start"
               )}>
                 <img
@@ -527,7 +541,6 @@ function App() {
                 <div className="absolute inset-0 bg-black/0" />
               </div>
             </div>
-          ))}
           ))}
 
           {/* Canvas center marker */}

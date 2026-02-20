@@ -334,6 +334,7 @@ function App() {
   const [activeModal, setActiveModal] = useState(null)
   const [selectedPhoto, setSelectedPhoto] = useState(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [isDarkTheme, setIsDarkTheme] = useState(true)
 
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
@@ -495,9 +496,9 @@ function App() {
   }
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-zinc-900 select-none">
+    <div className={`relative w-full h-full overflow-hidden ${isDarkTheme ? 'bg-zinc-900' : 'bg-gray-100'} select-none transition-colors duration-500`}>
       {/* TV Noise Overlay */}
-      <div className="tv-noise" />
+      <div className={`tv-noise ${!isDarkTheme && 'opacity-0'}`} />
       {/* Gradient Noise Overlay */}
       <div className="absolute top-0 left-0 w-full h-[100px] pointer-events-none z-20">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-transparent" />
@@ -560,9 +561,38 @@ function App() {
         </motion.div>
       </div>
 
-      {/* Instructions overlay */}
+      {/* Theme toggle and social links */}
+      <div className="fixed bottom-6 left-6 z-30">
+        <button
+          onClick={() => setIsDarkTheme(!isDarkTheme)}
+          className="p-2 rounded-full hover:bg-zinc-800/20 transition-colors"
+        >
+          <SafeIcon name={isDarkTheme ? "Sun" : "Moon"} size={24} className="text-zinc-500 hover:text-orange-500" />
+        </button>
+      </div>
+
+      <div className="fixed bottom-6 right-6 z-30 flex gap-4">
+        <a
+          href="https://t.me/sergiomusel"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-2 rounded-full hover:bg-zinc-800/20 transition-colors"
+        >
+          <SafeIcon name="Send" size={24} className="text-zinc-500 hover:text-orange-500" />
+        </a>
+        <a
+          href="https://instagram.com/sergiomusel"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-2 rounded-full hover:bg-zinc-800/20 transition-colors"
+        >
+          <SafeIcon name="Instagram" size={24} className="text-zinc-500 hover:text-orange-500" />
+        </a>
+      </div>
+
+      {/* Copyright */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-        <p className="font-mono text-zinc-500 text-xs tracking-widest uppercase">
+        <p className="font-['IBM_Plex_Mono'] text-zinc-500 text-xs tracking-widest uppercase">
           2026 made with Webly AI
         </p>
       </div>

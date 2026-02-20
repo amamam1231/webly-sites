@@ -513,7 +513,7 @@ function App() {
         <motion.div
           ref={canvasRef}
           style={{ x: springX, y: springY }}
-          className="absolute w-[30000px] h-[30000px] bg-zinc-900 select-none"
+          className="absolute w-[30000px] h-[30000px] select-none"
         >
           {/* Grid lines for depth */}
           <div className="absolute inset-0 opacity-5">
@@ -534,7 +534,7 @@ function App() {
               }}
               onClick={() => handlePhotoClick(photo)}
             >
-              <div className={cn( "relative w-full h-full overflow-hidden shadow-2xl flex flex-col",
+              <div className={cn( "relative w-full h-full overflow-hidden flex flex-col",
                 !photo.isVertical && "justify-start"
               )}>
                 <img

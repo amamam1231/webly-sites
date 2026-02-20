@@ -500,10 +500,7 @@ function App() {
       <div className="tv-noise" />
       {/* Gradient Noise Overlay */}
       <div className="absolute top-0 left-0 w-full h-[100px] pointer-events-none z-20">
-        <div className="absolute inset-0 bg-gradient-to-b from-black to-transparent" />
-        <div className="absolute inset-0 opacity-50 mix-blend-overlay">
-          <div className="w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMC40Ii8+PC9zdmc+')] bg-repeat" />
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-transparent" />
       </div>
       {/* Navigation */}
       <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />

@@ -9,7 +9,7 @@ function cn(...inputs) {
   return twMerge(clsx(...inputs))
 }
 
-// Canvas size - adjusted for mobile performance
+// Canvas size - increased for larger grid
 const CANVAS_SIZE = 30000
 
 // Photo data (unchanged)
@@ -46,20 +46,20 @@ const PHOTOS = [
   { id: 30, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5244.jpg?', title: 'Broken Pieces', date: '2023.12.28', camera: 'Leica M6' },
 ]
 
-// Generate random positions for photos - OPTIMIZED FOR MOBILE
+// Generate random positions for photos - INCREASED GRID SIZE
 const generatePositions = () => {
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
-  const cellWidth = isMobile ? 140 : 400
-  const cellHeight = isMobile ? 210 : 600
-  const spacing = isMobile ? 16 : 80
-  const cols = isMobile ? 2 : 20
-  // Much smaller multiplier for mobile to ensure smooth performance
-  const multiplier = isMobile ? 3 : 20
-  const totalPhotos = PHOTOS.length * multiplier
+  const positions = []
+  const isMobile = window.innerWidth < 768
+  const cellWidth = isMobile ? 160 : 400
+  const cellHeight = isMobile ? 240 : 600
+  const spacing = isMobile ? 20 : 80
+  // Increased columns from 20 to 30 for wider grid
+  const cols = isMobile ? 2 : 30
+  // Increased multiplier from 16 to 40 for more photos (1200 total)
+  const totalPhotos = PHOTOS.length * 40
   const rows = Math.ceil(totalPhotos / cols)
 
-  const positions = []
-
+  // Create vertical grid layout with more rows and columns
   for (let i = 0; i < totalPhotos; i++) {
     const photo = PHOTOS[i % PHOTOS.length]
     const col = Math.floor(i / rows)
@@ -67,6 +67,7 @@ const generatePositions = () => {
     const x = spacing + col * (cellWidth + spacing)
     const y = spacing + row * (cellHeight + spacing)
 
+    const isVertical = photo.height > photo.width
     positions.push({
       ...photo,
       x,
@@ -75,6 +76,7 @@ const generatePositions = () => {
       scale: 1,
       width: cellWidth,
       height: cellHeight,
+      isVertical,
     })
   }
 
@@ -93,19 +95,19 @@ function Navbar({ activeModal, setActiveModal }) {
   ]
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-4 md:px-12 md:py-6 flex justify-between items-start pointer-events-none">
+    <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none">
       <div className="pointer-events-auto">
-        <h1 className="font-serif text-white text-lg md:text-2xl font-bold leading-tight tracking-tight">
+        <h1 className="font-serif text-white text-xl md:text-2xl font-bold leading-tight tracking-tight">
           SERGIO<br/>MUSEL
         </h1>
       </div>
 
-      <div className="flex flex-col gap-2 md:gap-4 pointer-events-auto items-end">
+      <div className="flex flex-col gap-4 pointer-events-auto items-end">
         {navItems.map((item) => (
           <button
             key={item.id}
             onClick={item.action}
-            className={cn( "font-sans text-[10px] md:text-sm tracking-wide uppercase transition-colors duration-300 hover:text-orange-500",
+            className={cn( "font-sans text-xs md:text-sm tracking-wide uppercase transition-colors duration-300 hover:text-orange-500",
               (activeModal === item.id || (item.id === 'portfolio' && !activeModal))
                 ? "text-orange-500"
                 : "text-zinc-400"
@@ -125,25 +127,15 @@ function PhotoModal({ photo, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-40 bg-black/90 flex items-center justify-center p-4"
+      className="fixed inset-0 z-40 bg-black/60 flex items-center justify-center"
       onClick={onClose}
     >
-      <div className="relative w-full h-full flex flex-col items-center justify-center">
+      <div className="relative w-full h-full flex items-center justify-center">
         <img
           src={photo.src}
           alt={photo.title}
-          className="max-w-full max-h-[70vh] w-auto h-auto object-contain grayscale"
+          className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain grayscale"
         />
-        <div className="mt-6 text-center">
-          <h3 className="text-white font-mono text-lg md:text-xl mb-2">{photo.title}</h3>
-          <p className="text-zinc-400 font-mono text-xs md:text-sm">{photo.date} • {photo.camera}</p>
-        </div>
-        <button
-          onClick={onClose}
-          className="absolute top-0 right-0 text-zinc-400 hover:text-white transition-colors p-2"
-        >
-          <SafeIcon name="X" size={32} />
-        </button>
       </div>
     </div>
   )
@@ -161,16 +153,16 @@ function AboutModal({ onClose }) {
     >
       <button
         onClick={onClose}
-        className="fixed top-4 right-4 md:top-6 md:right-6 text-zinc-400 hover:text-white transition-colors z-50"
+        className="fixed top-6 right-6 text-zinc-400 hover:text-white transition-colors z-50"
       >
         <SafeIcon name="X" size={32} />
       </button>
 
       <div
-        className="min-h-screen flex items-center justify-center p-4 md:p-12 lg:p-24"
+        className="min-h-screen flex items-center justify-center p-6 md:p-12 lg:p-24"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20">
+        <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
           {/* Left - Photo */}
           <div className="relative">
             <div className="aspect-[3/4] bg-zinc-900 overflow-hidden">
@@ -180,16 +172,16 @@ function AboutModal({ onClose }) {
                 className="w-full h-full object-cover grayscale"
               />
             </div>
-            <div className="absolute -bottom-4 -right-4 w-16 h-16 md:w-24 md:h-24 border border-orange-500/30" />
+            <div className="absolute -bottom-4 -right-4 w-24 h-24 border border-orange-500/30" />
           </div>
 
           {/* Right - Content */}
           <div className="flex flex-col justify-center">
-            <h2 className="font-mono text-white text-3xl md:text-5xl font-bold mb-6 md:mb-8 tracking-tighter">
+            <h2 className="font-mono text-white text-4xl md:text-5xl font-bold mb-8 tracking-tighter">
               ABOUT ME
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8 md:mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
               <div>
                 <p className="text-zinc-400 leading-relaxed font-sans text-sm md:text-base">
                   Born in Prague and trained in the traditions of analog photography,
@@ -209,12 +201,12 @@ function AboutModal({ onClose }) {
             </div>
 
             {/* Awards */}
-            <div className="border-t border-zinc-800 pt-6 md:pt-8">
-              <h3 className="font-mono text-orange-500 text-xs md:text-sm tracking-widest mb-4 md:mb-6 flex items-center gap-2">
+            <div className="border-t border-zinc-800 pt-8">
+              <h3 className="font-mono text-orange-500 text-sm tracking-widest mb-6 flex items-center gap-2">
                 <SafeIcon name="Award" size={16} />
                 LEICA AWARDS
               </h3>
-              <div className="space-y-2 md:space-y-3 font-mono text-xs md:text-sm">
+              <div className="space-y-3 font-mono text-sm">
                 <div className="flex justify-between text-zinc-300">
                   <span>Leica Oskar Barnack Award</span>
                   <span className="text-zinc-600">2023</span>
@@ -270,13 +262,13 @@ function ConnectModal({ onClose }) {
 
       <button
         onClick={onClose}
-        className="fixed top-4 right-4 md:top-6 md:right-6 text-zinc-400 hover:text-white transition-colors z-50"
+        className="fixed top-6 right-6 text-zinc-400 hover:text-white transition-colors z-50"
       >
         <SafeIcon name="X" size={32} />
       </button>
 
       <div
-        className="relative min-h-screen flex flex-col items-center justify-center p-4 md:p-6 text-center"
+        className="relative min-h-screen flex flex-col items-center justify-center p-6 text-center"
         onClick={(e) => e.stopPropagation()}
       >
         <motion.div
@@ -285,43 +277,43 @@ function ConnectModal({ onClose }) {
           transition={{ delay: 0.2 }}
           className="max-w-2xl"
         >
-          <h2 className="font-mono text-white text-3xl md:text-6xl font-bold mb-4 tracking-tighter">
+          <h2 className="font-mono text-white text-4xl md:text-6xl font-bold mb-4 tracking-tighter">
             LET'S CONNECT
           </h2>
 
-          <p className="text-zinc-400 font-sans mb-8 md:mb-12 text-base md:text-lg px-4">
+          <p className="text-zinc-400 font-sans mb-12 text-lg">
             Open for collaborations, exhibitions, and commissioned work.
           </p>
 
-          <div className="flex flex-col items-center justify-center gap-4 md:gap-8 mb-8 md:mb-16">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-16">
             <a
               href="https://instagram.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 text-zinc-300 hover:text-orange-500 transition-colors font-mono text-sm md:text-base"
+              className="flex items-center gap-3 text-zinc-300 hover:text-orange-500 transition-colors font-mono"
             >
-              <SafeIcon name="Instagram" size={20} className="md:w-6 md:h-6" />
+              <SafeIcon name="Instagram" size={24} />
               <span>@sergiomusel</span>
             </a>
             <a
               href="https://twitter.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 text-zinc-300 hover:text-orange-500 transition-colors font-mono text-sm md:text-base"
+              className="flex items-center gap-3 text-zinc-300 hover:text-orange-500 transition-colors font-mono"
             >
-              <SafeIcon name="Twitter" size={20} className="md:w-6 md:h-6" />
+              <SafeIcon name="Twitter" size={24} />
               <span>@sergiomusel</span>
             </a>
             <a
               href="mailto:hello@sergiomusel.com"
-              className="flex items-center gap-3 text-zinc-300 hover:text-orange-500 transition-colors font-mono text-sm md:text-base"
+              className="flex items-center gap-3 text-zinc-300 hover:text-orange-500 transition-colors font-mono"
             >
-              <SafeIcon name="Mail" size={20} className="md:w-6 md:h-6" />
+              <SafeIcon name="Mail" size={24} />
               <span>hello@sergiomusel.com</span>
             </a>
           </div>
 
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-zinc-500 font-mono text-xs md:text-sm">
+          <div className="flex items-center justify-center gap-8 text-zinc-500 font-mono text-sm">
             <div className="flex items-center gap-2">
               <SafeIcon name="MapPin" size={14} />
               <span>Prague, CZ</span>
@@ -455,9 +447,6 @@ function App() {
   const handleTouchMove = useCallback((e) => {
     if (!isDragging || activeModal) return
 
-    // Prevent default to stop page scrolling while dragging canvas
-    e.preventDefault()
-
     const touch = e.touches[0]
     const dx = touch.clientX - dragStart.current.x
     const dy = touch.clientY - dragStart.current.y
@@ -509,14 +498,13 @@ function App() {
     <div className="relative w-full h-full overflow-hidden bg-zinc-900 select-none">
       {/* TV Noise Overlay */}
       <div className="tv-noise" />
-
       {/* Navigation */}
       <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />
 
       {/* Infinite Canvas Container */}
       <div
         ref={containerRef}
-        className={cn( "absolute inset-0 overflow-hidden canvas-container",
+        className={cn( "absolute inset-0 overflow-hidden",
           isDragging ? "cursor-grabbing" : "cursor-grab"
         )}
         onMouseDown={handleMouseDown}
@@ -546,11 +534,16 @@ function App() {
               }}
               onClick={() => handlePhotoClick(photo)}
             >
-              <div className="relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col justify-start">
+              <div className={cn( "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col",
+                !photo.isVertical && "justify-start"
+              )}>
                 <img
                   src={photo.src}
                   alt={photo.title}
-                  className="w-full h-auto object-contain align-self-start hover:opacity-50 transition-opacity duration-300"
+                  className={cn(
+                    'w-full hover:opacity-50 transition-opacity duration-300',
+                    photo.isVertical ? 'h-full object-cover' : 'h-auto object-contain align-self-start'
+                  )}
                   draggable={false}
                 />
                 <div className="absolute inset-0 bg-black/0" />
@@ -564,8 +557,8 @@ function App() {
       </div>
 
       {/* Instructions overlay */}
-      <div className="fixed bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-        <p className="font-mono text-zinc-500 text-[10px] md:text-xs tracking-widest uppercase">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+        <p className="font-mono text-zinc-500 text-xs tracking-widest uppercase">
           2026 made with Webly AI
         </p>
       </div>

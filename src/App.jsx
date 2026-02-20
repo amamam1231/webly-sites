@@ -48,10 +48,10 @@ const PHOTOS = [
 const generatePositions = () => {
   const positions = []
   const isMobile = window.innerWidth < 768
-  const cellWidth = isMobile ? 160 : 300
-  const cellHeight = isMobile ? 240 : 450
-  const spacing = isMobile ? 20 : 60
-  const cols = isMobile ? 2 : (Math.floor(window.innerWidth / (cellWidth + spacing)) || 6)
+  const cellWidth = isMobile ? 160 : 400
+  const cellHeight = isMobile ? 240 : 600
+  const spacing = isMobile ? 20 : 80
+  const cols = isMobile ? 2 : 8
   const rows = isMobile ? 15 : Math.ceil(PHOTOS.length * 3 / cols)
 
   // Create vertical grid layout
@@ -490,7 +490,7 @@ function App() {
           className="absolute inset-0 select-none"
           ref={canvasRef}
           style={{ x: springX, y: springY }}
-          className="absolute w-[3000px] h-[3000px] bg-zinc-900"
+          className="absolute w-[4000px] h-[4000px] bg-zinc-900"
         >
           {/* Grid lines for depth */}
           <div className="absolute inset-0 opacity-5">

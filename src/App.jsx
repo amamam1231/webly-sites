@@ -45,51 +45,53 @@ const PHOTOS = [
 ]
 
 // Generate random positions for photos
-  // Генерация позиций для фото
-  const generatePositions = useCallback(() => {
+  const generatePositions = () => {
     const positions = [];
     const isMobile = window.innerWidth < 768;
 
     if (isMobile) {
-      // Для мобильных устройств: 8 рядов x 60 столбцов (в 2 раза больше)
-      const rows = 8;
-      const cols = 60;
+      // Mobile: 4 rows x 30 columns (doubled from 2x15)
+      const rows = 4;
+      const cols = 30;
+      const spacing = 120;
+      const startX = -(cols * spacing) / 2;
+      const startY = -(rows * spacing) / 2;
 
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
           positions.push({
-            id: `mobile-${row}-${col}`,
-            row,
-            col,
-            x: col * (PHOTO_SIZE + GAP),
-            y: row * (PHOTO_SIZE + GAP),
-            rotation: (Math.random() - 0.5) * 10,
-            scale: 0.9 + Math.random() * 0.2
+            x: startX + col * spacing,
+            y: startY + row * spacing,
+            scale: 0.8,
+            delay: (row + col) * 0.02
           });
         }
       }
     } else {
-      // Для десктопов: 32 столбца (в 2 раза больше) с динамическим количеством рядов
-      const cols = 32;
-      const rows = Math.ceil(window.innerHeight / (PHOTO_SIZE + GAP)) + 10;
+      // Desktop: 16 columns x dynamic rows (doubled from 8xN)
+      const cols = 16;
+      const rows = Math.ceil(totalPhotos / cols);
+      const spacing = 200;
+      const startX = -(cols * spacing) / 2;
+      const startY = -(rows * spacing) / 2;
 
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-          positions.push({
-            id: `desktop-${row}-${col}`,
-            row,
-            col,
-            x: col * (PHOTO_SIZE + GAP),
-            y: row * (PHOTO_SIZE + GAP),
-            rotation: (Math.random() - 0.5) * 10,
-            scale: 0.9 + Math.random() * 0.2
-          });
+          const index = row * cols + col;
+          if (index < totalPhotos) {
+            positions.push({
+              x: startX + col * spacing,
+              y: startY + row * spacing,
+              scale: 1,
+              delay: (row + col) * 0.01
+            });
+          }
         }
       }
     }
 
     return positions;
-  }, []);
+  };
 
 const PHOTO_POSITIONS = generatePositions()
 
@@ -340,41 +342,54 @@ function ConnectModal({ onClose }) {
 }
 
 // Main App Component
-  // Центрирование на середине сетки при старте
+  // Initialize positions and center view
   useEffect(() => {
-    if (positions.length > 0 && !hasCentered) {
-      const isMobile = window.innerWidth < 768;
-      let centerX, centerY;
+    const positions = generatePositions();
+    setPositions(positions);
 
-      if (isMobile) {
-        // Для мобильных: центр 8x60 сетки
-        centerX = (60 * (PHOTO_SIZE + GAP)) / 2;
-        centerY = (8 * (PHOTO_SIZE + GAP)) / 2;
-      } else {
-        // Для десктопов: центр 32 столбцов с динамическими рядами
-        const cols = 32;
-        const rows = Math.ceil(window.innerHeight / (PHOTO_SIZE + GAP)) + 10;
-        centerX = (cols * (PHOTO_SIZE + GAP)) / 2;
-        centerY = (rows * (PHOTO_SIZE + GAP)) / 2;
-      }
+    // Calculate center coordinates for the new larger grid
+    const isMobile = window.innerWidth < 768;
+    let centerX, centerY;
 
-      // Вычитаем половину размера окна, чтобы центр сетки оказался в центре экрана
-      const offsetX = centerX - window.innerWidth / 2;
-      const offsetY = centerY - window.innerHeight / 2;
-
-      setPan({ x: -offsetX, y: -offsetY });
-      setHasCentered(true);
+    if (isMobile) {
+      // Mobile center: 4x30 grid
+      centerX = 0;
+      centerY = 0;
+    } else {
+      // Desktop center: 16xN grid
+      const cols = 16;
+      const rows = Math.ceil(totalPhotos / cols);
+      const spacing = 200;
+      centerX = 0;
+      centerY = 0;
     }
-  }, [positions, hasCentered]);
+
+    // Set initial position to center of grid
+    x.set(centerX);
+    y.set(centerY);
+
+    // Update spring targets to maintain center position
+    springX.set(centerX);
+    springY.set(centerY);
+
+    // Center the actual view
+    const container = containerRef.current;
+    if (container) {
+      const scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+      const scrollTop = (container.scrollHeight - container.clientHeight) / 2;
+      container.scrollLeft = scrollLeft;
+      container.scrollTop = scrollTop;
+    }
+  }, [totalPhotos]);
 
   // Mouse/touch handlers
-  const handleMouseDown = (e) => {
+  const handleMouseDown = (e: React.MouseEvent) => {
     isDragging.current = true;
     dragStart.current = { x: e.clientX - x.get(), y: e.clientY - y.get() };
     containerRef.current?.classList.add('cursor-grabbing');
   };
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging.current) return;
 
     const newX = e.clientX - dragStart.current.x;
@@ -391,13 +406,13 @@ function ConnectModal({ onClose }) {
     containerRef.current?.classList.remove('cursor-grabbing');
   };
 
-  const handleTouchStart = (e) => {
+  const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
     isDragging.current = true;
     dragStart.current = { x: touch.clientX - x.get(), y: touch.clientY - y.get() };
   };
 
-  const handleTouchMove = (e) => {
+  const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging.current) return;
 
     const touch = e.touches[0];
@@ -414,7 +429,7 @@ function ConnectModal({ onClose }) {
     isDragging.current = false;
   };
 
-  const handleWheel = (e) => {
+  const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
 
     const scaleAmount = e.deltaY > 0 ? 0.9 : 1.1;

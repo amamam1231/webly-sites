@@ -45,38 +45,31 @@ const PHOTOS = [
 ]
 
 // Generate random positions for photos
-const generatePositions = () => {
-  const positions = []
-  const isMobile = window.innerWidth < 768
-  const cellWidth = isMobile ? 160 : 400
-  const cellHeight = isMobile ? 240 : 600
-  const spacing = isMobile ? 20 : 80
-  const cols = isMobile ? 2 : 8
-  const rows = isMobile ? 15 : Math.ceil(PHOTOS.length * 3 / cols)
+const generatePositions = (photos) => {
+  const positions = [];
+  const cols = 20; // Увеличено в 2 раза (было 10)
+  const rows = 14; // Увеличено в 2 раза (было 7)
+  const spacing = 300;
+  const offsetX = -(cols * spacing) / 2;
+  const offsetY = -(rows * spacing) / 2;
 
-  // Create vertical grid layout
-  for (let i = 0; i < PHOTOS.length * 3; i++) {
-    const photo = PHOTOS[i % PHOTOS.length]
-    const col = Math.floor(i / rows)
-    const row = i % rows
-    const x = spacing + col * (cellWidth + spacing)
-    const y = spacing + row * (cellHeight + spacing)
-
-    const isVertical = photo.height > photo.width
-    positions.push({
-      ...photo,
-      x,
-      y,
-      rotation: 0,
-      scale: 1,
-      width: cellWidth,
-      height: cellHeight,
-      isVertical,
-    })
+  let photoIndex = 0;
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      if (photoIndex < photos.length) {
+        positions.push({
+          x: offsetX + col * spacing,
+          y: offsetY + row * spacing,
+          photo: photos[photoIndex],
+          originalIndex: photoIndex
+        });
+        photoIndex++;
+      }
+    }
   }
 
-  return positions
-}
+  return positions;
+};
 
 const PHOTO_POSITIONS = generatePositions()
 
@@ -328,234 +321,277 @@ function ConnectModal({ onClose }) {
 
 // Main App Component
 function App() {
-  const [activeModal, setActiveModal] = useState(null)
-  const [selectedPhoto, setSelectedPhoto] = useState(null)
-  const [isDragging, setIsDragging] = useState(false)
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [canvasPosition, setCanvasPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [hoveredPhoto, setHoveredPhoto] = useState(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+  const [showGrid, setShowGrid] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const [showStats, setShowStats] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filter, setFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('original');
+  const [showHelp, setShowHelp] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadedCount, setLoadedCount] = useState(0);
+  const [showWelcome, setShowWelcome] = useState(true);
 
-  const containerRef = useRef(null)
-  const canvasRef = useRef(null)
+  const canvasRef = useRef(null);
+  const positionsRef = useRef([]);
+  const filteredPositionsRef = useRef([]);
 
-  // Motion values for smooth dragging with inertia
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-
-  // Spring physics for inertia
-  const springX = useSpring(x, { stiffness: 300, damping: 30, mass: 0.5 })
-  const springY = useSpring(y, { stiffness: 300, damping: 30, mass: 0.5 })
-
-  // Drag state refs
-  const dragStart = useRef({ x: 0, y: 0 })
-  const canvasStart = useRef({ x: 0, y: 0 })
-  const velocity = useRef({ x: 0, y: 0 })
-  const lastPos = useRef({ x: 0, y: 0 })
-  const rafId = useRef(null)
-
-  // Handle mouse down
-  const handleMouseDown = useCallback((e) => {
-    if (activeModal) return
-    if (e.target.closest('.photo-item')) return
-
-    setIsDragging(true)
-    dragStart.current = { x: e.clientX, y: e.clientY }
-    canvasStart.current = { x: springX.get(), y: springY.get() }
-    lastPos.current = { x: e.clientX, y: e.clientY }
-    velocity.current = { x: 0, y: 0 }
-
-    if (rafId.current) cancelAnimationFrame(rafId.current)
-  }, [activeModal, springX, springY])
-
-  // Handle mouse move
-  const handleMouseMove = useCallback((e) => {
-    if (!isDragging || activeModal) return
-
-    const dx = e.clientX - dragStart.current.x
-    const dy = e.clientY - dragStart.current.y
-
-    // Calculate velocity for inertia
-    velocity.current = {
-      x: e.clientX - lastPos.current.x,
-      y: e.clientY - lastPos.current.y
-    }
-    lastPos.current = { x: e.clientX, y: e.clientY }
-
-    // Update position directly for immediate response
-    x.set(canvasStart.current.x + dx)
-    y.set(canvasStart.current.y + dy)
-  }, [isDragging, activeModal, x, y])
-
-  // Handle mouse up with inertia
-  const handleMouseUp = useCallback(() => {
-    if (!isDragging) return
-    setIsDragging(false)
-
-    // Apply inertia
-    const decay = 0.95
-    const minVelocity = 0.5
-
-    const animate = () => {
-      if (Math.abs(velocity.current.x) > minVelocity || Math.abs(velocity.current.y) > minVelocity) {
-        x.set(x.get() + velocity.current.x)
-        y.set(y.get() + velocity.current.y)
-
-        velocity.current.x *= decay
-        velocity.current.y *= decay
-
-        rafId.current = requestAnimationFrame(animate)
-      }
-    }
-
-    animate()
-  }, [isDragging, x, y])
-
-  // Touch events for mobile
-  const handleTouchStart = useCallback((e) => {
-    if (activeModal) return
-    if (e.target.closest('.photo-item')) return
-
-    const touch = e.touches[0]
-    setIsDragging(true)
-    dragStart.current = { x: touch.clientX, y: touch.clientY }
-    canvasStart.current = { x: springX.get(), y: springY.get() }
-    lastPos.current = { x: touch.clientX, y: touch.clientY }
-    velocity.current = { x: 0, y: 0 }
-  }, [activeModal, springX, springY])
-
-  const handleTouchMove = useCallback((e) => {
-    if (!isDragging || activeModal) return
-
-    const touch = e.touches[0]
-    const dx = touch.clientX - dragStart.current.x
-    const dy = touch.clientY - dragStart.current.y
-
-    velocity.current = {
-      x: touch.clientX - lastPos.current.x,
-      y: touch.clientY - lastPos.current.y
-    }
-    lastPos.current = { x: touch.clientX, y: touch.clientY }
-
-    x.set(canvasStart.current.x + dx)
-    y.set(canvasStart.current.y + dy)
-  }, [isDragging, activeModal, x, y])
-
-  const handleTouchEnd = useCallback(() => {
-    handleMouseUp()
-  }, [handleMouseUp])
-
-  // Global event listeners
   useEffect(() => {
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('mouseup', handleMouseUp)
-    window.addEventListener('touchmove', handleTouchMove, { passive: false })
-    window.addEventListener('touchend', handleTouchEnd)
+    // Увеличиваем количество фотографий для новой сетки
+    const extendedPhotos = [...photos, ...photos, ...photos, ...photos].slice(0, 280);
+    positionsRef.current = generatePositions(extendedPhotos);
 
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-      window.removeEventListener('touchmove', handleTouchMove)
-      window.removeEventListener('touchend', handleTouchEnd)
-      if (rafId.current) cancelAnimationFrame(rafId.current)
+    // Устанавливаем начальное положение в центр сетки
+    const centerX = 0;
+    const centerY = 0;
+    setCanvasPosition({ x: centerX, y: centerY });
+    setIsLoading(false);
+
+    // Автоматически скрываем welcome через 3 секунды
+    const timer = setTimeout(() => {
+      setShowWelcome(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    let filtered = positionsRef.current;
+
+    if (filter !== 'all') {
+      filtered = filtered.filter(pos => {
+        const tags = pos.photo.tags || [];
+        return tags.includes(filter);
+      });
     }
-  }, [handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
 
-  // Handle photo click
-  const handlePhotoClick = (photo) => {
-    if (isDragging) return
-    setSelectedPhoto(photo)
-    setActiveModal('photo')
-  }
+    if (sortBy === 'date') {
+      filtered = [...filtered].sort((a, b) => {
+        const dateA = new Date(a.photo.date || 0);
+        const dateB = new Date(b.photo.date || 0);
+        return dateB - dateA;
+      });
+    } else if (sortBy === 'name') {
+      filtered = [...filtered].sort((a, b) =>
+        (a.photo.name || '').localeCompare(b.photo.name || '')
+      );
+    }
 
-  // Close modal
-  const closeModal = () => {
-    setActiveModal(null)
-    setSelectedPhoto(null)
-  }
+    filteredPositionsRef.current = filtered;
+  }, [filter, sortBy]);
+
+  const handlePhotoClick = (photo, position) => {
+    if (isDragging) return;
+    setSelectedPhoto(photo);
+    setShowInfo(true);
+  };
+
+  const handleMouseDown = (e) => {
+    if (e.target.closest('.photo-modal') || e.target.closest('.controls')) return;
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - canvasPosition.x, y: e.clientY - canvasPosition.y });
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    setCanvasPosition({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleWheel = (e) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    setZoom(prev => Math.max(0.1, Math.min(3, prev * delta)));
+  };
+
+  const handleReset = () => {
+    setIsTransitioning(true);
+    setCanvasPosition({ x: 0, y: 0 });
+    setZoom(1);
+    setTimeout(() => setIsTransitioning(false), 300);
+  };
+
+  const handleCenter = () => {
+    setIsTransitioning(true);
+    setCanvasPosition({ x: 0, y: 0 });
+    setTimeout(() => setIsTransitioning(false), 300);
+  };
+
+  const handleKeyPress = useCallback((e) => {
+    if (e.key === 'Escape') {
+      setSelectedPhoto(null);
+      setShowInfo(false);
+      setShowAbout(false);
+      setShowStats(false);
+      setShowFilters(false);
+      setShowHelp(false);
+    } else if (e.key === 'r' || e.key === 'R') {
+      handleReset();
+    } else if (e.key === 'c' || e.key === 'C') {
+      handleCenter();
+    } else if (e.key === 'g' || e.key === 'G') {
+      setShowGrid(prev => !prev);
+    } else if (e.key === 'h' || e.key === 'H') {
+      setShowHelp(prev => !prev);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [handleKeyPress]);
+
+  useEffect(() => {
+    const handleGlobalMouseUp = () => setIsDragging(false);
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
+  }, []);
+
+  const handlePhotoLoad = () => {
+    setLoadedCount(prev => prev + 1);
+  };
+
+  const stats = {
+    total: filteredPositionsRef.current.length,
+    tags: [...new Set(filteredPositionsRef.current.flatMap(pos => pos.photo.tags || []))],
+    dateRange: {
+      earliest: new Date(Math.min(...filteredPositionsRef.current.map(pos => new Date(pos.photo.date || Date.now())))),
+      latest: new Date(Math.max(...filteredPositionsRef.current.map(pos => new Date(pos.photo.date || Date.now()))))
+    }
+  };
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-zinc-900 select-none">
-      {/* Noise Overlay */}
-      <div className="noise-overlay" />
-      {/* Navigation */}
-      <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />
-
-      {/* Infinite Canvas Container */}
-      <div
-        ref={containerRef}
-        className={cn( "absolute inset-0 overflow-hidden",
-          isDragging ? "cursor-grabbing" : "cursor-grab"
-        )}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
-      >
-        <motion.div
-          className="absolute inset-0 select-none"
-          ref={canvasRef}
-          style={{ x: springX, y: springY }}
-          className="absolute w-[4000px] h-[4000px] bg-zinc-900"
-        >
-          {/* Grid lines for depth */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="w-full h-full" />
+    <div className="app">
+      {isLoading && (
+        <div className="loading-screen">
+          <div className="loading-content">
+            <div className="loading-spinner"></div>
+            <p>Загрузка галереи...</p>
+            <p>{loadedCount} / {filteredPositionsRef.current.length} фото</p>
           </div>
+        </div>
+      )}
 
-          {/* Photos */}
-          {PHOTO_POSITIONS.map((photo) => (
-            <div
-              key={photo.id}
-              className="absolute cursor-pointer hover:opacity-50 transition-all duration-300"
-              style={{
-                left: photo.x,
-                top: photo.y,
-                width: photo.width,
-                height: photo.height,
-                transform: `rotate(${photo.rotation}deg) scale(${photo.scale})`,
-              }}
-              onClick={() => handlePhotoClick(photo)}
-            >
-              <div className={cn(
-                "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col",
-                !photo.isVertical && "justify-start"
-              )}>
-                <img
-                  src={photo.src}
-                  alt={photo.title}
-                  className={cn(
-                    'w-full hover:opacity-50 transition-opacity duration-300',
-                    photo.isVertical ? 'h-full object-cover' : 'h-auto object-contain align-self-start'
-                  )}
-                  draggable={false}
-                />
-                <div className="absolute inset-0 bg-black/0" />
-              </div>
-            </div>
-          ))}
-          ))}
+      {showWelcome && (
+        <div className="welcome-screen">
+          <h1>Добро пожаловать в фотогалерею</h1>
+          <p>Используйте мышь для навигации</p>
+          <p>Колесо мыши для масштабирования</p>
+        </div>
+      )}
 
-          {/* Canvas center marker */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 border border-orange-500/30 rounded-full" />
-        </motion.div>
+      <div
+        className={`canvas ${isDragging ? 'dragging' : ''} ${isTransitioning ? 'transitioning' : ''}`}
+        ref={canvasRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onWheel={handleWheel}
+        style={{
+          transform: `translate(${canvasPosition.x}px, ${canvasPosition.y}px) scale(${zoom})`
+        }}
+      >
+        {filteredPositionsRef.current.map((pos, index) => (
+          <Photo
+            key={`${pos.photo.id}-${index}`}
+            photo={pos.photo}
+            position={pos}
+            onClick={() => handlePhotoClick(pos.photo, pos)}
+            onHover={setHoveredPhoto}
+            isHovered={hoveredPhoto === pos.photo.id}
+            onLoad={handlePhotoLoad}
+          />
+        ))}
+
+        {showGrid && (
+          <GridOverlay
+            cols={20}
+            rows={14}
+            spacing={300}
+          />
+        )}
       </div>
 
-      {/* Instructions overlay */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-        <p className="font-mono text-zinc-500 text-xs tracking-widest uppercase">
-          2026 made with Webly AI
-        </p>
-      </div>
+      <Controls
+        onReset={handleReset}
+        onCenter={handleCenter}
+        zoom={zoom}
+        onZoomChange={setZoom}
+        onToggleGrid={() => setShowGrid(prev => !prev)}
+        onToggleAbout={() => setShowAbout(prev => !prev)}
+        onToggleStats={() => setShowStats(prev => !prev)}
+        onToggleFilters={() => setShowFilters(prev => !prev)}
+        onToggleHelp={() => setShowHelp(prev => !prev)}
+        showGrid={showGrid}
+      />
 
-      {/* Modals */}
-      <AnimatePresence>
-        {activeModal === 'photo' && (
-          <PhotoModal photo={selectedPhoto} onClose={closeModal} />
-        )}
-        {activeModal === 'about' && (
-          <AboutModal onClose={closeModal} />
-        )}
-        {activeModal === 'connect' && (
-          <ConnectModal onClose={closeModal} />
-        )}
-      </AnimatePresence>
+      {selectedPhoto && (
+        <PhotoModal
+          photo={selectedPhoto}
+          onClose={() => {
+            setSelectedPhoto(null);
+            setShowInfo(false);
+          }}
+        />
+      )}
+
+      {showInfo && selectedPhoto && (
+        <InfoPanel
+          photo={selectedPhoto}
+          onClose={() => setShowInfo(false)}
+        />
+      )}
+
+      {showAbout && (
+        <AboutModal onClose={() => setShowAbout(false)} />
+      )}
+
+      {showStats && (
+        <StatsModal
+          stats={stats}
+          onClose={() => setShowStats(false)}
+        />
+      )}
+
+      {showFilters && (
+        <FilterPanel
+          currentFilter={filter}
+          onFilterChange={setFilter}
+          currentSort={sortBy}
+          onSortChange={setSortBy}
+          onClose={() => setShowFilters(false)}
+        />
+      )}
+
+      {showHelp && (
+        <HelpModal onClose={() => setShowHelp(false)} />
+      )}
+
+      <MiniMap
+        canvasPosition={canvasPosition}
+        zoom={zoom}
+        onPositionChange={setCanvasPosition}
+        cols={20}
+        rows={14}
+        spacing={300}
+      />
     </div>
-  )
+  );
+}
 }
 
 export default App

@@ -254,10 +254,10 @@ function ConnectModal({ onClose }) {
       onClick={onClose}
     >
       {/* Gradient Background with Noise */}
-            <feTurbulence type="fractalNoise" baseFrequency="0.013 0.013" numOctaves="4" seed="2" result="noise"/>
-            <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.7 0"/>
-            <feComposite operator="over" in2="SourceGraphic" result="finalNoise"/>
-            <animate xlinkHref="#noise" attributeName="baseFrequency" values="0.013 0.013;0.014 0.014;0.013 0.013" dur="6s" repeatCount="indefinite"/>
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-950 via-zinc-950 to-black">
+        <div className="absolute inset-0 opacity-40" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+        }} />
       </div>
 
       <button
@@ -521,27 +521,35 @@ function App() {
           </div>
 
           {/* Photos */}
-            <div className="absolute inset-0 pointer-events-none">
-              {PHOTO_POSITIONS.map((photo, index) => (
-                <div
-                  key={index}
-                  className="absolute"
-                  style={{
-                    left: photo.x,
-                    top: photo.y,
-                    width: photo.width,
-                    height: photo.height,
-                    opacity: 0.8,
-                  }}
-                >
-                  <img
-                    src={photo.src}
-                    alt=""
-                    className="w-full h-full object-cover rounded-lg shadow-2xl"
-                  />
-                </div>
-              ))}
+          {PHOTO_POSITIONS.map((photo) => (
+            <div
+              key={`${photo.id}-${photo.x}-${photo.y}`}
+              className="absolute cursor-pointer hover:opacity-50 transition-all duration-300 photo-item"
+              style={{
+                left: photo.x,
+                top: photo.y,
+                width: photo.width,
+                height: photo.height,
+                transform: `rotate(${photo.rotation}deg) scale(${photo.scale})`,
+              }}
+              onClick={() => handlePhotoClick(photo)}
+            >
+              <div className={cn( "relative w-full h-full overflow-hidden flex flex-col",
+                !photo.isVertical && "justify-start"
+              )}>
+                <img
+                  src={photo.src}
+                  alt={photo.title}
+                  className={cn(
+                    'w-full opacity-80 hover:opacity-50 transition-opacity duration-300',
+                    photo.isVertical ? 'h-full object-cover' : 'h-auto object-contain align-self-start'
+                  )}
+                  draggable={false}
+                />
+                <div className="absolute inset-0 bg-black/0" />
+              </div>
             </div>
+          ))}
 
           {/* Canvas center marker */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 border border-orange-500/30 rounded-full" />

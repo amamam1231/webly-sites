@@ -256,7 +256,7 @@ function ConnectModal({ onClose }) {
       {/* Gradient Background with Noise */}
       <div className="absolute inset-0 bg-gradient-to-br from-orange-950 via-zinc-950 to-black">
         <div className="absolute inset-0 opacity-40" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.64' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
         }} />
       </div>
 
@@ -541,7 +541,7 @@ function App() {
                   src={photo.src}
                   alt={photo.title}
                   className={cn(
-                    'w-full opacity-80 hover:opacity-50 transition-opacity duration-300',
+                    'w-full opacity-80 hover:opacity-100 transition-opacity duration-300',
                     photo.isVertical ? 'h-full object-cover' : 'h-auto object-contain align-self-start'
                   )}
                   draggable={false}

@@ -534,19 +534,13 @@ function App() {
               }}
               onClick={() => handlePhotoClick(photo)}
             >
-              <div className={cn( "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col",
-                !photo.isVertical && "justify-start"
-              )}>
+              <div className="relative w-full h-full overflow-hidden">
                 <img
                   src={photo.src}
                   alt={photo.title}
-                  className={cn(
-                    'w-full hover:opacity-50 transition-opacity duration-300',
-                    photo.isVertical ? 'h-full object-cover' : 'h-auto object-contain align-self-start'
-                  )}
+                  className="w-full h-full object-cover grayscale hover:opacity-50 transition-opacity duration-300"
                   draggable={false}
                 />
-                <div className="absolute inset-0 bg-black/0" />
               </div>
             </div>
           ))}

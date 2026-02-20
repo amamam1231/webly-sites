@@ -496,8 +496,8 @@ function App() {
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-zinc-900 select-none">
-      {/* Noise Overlay */}
-      <div className="noise-overlay" />
+      {/* TV Noise Overlay */}
+      <div className="tv-noise" />
       {/* Navigation */}
       <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />
 

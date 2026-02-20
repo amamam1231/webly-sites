@@ -52,7 +52,7 @@ const generatePositions = () => {
   const cellHeight = isMobile ? 240 : 450
   const spacing = isMobile ? 20 : 60
   const cols = isMobile ? 2 : (Math.floor(window.innerWidth / (cellWidth + spacing)) || 6)
-  const rows = Math.ceil(PHOTOS.length * 3 / cols)
+  const rows = isMobile ? 15 : Math.ceil(PHOTOS.length * 3 / cols)
 
   // Create vertical grid layout
   for (let i = 0; i < PHOTOS.length * 3; i++) {

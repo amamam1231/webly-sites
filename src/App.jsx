@@ -47,10 +47,11 @@ const PHOTOS = [
 // Generate random positions for photos
 const generatePositions = () => {
   const positions = []
-  const cellWidth = 300
-  const cellHeight = 450
-  const spacing = 60
-  const cols = Math.floor(window.innerWidth / (cellWidth + spacing)) || 6
+  const isMobile = window.innerWidth < 768
+  const cellWidth = isMobile ? 160 : 300
+  const cellHeight = isMobile ? 240 : 450
+  const spacing = isMobile ? 20 : 60
+  const cols = isMobile ? 2 : (Math.floor(window.innerWidth / (cellWidth + spacing)) || 6)
   const rows = Math.ceil(PHOTOS.length * 3 / cols)
 
   // Create vertical grid layout
@@ -500,7 +501,7 @@ function App() {
           {PHOTO_POSITIONS.map((photo) => (
             <div
               key={photo.id}
-              className="absolute cursor-pointer hover:opacity-50"
+              className="absolute cursor-pointer hover:opacity-50 transition-all duration-300"
               style={{
                 left: photo.x,
                 top: photo.y,
@@ -526,6 +527,7 @@ function App() {
                 <div className="absolute inset-0 bg-black/0" />
               </div>
             </div>
+          ))}
           ))}
 
           {/* Canvas center marker */}

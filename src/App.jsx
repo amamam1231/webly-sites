@@ -9,10 +9,10 @@ function cn(...inputs) {
   return twMerge(clsx(...inputs))
 }
 
-// Canvas size - adjusted for mobile performance
+// Canvas size
 const CANVAS_SIZE = 30000
 
-// Photo data (unchanged)
+// Photo data
 const PHOTOS = [
   { id: 1, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453880-2918.jpg?', title: 'Urban Solitude', date: '2023.11.15', camera: 'Leica M10-R' },
   { id: 2, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-2291.jpg?', title: 'Shadow Play', date: '2023.10.22', camera: 'Leica Q2' },
@@ -36,79 +36,74 @@ const PHOTOS = [
   { id: 20, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8936.jpg?', title: 'Monochrome', date: '2023.10.10', camera: 'Leica Q2 Monochrom' },
   { id: 21, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-7385.jpg?', title: 'Film Memories', date: '2024.01.25', camera: 'Leica M6' },
   { id: 22, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8284.jpg?', title: 'Mirror World', date: '2023.09.05', camera: 'Leica M10-R' },
-  { id: 23, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8710.jpg?', title: 'Eternal', date: '2024.03.10', camera: 'Leica Q2' },
-  { id: 24, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-2278.jpg?', title: 'Pure Feeling', date: '2023.12.20', camera: 'Leica M6' },
-  { id: 25, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-1442.jpg?', title: 'Captured Time', date: '2024.02.05', camera: 'Leica M10-R' },
-  { id: 26, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-8417.jpg?', title: 'Deep Focus', date: '2023.11.05', camera: 'Leica Q2 Monochrom' },
-  { id: 27, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9947.jpg?', title: 'Quiet Objects', date: '2024.01.18', camera: 'Leica M6' },
-  { id: 28, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9719.jpg?', title: 'Lines & Curves', date: '2023.10.15', camera: 'Leica M10-R' },
-  { id: 29, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-1425.jpg?', title: 'Luminous Study', date: '2024.03.15', camera: 'Leica Q2' },
-  { id: 30, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5244.jpg?', title: 'Broken Pieces', date: '2023.12.28', camera: 'Leica M6' },
 ]
 
-// Generate random positions for photos - OPTIMIZED FOR MOBILE
-const generatePositions = () => {
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
-  const cellWidth = isMobile ? 140 : 400
-  const cellHeight = isMobile ? 210 : 600
-  const spacing = isMobile ? 16 : 80
-  const cols = isMobile ? 2 : 20
-  // Much smaller multiplier for mobile to ensure smooth performance
-  const multiplier = isMobile ? 3 : 20
-  const totalPhotos = PHOTOS.length * multiplier
-  const rows = Math.ceil(totalPhotos / cols)
+// Generate random positions for photos - same layout on all devices
+const PHOTO_POSITIONS = PHOTOS.map((photo, index) => {
+  // Create a scattered grid layout with random offsets
+  const gridSize = 5 // 5 columns
+  const col = index % gridSize
+  const row = Math.floor(index / gridSize)
 
-  const positions = []
+  // Base positions with large spacing
+  const baseX = 15000 + (col - 2) * 1200
+  const baseY = 15000 + (row - 2) * 1400
 
-  for (let i = 0; i < totalPhotos; i++) {
-    const photo = PHOTOS[i % PHOTOS.length]
-    const col = Math.floor(i / rows)
-    const row = i % rows
-    const x = spacing + col * (cellWidth + spacing)
-    const y = spacing + row * (cellHeight + spacing)
+  // Random offsets for creative disorder
+  const randomX = (Math.random() - 0.5) * 400
+  const randomY = (Math.random() - 0.5) * 400
 
-    positions.push({
-      ...photo,
-      x,
-      y,
-      rotation: 0,
-      scale: 1,
-      width: cellWidth,
-      height: cellHeight,
-    })
+  // Random rotation between -8 and 8 degrees
+  const rotation = (Math.random() - 0.5) * 16
+
+  // Random scale between 0.9 and 1.1
+  const scale = 0.9 + Math.random() * 0.2
+
+  // Photo dimensions - consistent across devices
+  const width = 350 + Math.random() * 100
+  const height = width * (1.2 + Math.random() * 0.4)
+
+  return {
+    ...photo,
+    x: baseX + randomX,
+    y: baseY + randomY,
+    width,
+    height,
+    rotation,
+    scale,
   }
+})
 
-  return positions
-}
-
-const PHOTO_POSITIONS = generatePositions()
-
-// Navbar Component
+// Navigation Component
 function Navbar({ activeModal, setActiveModal }) {
   const navItems = [
-    { label: 'Portfolio', id: 'portfolio', action: () => setActiveModal(null) },
-    { label: 'About Me', id: 'about', action: () => setActiveModal('about') },
-    { label: 'Connect', id: 'connect', action: () => setActiveModal('connect') },
-    { label: 'Blog', id: 'blog', action: () => window.open('https://medium.com', '_blank') },
+    { label: 'Portfolio', action: () => setActiveModal(null) },
+    { label: 'About Me', action: () => setActiveModal('about') },
+    { label: 'Connect', action: () => setActiveModal('connect') },
+    { label: 'Blog', action: () => window.open('https://blog.sergiomusel.com', '_blank') },
   ]
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-4 md:px-12 md:py-6 flex justify-between items-start pointer-events-none">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex items-start justify-between p-4 md:p-6 pointer-events-none">
+      {/* Logo */}
       <div className="pointer-events-auto">
-        <h1 className="font-serif text-white text-lg md:text-2xl font-bold leading-tight tracking-tight">
-          SERGIO<br/>MUSEL
+        <h1 className="font-mono text-white text-lg md:text-xl leading-tight tracking-tight cursor-pointer hover:text-orange-500 transition-colors" onClick={() => setActiveModal(null)}>
+          <span className="block">SERGIO</span>
+          <span className="block">MUSEL</span>
         </h1>
       </div>
 
-      <div className="flex flex-col gap-2 md:gap-4 pointer-events-auto items-end">
+      {/* Navigation Links */}
+      <div className="flex flex-col md:flex-row gap-2 md:gap-8 pointer-events-auto">
         {navItems.map((item) => (
           <button
-            key={item.id}
+            key={item.label}
             onClick={item.action}
-            className={cn( "font-sans text-[10px] md:text-sm tracking-wide uppercase transition-colors duration-300 hover:text-orange-500",
-              (activeModal === item.id || (item.id === 'portfolio' && !activeModal))
-                ? "text-orange-500"
-                : "text-zinc-400"
+            className={cn(
+              "font-mono text-xs md:text-sm tracking-widest uppercase transition-colors text-right",
+              activeModal === 'about' && item.label === 'About Me' ? "text-orange-500" :
+              activeModal === 'connect' && item.label === 'Connect' ? "text-orange-500" :
+              "text-zinc-400 hover:text-white"
             )}
           >
             {item.label}
@@ -124,28 +119,40 @@ function PhotoModal({ photo, onClose }) {
   if (!photo) return null
 
   return (
-    <div
-      className="fixed inset-0 z-40 bg-black/90 flex items-center justify-center p-4"
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="fixed inset-0 z-40 flex items-center justify-center bg-black/95"
       onClick={onClose}
     >
-      <div className="relative w-full h-full flex flex-col items-center justify-center">
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="relative max-w-[90vw] max-h-[90vh] flex flex-col items-center"
+        onClick={(e) => e.stopPropagation()}
+      >
         <img
           src={photo.src}
           alt={photo.title}
-          className="max-w-full max-h-[70vh] w-auto h-auto object-contain grayscale"
+          className="max-w-full max-h-[80vh] object-contain"
         />
-        <div className="mt-6 text-center">
-          <h3 className="text-white font-mono text-lg md:text-xl mb-2">{photo.title}</h3>
-          <p className="text-zinc-400 font-mono text-xs md:text-sm">{photo.date} • {photo.camera}</p>
+        <div className="mt-6 text-center font-mono text-zinc-400 text-xs md:text-sm space-y-1">
+          <p className="text-white text-sm md:text-base">{photo.title}</p>
+          <p>{photo.date}</p>
+          <p>{photo.camera}</p>
         </div>
         <button
           onClick={onClose}
-          className="absolute top-0 right-0 text-zinc-400 hover:text-white transition-colors p-2"
+          className="mt-6 font-mono text-zinc-500 hover:text-white text-xs tracking-widest uppercase transition-colors"
         >
-          <SafeIcon name="X" size={32} />
+          Close
         </button>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }
 
@@ -156,86 +163,71 @@ function AboutModal({ onClose }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-40 bg-zinc-950/98 overflow-y-auto"
+      transition={{ duration: 0.3 }}
+      className="fixed inset-0 z-40 flex items-center justify-center bg-zinc-900/98 overflow-y-auto"
       onClick={onClose}
     >
-      <button
-        onClick={onClose}
-        className="fixed top-4 right-4 md:top-6 md:right-6 text-zinc-400 hover:text-white transition-colors z-50"
-      >
-        <SafeIcon name="X" size={32} />
-      </button>
-
-      <div
-        className="min-h-screen flex items-center justify-center p-4 md:p-12 lg:p-24"
+      <motion.div
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 50, opacity: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="relative w-full max-w-6xl p-6 md:p-12"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20">
-          {/* Left - Photo */}
-          <div className="relative">
-            <div className="aspect-[3/4] bg-zinc-900 overflow-hidden">
-              <img
-                src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5768.jpg?"
-                alt="Sergio Musel"
-                className="w-full h-full object-cover grayscale"
-              />
-            </div>
-            <div className="absolute -bottom-4 -right-4 w-16 h-16 md:w-24 md:h-24 border border-orange-500/30" />
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 md:top-8 md:right-8 font-mono text-zinc-500 hover:text-white text-xs tracking-widest uppercase transition-colors"
+        >
+          <SafeIcon name="x" size={24} />
+        </button>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+          {/* Photo */}
+          <div className="aspect-[3/4] bg-zinc-800 overflow-hidden">
+            <img
+              src={PHOTOS[0].src}
+              alt="Sergio Musel"
+              className="w-full h-full object-cover grayscale"
+            />
           </div>
 
-          {/* Right - Content */}
-          <div className="flex flex-col justify-center">
-            <h2 className="font-mono text-white text-3xl md:text-5xl font-bold mb-6 md:mb-8 tracking-tighter">
-              ABOUT ME
+          {/* Content */}
+          <div className="flex flex-col justify-center space-y-6">
+            <h2 className="font-mono text-white text-2xl md:text-4xl tracking-tight">
+              About Me
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8 md:mb-12">
-              <div>
-                <p className="text-zinc-400 leading-relaxed font-sans text-sm md:text-base">
-                  Born in Prague and trained in the traditions of analog photography,
-                  I have spent the last decade capturing the raw essence of urban landscapes.
-                  My work explores the intersection of light and shadow, finding beauty in
-                  the overlooked corners of metropolitan life.
-                </p>
-              </div>
-              <div>
-                <p className="text-zinc-400 leading-relaxed font-sans text-sm md:text-base">
-                  Each photograph is a meditation on time and space, shot exclusively on
-                  Leica rangefinders. I believe in the slow process of craft—the deliberate
-                  click of the shutter, the anticipation of development, the tangible weight
-                  of silver gelatin prints.
-                </p>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-mono text-zinc-400 text-sm leading-relaxed">
+              <p>
+                Based in Prague, I specialize in black and white street photography
+                that captures the raw essence of urban life. My work explores the
+                interplay between light and shadow, finding beauty in fleeting moments
+                of everyday existence.
+              </p>
+              <p>
+                With over a decade of experience shooting exclusively on Leica cameras,
+                I've developed a distinctive aesthetic that emphasizes contrast, texture,
+                and emotional depth. My photographs have been exhibited across Europe
+                and featured in numerous publications.
+              </p>
             </div>
 
             {/* Awards */}
-            <div className="border-t border-zinc-800 pt-6 md:pt-8">
-              <h3 className="font-mono text-orange-500 text-xs md:text-sm tracking-widest mb-4 md:mb-6 flex items-center gap-2">
-                <SafeIcon name="Award" size={16} />
-                LEICA AWARDS
+            <div className="pt-8 border-t border-zinc-800">
+              <h3 className="font-mono text-zinc-500 text-xs tracking-widest uppercase mb-4">
+                Leica Awards & Recognition
               </h3>
-              <div className="space-y-2 md:space-y-3 font-mono text-xs md:text-sm">
-                <div className="flex justify-between text-zinc-300">
-                  <span>Leica Oskar Barnack Award</span>
-                  <span className="text-zinc-600">2023</span>
-                </div>
-                <div className="flex justify-between text-zinc-300">
-                  <span>Leica Street Photography Contest</span>
-                  <span className="text-zinc-600">2022</span>
-                </div>
-                <div className="flex justify-between text-zinc-300">
-                  <span>World Press Photo</span>
-                  <span className="text-zinc-600">2021</span>
-                </div>
-                <div className="flex justify-between text-zinc-300">
-                  <span>Prague Photo Festival</span>
-                  <span className="text-zinc-600">2020</span>
-                </div>
-              </div>
+              <ul className="font-mono text-zinc-400 text-sm space-y-2">
+                <li>2024 - Leica Oskar Barnack Award, Finalist</li>
+                <li>2023 - Prague Photo Festival, Best Series</li>
+                <li>2022 - European Street Photography, Honorable Mention</li>
+                <li>2021 - Leica Monochrome Challenge, Winner</li>
+              </ul>
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   )
 }
@@ -253,136 +245,101 @@ function ConnectModal({ onClose }) {
     }))
   }, [])
 
+  const socialLinks = [
+    { name: 'Instagram', url: 'https://instagram.com/sergiomusel' },
+    { name: 'Twitter', url: 'https://twitter.com/sergiomusel' },
+    { name: 'Behance', url: 'https://behance.net/sergiomusel' },
+    { name: 'Email', url: 'mailto:hello@sergiomusel.com' },
+  ]
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-40 overflow-y-auto"
+      transition={{ duration: 0.3 }}
+      className="fixed inset-0 z-40 flex items-center justify-center"
+      style={{
+        background: 'linear-gradient(135deg, #18181b 0%, #7c2d12 50%, #18181b 100%)',
+      }}
       onClick={onClose}
     >
-      {/* Gradient Background with Noise */}
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-950 via-zinc-950 to-black">
-        <div className="absolute inset-0 opacity-40" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-        }} />
+      {/* Noise overlay */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none">
+        <div className="w-full h-full tv-noise" style={{ position: 'absolute', opacity: 0.3 }} />
       </div>
 
-      <button
-        onClick={onClose}
-        className="fixed top-4 right-4 md:top-6 md:right-6 text-zinc-400 hover:text-white transition-colors z-50"
-      >
-        <SafeIcon name="X" size={32} />
-      </button>
-
-      <div
-        className="relative min-h-screen flex flex-col items-center justify-center p-4 md:p-6 text-center"
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="relative z-10 text-center p-8"
         onClick={(e) => e.stopPropagation()}
       >
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="max-w-2xl"
+        <button
+          onClick={onClose}
+          className="absolute -top-12 right-0 md:-top-16 md:-right-16 font-mono text-zinc-400 hover:text-white text-xs tracking-widest uppercase transition-colors"
         >
-          <h2 className="font-mono text-white text-3xl md:text-6xl font-bold mb-4 tracking-tighter">
-            LET'S CONNECT
-          </h2>
+          <SafeIcon name="x" size={24} />
+        </button>
 
-          <p className="text-zinc-400 font-sans mb-8 md:mb-12 text-base md:text-lg px-4">
-            Open for collaborations, exhibitions, and commissioned work.
-          </p>
+        <h2 className="font-mono text-white text-3xl md:text-5xl tracking-tight mb-8">
+          Let's Connect
+        </h2>
 
-          <div className="flex flex-col items-center justify-center gap-4 md:gap-8 mb-8 md:mb-16">
+        <div className="space-y-4 mb-12">
+          {socialLinks.map((link) => (
             <a
-              href="https://instagram.com"
+              key={link.name}
+              href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 text-zinc-300 hover:text-orange-500 transition-colors font-mono text-sm md:text-base"
+              className="block font-mono text-zinc-300 hover:text-orange-500 text-sm tracking-widest uppercase transition-colors"
             >
-              <SafeIcon name="Instagram" size={20} className="md:w-6 md:h-6" />
-              <span>@sergiomusel</span>
+              {link.name}
             </a>
-            <a
-              href="https://twitter.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 text-zinc-300 hover:text-orange-500 transition-colors font-mono text-sm md:text-base"
-            >
-              <SafeIcon name="Twitter" size={20} className="md:w-6 md:h-6" />
-              <span>@sergiomusel</span>
-            </a>
-            <a
-              href="mailto:hello@sergiomusel.com"
-              className="flex items-center gap-3 text-zinc-300 hover:text-orange-500 transition-colors font-mono text-sm md:text-base"
-            >
-              <SafeIcon name="Mail" size={20} className="md:w-6 md:h-6" />
-              <span>hello@sergiomusel.com</span>
-            </a>
-          </div>
+          ))}
+        </div>
 
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-zinc-500 font-mono text-xs md:text-sm">
-            <div className="flex items-center gap-2">
-              <SafeIcon name="MapPin" size={14} />
-              <span>Prague, CZ</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <SafeIcon name="Calendar" size={14} />
-              <span>{currentDate}</span>
-            </div>
-          </div>
-        </motion.div>
-      </div>
+        <div className="font-mono text-zinc-500 text-xs space-y-2">
+          <p>{currentDate}</p>
+          <p>Prague, CZ</p>
+        </div>
+      </motion.div>
     </motion.div>
   )
 }
 
 // Main App Component
 function App() {
-  const [activeModal, setActiveModal] = useState(null)
-  const [selectedPhoto, setSelectedPhoto] = useState(null)
-  const [isDragging, setIsDragging] = useState(false)
-
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [activeModal, setActiveModal] = useState(null)
+  const [selectedPhoto, setSelectedPhoto] = useState(null)
 
-  // Motion values for smooth dragging with inertia
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-
-  // Spring physics for inertia
-  const springX = useSpring(x, { stiffness: 300, damping: 30, mass: 0.5 })
-  const springY = useSpring(y, { stiffness: 300, damping: 30, mass: 0.5 })
-
-  // Drag state refs
   const dragStart = useRef({ x: 0, y: 0 })
-  const canvasStart = useRef({ x: 0, y: 0 })
-  const velocity = useRef({ x: 0, y: 0 })
+  const canvasStart = useRef({ x: -CANVAS_SIZE / 2, y: -CANVAS_SIZE / 2 })
   const lastPos = useRef({ x: 0, y: 0 })
+  const velocity = useRef({ x: 0, y: 0 })
   const rafId = useRef(null)
 
-  // Set initial position to center of grid content on mount
+  // Motion values for smooth animation
+  const x = useMotionValue(-CANVAS_SIZE / 2)
+  const y = useMotionValue(-CANVAS_SIZE / 2)
+
+  const springX = useSpring(x, { stiffness: 300, damping: 30 })
+  const springY = useSpring(y, { stiffness: 300, damping: 30 })
+
+  // Initialize canvas position
   useEffect(() => {
-    const viewportWidth = window.innerWidth
-    const viewportHeight = window.innerHeight
-
-    // Calculate bounds from generated positions to find center of content
-    const maxX = Math.max(...PHOTO_POSITIONS.map(p => p.x + p.width))
-    const maxY = Math.max(...PHOTO_POSITIONS.map(p => p.y + p.height))
-
-    // Center of the grid content
-    const contentCenterX = maxX / 2
-    const contentCenterY = maxY / 2
-
-    // Position viewport to show center of content
-    const centerX = -contentCenterX + (viewportWidth / 2)
-    const centerY = -contentCenterY + (viewportHeight / 2)
-
-    x.set(centerX)
-    y.set(centerY)
+    x.set(-CANVAS_SIZE / 2)
+    y.set(-CANVAS_SIZE / 2)
+    canvasStart.current = { x: -CANVAS_SIZE / 2, y: -CANVAS_SIZE / 2 }
   }, [])
 
-  // Handle mouse down
+  // Mouse event handlers
   const handleMouseDown = useCallback((e) => {
     if (activeModal) return
     if (e.target.closest('.photo-item')) return
@@ -392,54 +349,53 @@ function App() {
     canvasStart.current = { x: springX.get(), y: springY.get() }
     lastPos.current = { x: e.clientX, y: e.clientY }
     velocity.current = { x: 0, y: 0 }
-
-    if (rafId.current) cancelAnimationFrame(rafId.current)
   }, [activeModal, springX, springY])
 
-  // Handle mouse move
   const handleMouseMove = useCallback((e) => {
     if (!isDragging || activeModal) return
 
     const dx = e.clientX - dragStart.current.x
     const dy = e.clientY - dragStart.current.y
 
-    // Calculate velocity for inertia
     velocity.current = {
       x: e.clientX - lastPos.current.x,
       y: e.clientY - lastPos.current.y
     }
     lastPos.current = { x: e.clientX, y: e.clientY }
 
-    // Update position directly for immediate response
     x.set(canvasStart.current.x + dx)
     y.set(canvasStart.current.y + dy)
   }, [isDragging, activeModal, x, y])
 
-  // Handle mouse up with inertia
   const handleMouseUp = useCallback(() => {
     if (!isDragging) return
+
     setIsDragging(false)
 
     // Apply inertia
-    const decay = 0.95
-    const minVelocity = 0.5
+    const vx = velocity.current.x * 2
+    const vy = velocity.current.y * 2
 
-    const animate = () => {
-      if (Math.abs(velocity.current.x) > minVelocity || Math.abs(velocity.current.y) > minVelocity) {
-        x.set(x.get() + velocity.current.x)
-        y.set(y.get() + velocity.current.y)
+    const currentX = x.get()
+    const currentY = y.get()
 
-        velocity.current.x *= decay
-        velocity.current.y *= decay
+    x.set(currentX + vx)
+    y.set(currentY + vy)
 
-        rafId.current = requestAnimationFrame(animate)
-      }
-    }
+    // Boundary checks
+    const maxX = 0
+    const minX = -CANVAS_SIZE + window.innerWidth
+    const maxY = 0
+    const minY = -CANVAS_SIZE + window.innerHeight
 
-    animate()
+    const boundedX = Math.max(minX, Math.min(maxX, currentX + vx))
+    const boundedY = Math.max(minY, Math.min(maxY, currentY + vy))
+
+    x.set(boundedX)
+    y.set(boundedY)
   }, [isDragging, x, y])
 
-  // Touch events for mobile
+  // Touch event handlers
   const handleTouchStart = useCallback((e) => {
     if (activeModal) return
     if (e.target.closest('.photo-item')) return
@@ -455,7 +411,6 @@ function App() {
   const handleTouchMove = useCallback((e) => {
     if (!isDragging || activeModal) return
 
-    // Prevent default to stop page scrolling while dragging canvas
     e.preventDefault()
 
     const touch = e.touches[0]
@@ -532,7 +487,7 @@ function App() {
             <div className="w-full h-full" />
           </div>
 
-          {/* Photos */}
+          {/* Photos - Same layout on all devices */}
           {PHOTO_POSITIONS.map((photo) => (
             <div
               key={`${photo.id}-${photo.x}-${photo.y}`}

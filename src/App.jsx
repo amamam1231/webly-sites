@@ -255,8 +255,8 @@ function ConnectModal({ onClose }) {
     >
       {/* Gradient Background with Noise */}
       <div className="absolute inset-0 bg-gradient-to-br from-orange-950 via-zinc-950 to-black">
-        <div className="absolute inset-0 opacity-60" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='8' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+        <div className="absolute inset-0 opacity-80" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
         }} />
       </div>
 
@@ -496,12 +496,12 @@ function App() {
   }
 
   return (
-    <div className={`relative w-full h-full overflow-hidden ${isDarkTheme ? 'bg-zinc-900' : 'bg-gray-100'} select-none transition-colors duration-500`}>
+    <div className="relative w-full h-full overflow-hidden bg-zinc-950 select-none transition-colors duration-500">
       {/* TV Noise Overlay */}
       <div className={`tv-noise ${!isDarkTheme && 'opacity-0'}`} />
       {/* Gradient Noise Overlay */}
       <div className="absolute top-0 left-0 w-full h-[100px] pointer-events-none z-20">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 to-transparent" />
       </div>
       {/* Navigation */}
       <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />

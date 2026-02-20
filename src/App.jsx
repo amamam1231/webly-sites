@@ -326,38 +326,28 @@ function ConnectModal({ onClose }) {
 }
 
 // Main App Component
-  // Three.js scene setup
-  const mountRef = useRef<HTMLDivElement>(null);
-  const sceneRef = useRef<THREE.Scene | null>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
-  const animationIdRef = useRef<number | null>(null);
-  const photoMeshesRef = useRef<THREE.Mesh[]>([]);
-  const raycasterRef = useRef<THREE.Raycaster>(new THREE.Raycaster());
-  const mouseRef = useRef<THREE.Vector2>(new THREE.Vector2());
-  const isDraggingRef = useRef(false);
-  const previousMouseRef = useRef<THREE.Vector2>(new THREE.Vector2());
-
+  // Инициализация камеры и сцены
   useEffect(() => {
-    if (!mountRef.current || photos.length === 0) return;
+    if (!canvasRef.current || !positions.length) return;
 
-    // Scene setup
+    // Создаем сцену
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a1a1a);
-    sceneRef.current = scene;
+    scene.background = new THREE.Color(0x0a0a0a);
 
-    // Camera setup
+    // Создаем камеру с начальной позицией в центре сетки
     const camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
       0.1,
       1000
     );
-    camera.position.set(0, 0, 10);
-    cameraRef.current = camera;
 
-    // Renderer setup
+    // Устанавливаем камеру в центр сетки (0, 0, 1200)
+    camera.position.set(0, 0, 1200);
+
+    // Создаем renderer
     const renderer = new THREE.WebGLRenderer({
+      canvas: canvasRef.current,
       antialias: true,
       alpha: true
     });
@@ -365,158 +355,223 @@ function ConnectModal({ onClose }) {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    mountRef.current.appendChild(renderer.domElement);
-    rendererRef.current = renderer;
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    // Добавляем ambient light
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
     scene.add(ambientLight);
 
+    // Добавляем directional light
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(5, 5, 5);
+    directionalLight.position.set(1000, 1000, 1000);
     directionalLight.castShadow = true;
     directionalLight.shadow.mapSize.width = 2048;
     directionalLight.shadow.mapSize.height = 2048;
     scene.add(directionalLight);
 
-    const pointLight = new THREE.PointLight(0xffffff, 0.5);
-    pointLight.position.set(-5, -5, 5);
-    scene.add(pointLight);
+    // Добавляем point lights для драматичности
+    const pointLight1 = new THREE.PointLight(0xff6b6b, 0.5, 2000);
+    pointLight1.position.set(500, 500, 500);
+    scene.add(pointLight1);
 
-    // Create photo meshes
-    const loader = new THREE.TextureLoader();
-    const meshes: THREE.Mesh[] = [];
+    const pointLight2 = new THREE.PointLight(0x6b6bff, 0.5, 2000);
+    pointLight2.position.set(-500, -500, 500);
+    scene.add(pointLight2);
 
-    photos.forEach((photo, index) => {
-      const texture = loader.load(photo.url, (tex) => {
-        tex.minFilter = THREE.LinearFilter;
-        tex.magFilter = THREE.LinearFilter;
-        tex.colorSpace = THREE.SRGBColorSpace;
-      }, undefined, (err) => {
-        console.error('Error loading texture:', err);
-      });
+    // Создаем группу для всех фото
+    const photosGroup = new THREE.Group();
+    scene.add(photosGroup);
 
-      const aspectRatio = photo.width / photo.height;
-      const geometry = new THREE.PlaneGeometry(3 * aspectRatio, 3);
+    // Создаем фото
+    const photoMeshes = [];
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    positions.forEach((position, index) => {
+      // Создаем плоскость для фото
+      const geometry = new THREE.PlaneGeometry(400, 300);
+
+      // Создаем material с заглушкой
       const material = new THREE.MeshLambertMaterial({
-        map: texture,
+        color: 0x333333,
         transparent: true,
         opacity: 0.9
       });
 
       const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(position.x, position.y, position.z);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      mesh.userData = {
+        index,
+        id: position.id,
+        originalPosition: { ...position },
+        isPhoto: true
+      };
 
-      // Position photos in a circle
-      const angle = (index / photos.length) * Math.PI * 2;
-      const radius = 6;
-      mesh.position.x = Math.cos(angle) * radius;
-      mesh.position.y = Math.sin(angle) * radius;
-      mesh.position.z = (Math.random() - 0.5) * 2;
+      // Добавляем рамку
+      const frameGeometry = new THREE.PlaneGeometry(420, 320);
+      const frameMaterial = new THREE.MeshLambertMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.8
+      });
+      const frame = new THREE.Mesh(frameGeometry, frameMaterial);
+      frame.position.z = -1;
+      mesh.add(frame);
 
-      mesh.userData = { photo, index };
-      scene.add(mesh);
-      meshes.push(mesh);
+      photosGroup.add(mesh);
+      photoMeshes.push(mesh);
     });
 
-    photoMeshesRef.current = meshes;
+    // Загружаем реальные изображения
+    photoMeshes.forEach((mesh, index) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const texture = new THREE.Texture(img);
+        texture.needsUpdate = true;
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
 
-    // Mouse events
-    const handleMouseMove = (event: MouseEvent) => {
-      mouseRef.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouseRef.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        const material = new THREE.MeshLambertMaterial({
+          map: texture,
+          transparent: true,
+          opacity: 0.95
+        });
 
-      if (isDraggingRef.current) {
-        const deltaX = mouseRef.current.x - previousMouseRef.current.x;
-        const deltaY = mouseRef.current.y - previousMouseRef.current.y;
+        mesh.material.dispose();
+        mesh.material = material;
 
-        camera.position.x -= deltaX * 5;
-        camera.position.y += deltaY * 5;
-      }
+        // Добавляем небольшую случайную задержку для эффекта загрузки
+        setTimeout(() => {
+          mesh.material.opacity = 1;
+        }, index * 100);
+      };
 
-      previousMouseRef.current.copy(mouseRef.current);
-    };
+      img.onerror = () => {
+        // Если изображение не загрузилось, используем цветную заглушку
+        const colors = [0xff6b6b, 0x4ecdc4, 0x45b7d1, 0xf9ca24, 0xf0932b, 0xeb4d4b, 0x6c5ce7, 0xa29bfe];
+        const material = new THREE.MeshLambertMaterial({
+          color: colors[index % colors.length],
+          transparent: true,
+          opacity: 0.8
+        });
 
-    const handleMouseDown = (event: MouseEvent) => {
-      isDraggingRef.current = true;
-      previousMouseRef.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-      previousMouseRef.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    };
+        mesh.material.dispose();
+        mesh.material = material;
+      };
 
-    const handleMouseUp = () => {
-      isDraggingRef.current = false;
-    };
+      // Используем изображения с picsum.photos для демонстрации
+      img.src = `https://picsum.photos/400/300?random=${index + 1}`;
+    });
 
-    const handleWheel = (event: WheelEvent) => {
-      camera.position.z += event.deltaY * 0.01;
-      camera.position.z = Math.max(3, Math.min(20, camera.position.z));
-    };
+    // Обработка мыши
+    const handleMouseMove = (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-    const handleResize = () => {
-      if (cameraRef.current && rendererRef.current) {
-        cameraRef.current.aspect = window.innerWidth / window.innerHeight;
-        cameraRef.current.updateProjectionMatrix();
-        rendererRef.current.setSize(window.innerWidth, window.innerHeight);
-      }
-    };
+      // Проверяем наведение на фото
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(photoMeshes);
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mouseup', handleMouseUp);
-    window.addEventListener('wheel', handleWheel);
-    window.addEventListener('resize', handleResize);
-
-    // Animation loop
-    const animate = () => {
-      if (!rendererRef.current || !sceneRef.current || !cameraRef.current) return;
-
-      animationIdRef.current = requestAnimationFrame(animate);
-
-      // Rotate photos slowly
-      photoMeshesRef.current.forEach((mesh, index) => {
-        mesh.rotation.y += 0.001 * (index % 2 === 0 ? 1 : -1);
+      // Сбрасываем все фото
+      photoMeshes.forEach(mesh => {
+        mesh.scale.set(1, 1, 1);
+        mesh.position.z = mesh.userData.originalPosition.z;
       });
 
-      rendererRef.current.render(sceneRef.current, cameraRef.current);
+      // Подсвечиваем наведенное фото
+      if (intersects.length > 0) {
+        const hoveredMesh = intersects[0].object;
+        hoveredMesh.scale.set(1.1, 1.1, 1.1);
+        hoveredMesh.position.z = 50;
+        document.body.style.cursor = 'pointer';
+      } else {
+        document.body.style.cursor = 'default';
+      }
+    };
+
+    const handleClick = (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(photoMeshes);
+
+      if (intersects.length > 0) {
+        const clickedMesh = intersects[0].object;
+        const photoIndex = clickedMesh.userData.index;
+        setSelectedPhoto(photoIndex);
+      }
+    };
+
+    // Добавляем обработчики событий
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('click', handleClick);
+
+    // Обработка колеса мыши для зума
+    const handleWheel = (event) => {
+      event.preventDefault();
+      const zoomSpeed = 0.1;
+      const delta = event.deltaY > 0 ? 1 + zoomSpeed : 1 - zoomSpeed;
+
+      camera.position.z *= delta;
+      camera.position.z = Math.max(500, Math.min(3000, camera.position.z));
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: false });
+
+    // Анимация
+    let animationId;
+    const animate = () => {
+      animationId = requestAnimationFrame(animate);
+
+      // Вращаем группу фото медленно
+      photosGroup.rotation.y += 0.001;
+
+      // Обновляем позиции фото с учетом вращения группы
+      photoMeshes.forEach((mesh, index) => {
+        const position = positions[index];
+        mesh.lookAt(camera.position);
+      });
+
+      renderer.render(scene, camera);
     };
 
     animate();
 
-    // Cleanup
-    return () => {
-      if (animationIdRef.current) {
-        cancelAnimationFrame(animationIdRef.current);
-      }
+    // Обработка изменения размера окна
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
 
+    window.addEventListener('resize', handleResize);
+
+    // Сохраняем ссылки для очистки
+    sceneRef.current = { scene, camera, renderer, photoMeshes, photosGroup };
+
+    // Очистка
+    return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('click', handleClick);
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animationId);
 
-      if (mountRef.current && rendererRef.current) {
-        mountRef.current.removeChild(rendererRef.current.domElement);
+      if (renderer) {
+        renderer.dispose();
       }
 
-      if (rendererRef.current) {
-        rendererRef.current.dispose();
-      }
-
-      photoMeshesRef.current.forEach(mesh => {
-        if (mesh.geometry) mesh.geometry.dispose();
-        if (mesh.material) {
-          if (Array.isArray(mesh.material)) {
-            mesh.material.forEach(m => m.dispose());
-          } else {
-            (mesh.material as THREE.Material).dispose();
-          }
+      photoMeshes.forEach(mesh => {
+        if (mesh.material.map) {
+          mesh.material.map.dispose();
         }
+        mesh.material.dispose();
+        mesh.geometry.dispose();
       });
-
-      sceneRef.current = null;
-      rendererRef.current = null;
-      cameraRef.current = null;
-      photoMeshesRef.current = [];
     };
-  }, [photos]);
+  }, [positions]);
 
 export default App

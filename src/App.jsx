@@ -11,57 +11,76 @@ function cn(...inputs) {
 }
 
 // Photo data
-const PHOTOS = [
-  { id: 1, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453880-2918.jpg?', title: 'Urban Solitude', date: '2023.11.15', camera: 'Leica M10-R' },
-  { id: 2, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-2291.jpg?', title: 'Shadow Play', date: '2023.10.22', camera: 'Leica Q2' },
-  { id: 3, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-7476.jpg?', title: 'Morning Light', date: '2024.01.08', camera: 'Leica M6' },
-  { id: 4, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-3765.jpg?', title: 'Silent Streets', date: '2023.09.14', camera: 'Leica M10-R' },
-  { id: 5, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8936.jpg?', title: 'Contrast', date: '2024.02.01', camera: 'Leica Q2 Monochrom' },
-  { id: 6, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-7385.jpg?', title: 'Analog Dreams', date: '2023.12.03', camera: 'Leica M6' },
-  { id: 7, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8284.jpg?', title: 'Reflections', date: '2024.01.20', camera: 'Leica M10-R' },
-  { id: 8, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8710.jpg?', title: 'Timeless', date: '2023.08.30', camera: 'Leica Q2' },
-  { id: 9, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-2278.jpg?', title: 'Raw Emotion', date: '2024.02.15', camera: 'Leica M6' },
-  { id: 10, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-1442.jpg?', title: 'Fleeting Moment', date: '2023.11.28', camera: 'Leica M10-R' },
-  { id: 11, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-8417.jpg?', title: 'Depth', date: '2024.01.12', camera: 'Leica Q2 Monochrom' },
-  { id: 12, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9947.jpg?', title: 'Still Life', date: '2023.10.05', camera: 'Leica M6' },
-  { id: 13, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9719.jpg?', title: 'Geometry', date: '2024.02.20', camera: 'Leica M10-R' },
-  { id: 14, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-1425.jpg?', title: 'Light Study', date: '2023.09.22', camera: 'Leica Q2' },
-  { id: 15, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5244.jpg?', title: 'Fragments', date: '2024.01.30', camera: 'Leica M6' },
-  { id: 16, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453880-2918.jpg?', title: 'Urban Echo', date: '2023.12.15', camera: 'Leica M10-R' },
-  { id: 17, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-2291.jpg?', title: 'Shadow Dance', date: '2024.03.01', camera: 'Leica Q2' },
-  { id: 18, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-7476.jpg?', title: 'Golden Hour', date: '2023.11.20', camera: 'Leica M6' },
-  { id: 19, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-3765.jpg?', title: 'Night Walk', date: '2024.02.28', camera: 'Leica M10-R' },
-  { id: 20, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8936.jpg?', title: 'Monochrome', date: '2023.10.10', camera: 'Leica Q2 Monochrom' },
-  { id: 21, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-7385.jpg?', title: 'Film Memories', date: '2024.01.25', camera: 'Leica M6' },
-  { id: 22, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8284.jpg?', title: 'Mirror World', date: '2023.09.05', camera: 'Leica M10-R' },
-  { id: 23, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8710.jpg?', title: 'Eternal', date: '2024.03.10', camera: 'Leica Q2' },
-  { id: 24, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-2278.jpg?', title: 'Pure Feeling', date: '2023.12.20', camera: 'Leica M6' },
-  { id: 25, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-1442.jpg?', title: 'Captured Time', date: '2024.02.05', camera: 'Leica M10-R' },
-  { id: 26, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-8417.jpg?', title: 'Deep Focus', date: '2023.11.05', camera: 'Leica Q2 Monochrom' },
-  { id: 27, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9947.jpg?', title: 'Quiet Objects', date: '2024.01.18', camera: 'Leica M6' },
-  { id: 28, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9719.jpg?', title: 'Lines & Curves', date: '2023.10.15', camera: 'Leica M10-R' },
-  { id: 29, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-1425.jpg?', title: 'Luminous Study', date: '2024.03.15', camera: 'Leica Q2' },
-  { id: 30, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5244.jpg?', title: 'Broken Pieces', date: '2023.12.28', camera: 'Leica M6' },
-]
+const PHOTOS = Array.from({ length: 225 }, (_, i) => ({
+  id: i + 1,
+  src: `https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-177145388${Math.floor(i / 10)}-${i % 10}${i % 10}${i % 10}${i % 10}.jpg?`,
+  title: [
+    'Urban Solitude', 'Shadow Play', 'Morning Light', 'Silent Streets', 'Contrast',
+    'Analog Dreams', 'Reflections', 'Timeless', 'Raw Emotion', 'Fleeting Moment',
+    'Depth', 'Still Life', 'Geometry', 'Light Study', 'Fragments',
+    'Urban Echo', 'Shadow Dance', 'Golden Hour', 'Night Walk', 'Monochrome',
+    'Film Memories', 'Mirror World', 'Eternal', 'Pure Feeling', 'Captured Time',
+    'Deep Focus', 'Quiet Objects', 'Lines & Curves', 'Luminous Study', 'Broken Pieces',
+    'Street Portrait', 'City Lights', 'Dawn Patrol', 'Midnight Blue', 'Urban Jungle',
+    'Concrete Poetry', 'Neon Dreams', 'Rainy Days', 'Window Light', 'Passing Shadows',
+    'Fleeting Glimpse', 'Urban Geometry', 'Light Patterns', 'Texture Study', 'Color Theory',
+    'Motion Blur', 'Double Exposure', 'Film Grain', 'Vintage Vibes', 'Modern Classic',
+    'Minimalist', 'Abstract View', 'Negative Space', 'Golden Ratio', 'Rule of Thirds',
+    'Leading Lines', 'Framing Device', 'Symmetry', 'Asymmetry', 'Balance',
+    'Tension', 'Harmony', 'Contrast Study', 'Tone Poem', 'Color Harmony',
+    'Monochrome World', 'High Key', 'Low Key', 'Chiaroscuro', 'Silhouette',
+    'Backlight', 'Side Light', 'Front Light', 'Diffused Light', 'Hard Light',
+    'Soft Focus', 'Sharp Detail', 'Bokeh Dreams', 'Depth of Field', 'Selective Focus',
+    'Motion Study', 'Time Lapse', 'Long Exposure', 'Panning Shot', 'Freeze Frame',
+    'Street Scene', 'Urban Decay', 'Modern Architecture', 'Classic Design', 'Industrial',
+    'Nature Urban', 'Park Life', 'Tree Shadows', 'Leaf Patterns', 'Water Reflections',
+    'Puddle Mirror', 'Rain Drops', 'Foggy Morning', 'Misty Evening', 'Cloud Study',
+    'Sky Drama', 'Sunset Colors', 'Sunrise Glow', 'Blue Hour', 'Magic Hour',
+    'Night Photography', 'Star Trails', 'Light Trails', 'Traffic Streams', 'City Glow',
+    'Neon Signs', 'Store Fronts', 'Cafe Culture', 'Restaurant Life', 'Bar Scene',
+    'People Watching', 'Street Fashion', 'Urban Style', 'Classic Look', 'Modern Trend',
+    'Portrait Study', 'Environmental Portrait', 'Candid Moment', 'Stolen Glance', 'Direct Gaze',
+    'Window Portrait', 'Doorway Shot', 'Staircase Study', 'Elevator Mirror', 'Reflection Portrait',
+    'Self Reflection', 'Mirror Image', 'Double Take', 'Split Personality', 'Shadow Self',
+    'Identity Study', 'Character Study', 'Mood Portrait', 'Emotional Range', 'Facial Landscape',
+    'Hand Study', 'Gesture Capture', 'Body Language', 'Posed Natural', 'Candid Posed',
+    'Street Corner', 'Cross Walk', 'Traffic Light', 'Bus Stop', 'Metro Station',
+    'Underground Life', 'Platform Scene', 'Train Window', 'Journey Moment', 'Travel Portrait',
+    'Tourist View', 'Local Perspective', 'Insider View', 'Outsider Looking In', 'Cultural Study',
+    'Urban Culture', 'Subculture', 'Youth Culture', 'Street Art', 'Graffiti Study',
+    'Wall Texture', 'Painted Surface', 'Weathered Wall', 'Aged Beauty', 'Patina Study',
+    'Rust Patterns', 'Metal Surfaces', 'Glass Reflections', 'Transparent World', 'Opaque Dreams',
+    'Light Through Glass', 'Prism Effects', 'Lens Flare', 'Optical Phenomena', 'Visual Poetry',
+    'Abstract Reality', 'Concrete Abstract', 'Urban Abstract', 'Geometric Abstract', 'Organic Abstract',
+    'Mixed Media', 'Digital Analog', 'Film Digital', 'Old New', 'Past Present',
+    'Time Travel', 'Memory Lane', 'Nostalgia Trip', 'Future Past', 'Present Moment',
+    'Living Now', 'Being Present', 'Mindful Seeing', 'Conscious Capture', 'Intentional Frame',
+    'Deliberate Choice', 'Careful Composition', 'Thoughtful Moment', 'Considered View', 'Mindful Photography'
+  ][i % 150],
+  date: `202${Math.floor(i / 75) + 3}.${String(Math.floor((i % 75) / 6) + 1).padStart(2, '0')}.${String((i % 6) * 5 + 1).padStart(2, '0')}`,
+  camera: ['Leica M10-R', 'Leica Q2', 'Leica M6', 'Leica Q2 Monochrom'][i % 4]
+}));
 
 // Generate random positions for photos
 const generatePositions = () => {
   const positions = []
-  const cellWidth = 300
-  const cellHeight = 450
-  const spacing = 60
-  const cols = Math.floor(window.innerWidth / (cellWidth + spacing)) || 6
-  const rows = Math.ceil(PHOTOS.length * 3 / cols)
+  const cellWidth = 200
+  const cellHeight = 300
+  const spacing = 20
+  const cols = 15
+  const rows = 15
 
-  // Create vertical grid layout
-  for (let i = 0; i < PHOTOS.length * 3; i++) {
-    const photo = PHOTOS[i % PHOTOS.length]
-    const col = Math.floor(i / rows)
-    const row = i % rows
+  // Create a shuffled array of photos
+  const shuffledPhotos = [...PHOTOS].sort(() => Math.random() - 0.5)
+
+  // Create 15x15 grid layout
+  for (let i = 0; i < 225; i++) {
+    const photo = shuffledPhotos[i]
+    const col = i % cols
+    const row = Math.floor(i / cols)
     const x = spacing + col * (cellWidth + spacing)
     const y = spacing + row * (cellHeight + spacing)
 
-    const isVertical = photo.height > photo.width
     positions.push({
       ...photo,
       x,
@@ -70,7 +89,7 @@ const generatePositions = () => {
       scale: 1,
       width: cellWidth,
       height: cellHeight,
-      isVertical,
+      isVertical: true,
     })
   }
 
@@ -500,7 +519,7 @@ function App() {
           {PHOTO_POSITIONS.map((photo) => (
             <div
               key={photo.id}
-              className="absolute cursor-pointer hover:opacity-50"
+              className="absolute cursor-pointer hover:opacity-50 transition-opacity duration-300"
               style={{
                 left: photo.x,
                 top: photo.y,
@@ -510,17 +529,11 @@ function App() {
               }}
               onClick={() => handlePhotoClick(photo)}
             >
-              <div className={cn(
-                "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col",
-                !photo.isVertical && "justify-start"
-              )}>
+              <div className="relative w-full h-full overflow-hidden bg-zinc-800 shadow-lg flex flex-col">
                 <img
                   src={photo.src}
                   alt={photo.title}
-                  className={cn(
-                    'w-full hover:opacity-50 transition-opacity duration-300',
-                    photo.isVertical ? 'h-full object-cover' : 'h-auto object-contain align-self-start'
-                  )}
+                  className="w-full h-full object-cover hover:opacity-50 transition-opacity duration-300"
                   draggable={false}
                 />
                 <div className="absolute inset-0 bg-black/0" />

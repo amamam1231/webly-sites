@@ -1,3 +1,4 @@
+// === IMPORTS ===
 import { SafeIcon } from './components/SafeIcon';
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
@@ -12,7 +13,7 @@ function cn(...inputs) {
 // Canvas size - increased for larger grid
 const CANVAS_SIZE = 30000
 
-// Photo data (unchanged)
+// Photo data
 const PHOTOS = [
   { id: 1, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453880-2918.jpg?', title: 'Urban Solitude', date: '2023.11.15', camera: 'Leica M10-R' },
   { id: 2, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-2291.jpg?', title: 'Shadow Play', date: '2023.10.22', camera: 'Leica Q2' },
@@ -28,94 +29,85 @@ const PHOTOS = [
   { id: 12, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9947.jpg?', title: 'Still Life', date: '2023.10.05', camera: 'Leica M6' },
   { id: 13, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9719.jpg?', title: 'Geometry', date: '2024.02.20', camera: 'Leica M10-R' },
   { id: 14, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-1425.jpg?', title: 'Light Study', date: '2023.09.22', camera: 'Leica Q2' },
-  { id: 15, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5244.jpg?', title: 'Fragments', date: '2024.01.30', camera: 'Leica M6' },
-  { id: 16, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453880-2918.jpg?', title: 'Urban Echo', date: '2023.12.15', camera: 'Leica M10-R' },
-  { id: 17, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-2291.jpg?', title: 'Shadow Dance', date: '2024.03.01', camera: 'Leica Q2' },
-  { id: 18, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-7476.jpg?', title: 'Golden Hour', date: '2023.11.20', camera: 'Leica M6' },
-  { id: 19, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-3765.jpg?', title: 'Night Walk', date: '2024.02.28', camera: 'Leica M10-R' },
-  { id: 20, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8936.jpg?', title: 'Monochrome', date: '2023.10.10', camera: 'Leica Q2 Monochrom' },
-  { id: 21, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-7385.jpg?', title: 'Film Memories', date: '2024.01.25', camera: 'Leica M6' },
-  { id: 22, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8284.jpg?', title: 'Mirror World', date: '2023.09.05', camera: 'Leica M10-R' },
-  { id: 23, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8710.jpg?', title: 'Eternal', date: '2024.03.10', camera: 'Leica Q2' },
-  { id: 24, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-2278.jpg?', title: 'Pure Feeling', date: '2023.12.20', camera: 'Leica M6' },
-  { id: 25, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-1442.jpg?', title: 'Captured Time', date: '2024.02.05', camera: 'Leica M10-R' },
-  { id: 26, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-8417.jpg?', title: 'Deep Focus', date: '2023.11.05', camera: 'Leica Q2 Monochrom' },
-  { id: 27, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9947.jpg?', title: 'Quiet Objects', date: '2024.01.18', camera: 'Leica M6' },
-  { id: 28, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9719.jpg?', title: 'Lines & Curves', date: '2023.10.15', camera: 'Leica M10-R' },
-  { id: 29, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-1425.jpg?', title: 'Luminous Study', date: '2024.03.15', camera: 'Leica Q2' },
-  { id: 30, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5244.jpg?', title: 'Broken Pieces', date: '2023.12.28', camera: 'Leica M6' },
 ]
 
-// Generate random positions for photos - INCREASED GRID SIZE
-const generatePositions = () => {
-  const positions = []
-  const isMobile = window.innerWidth < 768
-  const cellWidth = isMobile ? 160 : 400
-  const cellHeight = isMobile ? 240 : 600
-  const spacing = isMobile ? 20 : 80
-  // Increased columns from 20 to 30 for wider grid
-  const cols = isMobile ? 2 : 30
-  // Increased multiplier from 16 to 40 for more photos (1200 total)
-  const totalPhotos = PHOTOS.length * 40
-  const rows = Math.ceil(totalPhotos / cols)
+// Generate random positions for photos (scattered layout)
+const PHOTO_POSITIONS = PHOTOS.map((photo, index) => {
+  const margin = 400
+  const availableSpace = CANVAS_SIZE - (margin * 2)
 
-  // Create vertical grid layout with more rows and columns
-  for (let i = 0; i < totalPhotos; i++) {
-    const photo = PHOTOS[i % PHOTOS.length]
-    const col = Math.floor(i / rows)
-    const row = i % rows
-    const x = spacing + col * (cellWidth + spacing)
-    const y = spacing + row * (cellHeight + spacing)
+  // Create clusters but with randomness
+  const gridX = (index % 5) * (availableSpace / 5) + margin
+  const gridY = Math.floor(index / 5) * (availableSpace / 3) + margin
 
-    const isVertical = photo.height > photo.width
-    positions.push({
-      ...photo,
-      x,
-      y,
-      rotation: 0,
-      scale: 1,
-      width: cellWidth,
-      height: cellHeight,
-      isVertical,
-    })
+  // Add randomness to create "creative chaos"
+  const x = gridX + (Math.random() - 0.5) * 800
+  const y = gridY + (Math.random() - 0.5) * 600
+
+  // Random size between 350-550px
+  const width = 350 + Math.random() * 200
+  const aspectRatio = 0.7 + Math.random() * 0.6 // 0.7 to 1.3
+  const height = width * aspectRatio
+
+  // Random rotation -8 to 8 degrees
+  const rotation = (Math.random() - 0.5) * 16
+
+  // Random scale 0.85 to 1.15
+  const scale = 0.85 + Math.random() * 0.3
+
+  return {
+    ...photo,
+    x,
+    y,
+    width,
+    height,
+    rotation,
+    scale,
+    isVertical: aspectRatio > 1
   }
-
-  return positions
-}
-
-const PHOTO_POSITIONS = generatePositions()
+})
 
 // Navbar Component
 function Navbar({ activeModal, setActiveModal }) {
-  const navItems = [
-    { label: 'Portfolio', id: 'portfolio', action: () => setActiveModal(null) },
-    { label: 'About Me', id: 'about', action: () => setActiveModal('about') },
-    { label: 'Connect', id: 'connect', action: () => setActiveModal('connect') },
-    { label: 'Blog', id: 'blog', action: () => window.open('https://medium.com', '_blank') },
-  ]
-
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-6 md:p-8 pointer-events-none">
       <div className="pointer-events-auto">
-        <h1 className="font-serif text-white text-xl md:text-2xl font-bold leading-tight tracking-tight">
+        <h1 className="font-mono text-white text-2xl md:text-3xl font-bold tracking-tighter leading-none">
           SERGIO<br/>MUSEL
         </h1>
       </div>
 
-      <div className="flex flex-col gap-4 pointer-events-auto items-end">
-        {navItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={item.action}
-            className={cn( "font-sans text-xs md:text-sm tracking-wide uppercase transition-colors duration-300 hover:text-orange-500",
-              (activeModal === item.id || (item.id === 'portfolio' && !activeModal))
-                ? "text-orange-500"
-                : "text-zinc-400"
-            )}
-          >
-            {item.label}
-          </button>
-        ))}
+      <div className="flex gap-6 md:gap-8 font-mono text-xs md:text-sm tracking-widest pointer-events-auto">
+        <button
+          onClick={() => setActiveModal(null)}
+          className={cn( "transition-colors hover:text-orange-500",
+            !activeModal ? "text-orange-500" : "text-zinc-300"
+          )}
+        >
+          Portfolio
+        </button>
+        <button
+          onClick={() => setActiveModal('about')}
+          className={cn( "transition-colors hover:text-orange-500",
+            activeModal === 'about' ? "text-orange-500" : "text-zinc-300"
+          )}
+        >
+          About Me
+        </button>
+        <button
+          onClick={() => setActiveModal('connect')}
+          className={cn( "transition-colors hover:text-orange-500",
+            activeModal === 'connect' ? "text-orange-500" : "text-zinc-300"
+          )}
+        >
+          Connect
+        </button>
+        <button
+          onClick={() => {}}
+          className="text-zinc-300 hover:text-orange-500 transition-colors"
+        >
+          Blog
+        </button>
       </div>
     </nav>
   )
@@ -126,18 +118,42 @@ function PhotoModal({ photo, onClose }) {
   if (!photo) return null
 
   return (
-    <div
-      className="fixed inset-0 z-40 bg-black/60 flex items-center justify-center"
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="fixed inset-0 z-40 bg-black/95 flex items-center justify-center p-4 md:p-8"
       onClick={onClose}
     >
-      <div className="relative w-full h-full flex items-center justify-center">
+      <button
+        onClick={onClose}
+        className="fixed top-6 right-6 text-zinc-400 hover:text-white transition-colors z-50 p-2"
+      >
+        <SafeIcon name="X" size={32} />
+      </button>
+
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="max-w-6xl w-full flex flex-col items-center"
+        onClick={(e) => e.stopPropagation()}
+      >
         <img
           src={photo.src}
           alt={photo.title}
-          className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain grayscale"
+          className="max-h-[75vh] max-w-full object-contain mb-8 grayscale"
         />
-      </div>
-    </div>
+        <div className="text-center font-mono space-y-2">
+          <h3 className="text-white text-xl md:text-2xl tracking-tight">{photo.title}</h3>
+          <p className="text-zinc-500 text-sm md:text-base">
+            {photo.date} — {photo.camera}
+          </p>
+        </div>
+      </motion.div>
+    </motion.div>
   )
 }
 
@@ -148,81 +164,76 @@ function AboutModal({ onClose }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-40 bg-zinc-950/98 overflow-y-auto"
+      className="fixed inset-0 z-40 overflow-y-auto bg-zinc-950/98 backdrop-blur-sm"
       onClick={onClose}
     >
       <button
         onClick={onClose}
-        className="fixed top-6 right-6 text-zinc-400 hover:text-white transition-colors z-50"
+        className="fixed top-6 right-6 text-zinc-400 hover:text-white transition-colors z-50 p-2"
       >
         <SafeIcon name="X" size={32} />
       </button>
 
-      <div
-        className="min-h-screen flex items-center justify-center p-6 md:p-12 lg:p-24"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-          {/* Left - Photo */}
-          <div className="relative">
-            <div className="aspect-[3/4] bg-zinc-900 overflow-hidden">
+      <div className="min-h-screen p-6 md:p-12 lg:p-24 pt-24" onClick={(e) => e.stopPropagation()}>
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 lg:gap-24 mb-16">
+            {/* Left - Photo */}
+            <div className="relative">
               <img
-                src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5768.jpg?"
+                src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-1425.jpg"
                 alt="Sergio Musel"
-                className="w-full h-full object-cover grayscale"
+                className="w-full h-auto grayscale contrast-125"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/50 to-transparent pointer-events-none" />
             </div>
-            <div className="absolute -bottom-4 -right-4 w-24 h-24 border border-orange-500/30" />
+
+            {/* Right - Bio */}
+            <div className="space-y-8 flex flex-col justify-center">
+              <h2 className="font-mono text-4xl md:text-6xl font-bold text-white tracking-tighter">
+                ABOUT
+              </h2>
+
+              <div className="grid md:grid-cols-2 gap-8 text-zinc-300 leading-relaxed text-sm md:text-base">
+                <p className="font-sans">
+                  Sergio Musel is a Prague-based photographer specializing in black and white analog photography. With over a decade of experience capturing urban landscapes and intimate portraits, his work explores the interplay between light and shadow in everyday moments.
+                </p>
+                <p className="font-sans">
+                  His approach combines classical darkroom techniques with contemporary visual storytelling. Inspired by the works of Cartier-Bresson and Josef Koudelka, Sergio seeks to find beauty in the mundane and extraordinary in the ordinary.
+                </p>
+              </div>
+
+              <div className="pt-8 border-t border-zinc-800">
+                <p className="font-mono text-zinc-500 text-xs tracking-widest uppercase mb-4">
+                  Equipment
+                </p>
+                <p className="text-zinc-300 font-mono text-sm">
+                  Leica M10-R, Leica Q2 Monochrom, Leica M6, Hasselblad 500CM
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Right - Content */}
-          <div className="flex flex-col justify-center">
-            <h2 className="font-mono text-white text-4xl md:text-5xl font-bold mb-8 tracking-tighter">
-              ABOUT ME
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-              <div>
-                <p className="text-zinc-400 leading-relaxed font-sans text-sm md:text-base">
-                  Born in Prague and trained in the traditions of analog photography,
-                  I have spent the last decade capturing the raw essence of urban landscapes.
-                  My work explores the intersection of light and shadow, finding beauty in
-                  the overlooked corners of metropolitan life.
-                </p>
+          {/* Awards Section */}
+          <div className="border-t border-zinc-800 pt-12">
+            <h3 className="font-mono text-xs text-zinc-500 uppercase tracking-widest mb-8">
+              Selected Awards & Exhibitions
+            </h3>
+            <div className="space-y-0 max-w-3xl">
+              <div className="flex justify-between text-zinc-300 py-4 border-b border-zinc-800 font-mono text-sm">
+                <span>Leica Oskar Barnack Award</span>
+                <span className="text-zinc-600">2023</span>
               </div>
-              <div>
-                <p className="text-zinc-400 leading-relaxed font-sans text-sm md:text-base">
-                  Each photograph is a meditation on time and space, shot exclusively on
-                  Leica rangefinders. I believe in the slow process of craft—the deliberate
-                  click of the shutter, the anticipation of development, the tangible weight
-                  of silver gelatin prints.
-                </p>
+              <div className="flex justify-between text-zinc-300 py-4 border-b border-zinc-800 font-mono text-sm">
+                <span>Prague Photo Festival</span>
+                <span className="text-zinc-600">2020</span>
               </div>
-            </div>
-
-            {/* Awards */}
-            <div className="border-t border-zinc-800 pt-8">
-              <h3 className="font-mono text-orange-500 text-sm tracking-widest mb-6 flex items-center gap-2">
-                <SafeIcon name="Award" size={16} />
-                LEICA AWARDS
-              </h3>
-              <div className="space-y-3 font-mono text-sm">
-                <div className="flex justify-between text-zinc-300">
-                  <span>Leica Oskar Barnack Award</span>
-                  <span className="text-zinc-600">2023</span>
-                </div>
-                <div className="flex justify-between text-zinc-300">
-                  <span>Leica Street Photography Contest</span>
-                  <span className="text-zinc-600">2022</span>
-                </div>
-                <div className="flex justify-between text-zinc-300">
-                  <span>World Press Photo</span>
-                  <span className="text-zinc-600">2021</span>
-                </div>
-                <div className="flex justify-between text-zinc-300">
-                  <span>Prague Photo Festival</span>
-                  <span className="text-zinc-600">2020</span>
-                </div>
+              <div className="flex justify-between text-zinc-300 py-4 border-b border-zinc-800 font-mono text-sm">
+                <span>European Photography Award</span>
+                <span className="text-zinc-600">2019</span>
+              </div>
+              <div className="flex justify-between text-zinc-300 py-4 font-mono text-sm">
+                <span>Angkor Photo Festival</span>
+                <span className="text-zinc-600">2018</span>
               </div>
             </div>
           </div>
@@ -372,7 +383,7 @@ function App() {
 
     x.set(centerX)
     y.set(centerY)
-  }, [])
+  }, [x, y])
 
   // Handle mouse down
   const handleMouseDown = useCallback((e) => {
@@ -496,8 +507,9 @@ function App() {
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-zinc-900 select-none">
-      {/* TV Noise Overlay */}
+      {/* TV Noise Overlay - Live Film Grain */}
       <div className="tv-noise" />
+
       {/* Navigation */}
       <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />
 
@@ -515,9 +527,12 @@ function App() {
           style={{ x: springX, y: springY }}
           className="absolute w-[30000px] h-[30000px] bg-zinc-900 select-none"
         >
-          {/* Grid lines for depth */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="w-full h-full" />
+          {/* Subtle grid lines for depth */}
+          <div className="absolute inset-0 opacity-[0.02]">
+            <div className="w-full h-full" style={{
+              backgroundImage: 'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
+              backgroundSize: '100px 100px'
+            }} />
           </div>
 
           {/* Photos */}
@@ -534,19 +549,17 @@ function App() {
               }}
               onClick={() => handlePhotoClick(photo)}
             >
-              <div className={cn( "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col",
-                !photo.isVertical && "justify-start"
-              )}>
+              <div className="relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl">
                 <img
                   src={photo.src}
                   alt={photo.title}
                   className={cn(
-                    'w-full hover:opacity-50 transition-opacity duration-300',
-                    photo.isVertical ? 'h-full object-cover' : 'h-auto object-contain align-self-start'
+                    'w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500',
+                    !photo.isVertical && 'object-center'
                   )}
                   draggable={false}
                 />
-                <div className="absolute inset-0 bg-black/0" />
+                <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors" />
               </div>
             </div>
           ))}
@@ -558,8 +571,8 @@ function App() {
 
       {/* Instructions overlay */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-        <p className="font-mono text-zinc-500 text-xs tracking-widest uppercase">
-          2026 made with Webly AI
+        <p className="font-mono text-zinc-600 text-[10px] tracking-widest uppercase">
+          Drag to explore • Click photos to view
         </p>
       </div>
 

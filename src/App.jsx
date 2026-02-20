@@ -253,9 +253,11 @@ function ConnectModal({ onClose }) {
       className="fixed inset-0 z-40 overflow-y-auto"
       onClick={onClose}
     >
-            <feTurbulence type="fractalNoise" baseFrequency="0.013 0.013" numOctaves="4" result="noise">
-              <animate attributeName="baseFrequency" dur="12s" values="0.013 0.013;0.014 0.014;0.013 0.013" repeatCount="indefinite" />
-            </feTurbulence>
+      {/* Gradient Background with Noise */}
+          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" seed="2">
+            <animate attributeName="baseFrequency" values="0.65;0.67;0.65" dur="4.8s" repeatCount="indefinite" />
+          </feTurbulence>
+      </div>
 
       <button
         onClick={onClose}
@@ -518,19 +520,29 @@ function App() {
           </div>
 
           {/* Photos */}
-                <div className="flex flex-wrap justify-center gap-4 mb-8">
-                  {teamMembers.map((member, index) => (
-                    <div key={index} className="text-center">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="relative w-full h-full max-w-4xl max-h-[600px]">
+                <AnimatePresence mode="wait">
+                  {currentPhoto && (
+                    <motion.div
+                      key={currentPhoto.id}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 0.8, scale: 1 }}
+                      exit={{ opacity: 0, scale: 1.2 }}
+                      transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className="absolute inset-0 flex items-center justify-center"
+                    >
                       <img
-                        src={member.image}
-                        alt={member.name}
-                        className="w-24 h-24 rounded-full mx-auto mb-2 object-cover opacity-80"
+                        src={currentPhoto.url}
+                        alt={currentPhoto.alt}
+                        className="max-w-full max-h-full object-contain rounded-lg"
+                        style={{ opacity: 0.8 }}
                       />
-                      <h4 className="font-semibold text-sm">{member.name}</h4>
-                      <p className="text-xs text-gray-600">{member.role}</p>
-                    </div>
-                  ))}
-                </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
             </div>
           ))}
 

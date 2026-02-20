@@ -6,11 +6,11 @@ import { twMerge } from 'tailwind-merge'
 
 // Utility for tailwind class merging
 function cn(...inputs) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(...inputs))
 }
 
 // Canvas size - increased for larger grid
-const CANVAS_SIZE = 12000
+const CANVAS_SIZE = 30000
 
 // Photo data (unchanged)
 const PHOTOS = [
@@ -53,10 +53,10 @@ const generatePositions = () => {
   const cellWidth = isMobile ? 160 : 400
   const cellHeight = isMobile ? 240 : 600
   const spacing = isMobile ? 20 : 80
-  // Increased columns from 8 to 20 for desktop
-  const cols = isMobile ? 2 : 20
-  // Increased multiplier from 3 to 16 for more photos (480 total)
-  const totalPhotos = PHOTOS.length * 16
+  // Increased columns from 20 to 30 for wider grid
+  const cols = isMobile ? 2 : 30
+  // Increased multiplier from 16 to 40 for more photos (1200 total)
+  const totalPhotos = PHOTOS.length * 40
   const rows = Math.ceil(totalPhotos / cols)
 
   // Create vertical grid layout with more rows and columns
@@ -353,14 +353,22 @@ function App() {
   const lastPos = useRef({ x: 0, y: 0 })
   const rafId = useRef(null)
 
-  // Set initial position to center of canvas on mount
+  // Set initial position to center of grid content on mount
   useEffect(() => {
     const viewportWidth = window.innerWidth
     const viewportHeight = window.innerHeight
 
-    // Center the viewport on the canvas
-    const centerX = -(CANVAS_SIZE / 2) + (viewportWidth / 2)
-    const centerY = -(CANVAS_SIZE / 2) + (viewportHeight / 2)
+    // Calculate bounds from generated positions to find center of content
+    const maxX = Math.max(...PHOTO_POSITIONS.map(p => p.x + p.width))
+    const maxY = Math.max(...PHOTO_POSITIONS.map(p => p.y + p.height))
+
+    // Center of the grid content
+    const contentCenterX = maxX / 2
+    const contentCenterY = maxY / 2
+
+    // Position viewport to show center of content
+    const centerX = -contentCenterX + (viewportWidth / 2)
+    const centerY = -contentCenterY + (viewportHeight / 2)
 
     x.set(centerX)
     y.set(centerY)
@@ -505,7 +513,7 @@ function App() {
         <motion.div
           ref={canvasRef}
           style={{ x: springX, y: springY }}
-          className="absolute w-[12000px] h-[12000px] bg-zinc-900 select-none"
+          className="absolute w-[30000px] h-[30000px] bg-zinc-900 select-none"
         >
           {/* Grid lines for depth */}
           <div className="absolute inset-0 opacity-5">

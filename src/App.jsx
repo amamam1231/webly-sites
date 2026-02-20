@@ -45,53 +45,38 @@ const PHOTOS = [
 ]
 
 // Generate random positions for photos
-  const generatePositions = () => {
-    const positions = [];
-    const isMobile = window.innerWidth < 768;
+const generatePositions = () => {
+  const positions = []
+  const isMobile = window.innerWidth < 768
+  const cellWidth = isMobile ? 160 : 400
+  const cellHeight = isMobile ? 240 : 600
+  const spacing = isMobile ? 20 : 80
+  const cols = isMobile ? 2 : 8
+  const rows = isMobile ? 15 : Math.ceil(PHOTOS.length * 3 / cols)
 
-    if (isMobile) {
-      // Mobile: 4 rows x 30 columns (doubled from 2x15)
-      const rows = 4;
-      const cols = 30;
-      const spacing = 120;
-      const startX = -(cols * spacing) / 2;
-      const startY = -(rows * spacing) / 2;
+  // Create vertical grid layout
+  for (let i = 0; i < PHOTOS.length * 3; i++) {
+    const photo = PHOTOS[i % PHOTOS.length]
+    const col = Math.floor(i / rows)
+    const row = i % rows
+    const x = spacing + col * (cellWidth + spacing)
+    const y = spacing + row * (cellHeight + spacing)
 
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-          positions.push({
-            x: startX + col * spacing,
-            y: startY + row * spacing,
-            scale: 0.8,
-            delay: (row + col) * 0.02
-          });
-        }
-      }
-    } else {
-      // Desktop: 16 columns x dynamic rows (doubled from 8xN)
-      const cols = 16;
-      const rows = Math.ceil(totalPhotos / cols);
-      const spacing = 200;
-      const startX = -(cols * spacing) / 2;
-      const startY = -(rows * spacing) / 2;
+    const isVertical = photo.height > photo.width
+    positions.push({
+      ...photo,
+      x,
+      y,
+      rotation: 0,
+      scale: 1,
+      width: cellWidth,
+      height: cellHeight,
+      isVertical,
+    })
+  }
 
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-          const index = row * cols + col;
-          if (index < totalPhotos) {
-            positions.push({
-              x: startX + col * spacing,
-              y: startY + row * spacing,
-              scale: 1,
-              delay: (row + col) * 0.01
-            });
-          }
-        }
-      }
-    }
-
-    return positions;
-  };
+  return positions
+}
 
 const PHOTO_POSITIONS = generatePositions()
 
@@ -342,224 +327,235 @@ function ConnectModal({ onClose }) {
 }
 
 // Main App Component
-  // Initialize positions and center view
-  useEffect(() => {
-    const positions = generatePositions();
-    setPositions(positions);
+function App() {
+  const [activeModal, setActiveModal] = useState(null)
+  const [selectedPhoto, setSelectedPhoto] = useState(null)
+  const [isDragging, setIsDragging] = useState(false)
 
-    // Calculate center coordinates for the new larger grid
-    const isMobile = window.innerWidth < 768;
-    let centerX, centerY;
+  const containerRef = useRef(null)
+  const canvasRef = useRef(null)
 
-    if (isMobile) {
-      // Mobile center: 4x30 grid
-      centerX = 0;
-      centerY = 0;
-    } else {
-      // Desktop center: 16xN grid
-      const cols = 16;
-      const rows = Math.ceil(totalPhotos / cols);
-      const spacing = 200;
-      centerX = 0;
-      centerY = 0;
+  // Motion values for smooth dragging with inertia
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+
+  // Spring physics for inertia
+  const springX = useSpring(x, { stiffness: 300, damping: 30, mass: 0.5 })
+  const springY = useSpring(y, { stiffness: 300, damping: 30, mass: 0.5 })
+
+  // Drag state refs
+  const dragStart = useRef({ x: 0, y: 0 })
+  const canvasStart = useRef({ x: 0, y: 0 })
+  const velocity = useRef({ x: 0, y: 0 })
+  const lastPos = useRef({ x: 0, y: 0 })
+  const rafId = useRef(null)
+
+  // Handle mouse down
+  const handleMouseDown = useCallback((e) => {
+    if (activeModal) return
+    if (e.target.closest('.photo-item')) return
+
+    setIsDragging(true)
+    dragStart.current = { x: e.clientX, y: e.clientY }
+    canvasStart.current = { x: springX.get(), y: springY.get() }
+    lastPos.current = { x: e.clientX, y: e.clientY }
+    velocity.current = { x: 0, y: 0 }
+
+    if (rafId.current) cancelAnimationFrame(rafId.current)
+  }, [activeModal, springX, springY])
+
+  // Handle mouse move
+  const handleMouseMove = useCallback((e) => {
+    if (!isDragging || activeModal) return
+
+    const dx = e.clientX - dragStart.current.x
+    const dy = e.clientY - dragStart.current.y
+
+    // Calculate velocity for inertia
+    velocity.current = {
+      x: e.clientX - lastPos.current.x,
+      y: e.clientY - lastPos.current.y
     }
+    lastPos.current = { x: e.clientX, y: e.clientY }
 
-    // Set initial position to center of grid
-    x.set(centerX);
-    y.set(centerY);
+    // Update position directly for immediate response
+    x.set(canvasStart.current.x + dx)
+    y.set(canvasStart.current.y + dy)
+  }, [isDragging, activeModal, x, y])
 
-    // Update spring targets to maintain center position
-    springX.set(centerX);
-    springY.set(centerY);
+  // Handle mouse up with inertia
+  const handleMouseUp = useCallback(() => {
+    if (!isDragging) return
+    setIsDragging(false)
 
-    // Center the actual view
-    const container = containerRef.current;
-    if (container) {
-      const scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
-      const scrollTop = (container.scrollHeight - container.clientHeight) / 2;
-      container.scrollLeft = scrollLeft;
-      container.scrollTop = scrollTop;
-    }
-  }, [totalPhotos]);
+    // Apply inertia
+    const decay = 0.95
+    const minVelocity = 0.5
 
-  // Mouse/touch handlers
-  const handleMouseDown = (e: React.MouseEvent) => {
-    isDragging.current = true;
-    dragStart.current = { x: e.clientX - x.get(), y: e.clientY - y.get() };
-    containerRef.current?.classList.add('cursor-grabbing');
-  };
+    const animate = () => {
+      if (Math.abs(velocity.current.x) > minVelocity || Math.abs(velocity.current.y) > minVelocity) {
+        x.set(x.get() + velocity.current.x)
+        y.set(y.get() + velocity.current.y)
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging.current) return;
+        velocity.current.x *= decay
+        velocity.current.y *= decay
 
-    const newX = e.clientX - dragStart.current.x;
-    const newY = e.clientY - dragStart.current.y;
-
-    x.set(newX);
-    y.set(newY);
-    springX.set(newX);
-    springY.set(newY);
-  };
-
-  const handleMouseUp = () => {
-    isDragging.current = false;
-    containerRef.current?.classList.remove('cursor-grabbing');
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    isDragging.current = true;
-    dragStart.current = { x: touch.clientX - x.get(), y: touch.clientY - y.get() };
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging.current) return;
-
-    const touch = e.touches[0];
-    const newX = touch.clientX - dragStart.current.x;
-    const newY = touch.clientY - dragStart.current.y;
-
-    x.set(newX);
-    y.set(newY);
-    springX.set(newX);
-    springY.set(newY);
-  };
-
-  const handleTouchEnd = () => {
-    isDragging.current = false;
-  };
-
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-
-    const scaleAmount = e.deltaY > 0 ? 0.9 : 1.1;
-    const newScale = Math.max(0.5, Math.min(3, scale.get() * scaleAmount));
-    scale.set(newScale);
-    springScale.set(newScale);
-  };
-
-  // Handle window resize
-  useEffect(() => {
-    const handleResize = () => {
-      const positions = generatePositions();
-      setPositions(positions);
-
-      // Recalculate center on resize
-      const isMobile = window.innerWidth < 768;
-      let centerX, centerY;
-
-      if (isMobile) {
-        centerX = 0;
-        centerY = 0;
-      } else {
-        centerX = 0;
-        centerY = 0;
+        rafId.current = requestAnimationFrame(animate)
       }
+    }
 
-      x.set(centerX);
-      y.set(centerY);
-      springX.set(centerX);
-      springY.set(centerY);
-    };
+    animate()
+  }, [isDragging, x, y])
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [totalPhotos]);
+  // Touch events for mobile
+  const handleTouchStart = useCallback((e) => {
+    if (activeModal) return
+    if (e.target.closest('.photo-item')) return
+
+    const touch = e.touches[0]
+    setIsDragging(true)
+    dragStart.current = { x: touch.clientX, y: touch.clientY }
+    canvasStart.current = { x: springX.get(), y: springY.get() }
+    lastPos.current = { x: touch.clientX, y: touch.clientY }
+    velocity.current = { x: 0, y: 0 }
+  }, [activeModal, springX, springY])
+
+  const handleTouchMove = useCallback((e) => {
+    if (!isDragging || activeModal) return
+
+    const touch = e.touches[0]
+    const dx = touch.clientX - dragStart.current.x
+    const dy = touch.clientY - dragStart.current.y
+
+    velocity.current = {
+      x: touch.clientX - lastPos.current.x,
+      y: touch.clientY - lastPos.current.y
+    }
+    lastPos.current = { x: touch.clientX, y: touch.clientY }
+
+    x.set(canvasStart.current.x + dx)
+    y.set(canvasStart.current.y + dy)
+  }, [isDragging, activeModal, x, y])
+
+  const handleTouchEnd = useCallback(() => {
+    handleMouseUp()
+  }, [handleMouseUp])
+
+  // Global event listeners
+  useEffect(() => {
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    window.addEventListener('touchmove', handleTouchMove, { passive: false })
+    window.addEventListener('touchend', handleTouchEnd)
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchend', handleTouchEnd)
+      if (rafId.current) cancelAnimationFrame(rafId.current)
+    }
+  }, [handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
+
+  // Handle photo click
+  const handlePhotoClick = (photo) => {
+    if (isDragging) return
+    setSelectedPhoto(photo)
+    setActiveModal('photo')
+  }
+
+  // Close modal
+  const closeModal = () => {
+    setActiveModal(null)
+    setSelectedPhoto(null)
+  }
 
   return (
-    <div className="fixed inset-0 bg-black overflow-hidden">
+    <div className="relative w-full h-full overflow-hidden bg-zinc-900 select-none">
+      {/* Noise Overlay */}
+      <div className="noise-overlay" />
+      {/* Navigation */}
+      <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />
+
+      {/* Infinite Canvas Container */}
       <div
         ref={containerRef}
-        className="w-full h-full relative cursor-grab"
+        className={cn( "absolute inset-0 overflow-hidden",
+          isDragging ? "cursor-grabbing" : "cursor-grab"
+        )}
         onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
         onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onWheel={handleWheel}
       >
         <motion.div
-          className="absolute w-full h-full"
-          style={{
-            x: springX,
-            y: springY,
-            scale: springScale,
-          }}
+          className="absolute inset-0 select-none"
+          ref={canvasRef}
+          style={{ x: springX, y: springY }}
+          className="absolute w-[4000px] h-[4000px] bg-zinc-900"
         >
-          {positions.map((pos, index) => {
-            const photoIndex = index % photos.length;
-            const photo = photos[photoIndex];
+          {/* Grid lines for depth */}
+          <div className="absolute inset-0 opacity-5">
+            <div className="w-full h-full" />
+          </div>
 
-            return (
-              <motion.div
-                key={index}
-                className="absolute"
-                style={{
-                  left: '50%',
-                  top: '50%',
-                  x: pos.x,
-                  y: pos.y,
-                  scale: pos.scale,
-                }}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: pos.scale }}
-                transition={{ delay: pos.delay, duration: 0.5 }}
-              >
-                <div className="relative group">
-                  <img
-                    src={photo.url}
-                    alt={photo.title}
-                    className="w-32 h-32 md:w-48 md:h-48 object-cover rounded-lg shadow-lg transition-transform group-hover:scale-110"
-                    onClick={() => setSelectedPhoto(photo)}
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity rounded-lg" />
-                </div>
-              </motion.div>
-            );
-          })}
+          {/* Photos */}
+          {PHOTO_POSITIONS.map((photo) => (
+            <div
+              key={photo.id}
+              className="absolute cursor-pointer hover:opacity-50 transition-all duration-300"
+              style={{
+                left: photo.x,
+                top: photo.y,
+                width: photo.width,
+                height: photo.height,
+                transform: `rotate(${photo.rotation}deg) scale(${photo.scale})`,
+              }}
+              onClick={() => handlePhotoClick(photo)}
+            >
+              <div className={cn(
+                "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col",
+                !photo.isVertical && "justify-start"
+              )}>
+                <img
+                  src={photo.src}
+                  alt={photo.title}
+                  className={cn(
+                    'w-full hover:opacity-50 transition-opacity duration-300',
+                    photo.isVertical ? 'h-full object-cover' : 'h-auto object-contain align-self-start'
+                  )}
+                  draggable={false}
+                />
+                <div className="absolute inset-0 bg-black/0" />
+              </div>
+            </div>
+          ))}
+          ))}
 
-          {/* Center marker */}
-          <div className="absolute w-4 h-4 bg-red-500 rounded-full"
-               style={{
-                 left: '50%',
-                 top: '50%',
-                 transform: 'translate(-50%, -50%)',
-                 opacity: 0.5
-               }} />
+          {/* Canvas center marker */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 border border-orange-500/30 rounded-full" />
         </motion.div>
       </div>
 
-      {/* Selected photo modal */}
-      {selectedPhoto && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
-          onClick={() => setSelectedPhoto(null)}
-        >
-          <motion.div
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0.8 }}
-            className="max-w-4xl max-h-screen p-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img
-              src={selectedPhoto.url}
-              alt={selectedPhoto.title}
-              className="w-full h-auto max-h-screen object-contain"
-            />
-            <div className="text-white text-center mt-4">
-              <h3 className="text-2xl font-bold">{selectedPhoto.title}</h3>
-              <p className="text-gray-300 mt-2">{selectedPhoto.description}</p>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
+      {/* Instructions overlay */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+        <p className="font-mono text-zinc-500 text-xs tracking-widest uppercase">
+          2026 made with Webly AI
+        </p>
+      </div>
+
+      {/* Modals */}
+      <AnimatePresence>
+        {activeModal === 'photo' && (
+          <PhotoModal photo={selectedPhoto} onClose={closeModal} />
+        )}
+        {activeModal === 'about' && (
+          <AboutModal onClose={closeModal} />
+        )}
+        {activeModal === 'connect' && (
+          <ConnectModal onClose={closeModal} />
+        )}
+      </AnimatePresence>
     </div>
-  );
+  )
+}
 
 export default App

@@ -26,9 +26,9 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 9999;
+  z-index: 1;
   pointer-events: none;
-  opacity: 0.12;
+  opacity: 0.22;
 
   /* Monochrome noise texture using SVG data URI for better quality */
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -36,7 +36,7 @@ body {
   background-size: 256px 256px;
 
   /* Broken TV animation - 10 frames with random position shifts */
-  animation: broken-tv-noise 0.15s steps(10, end) infinite;
+  animation: broken-tv-noise 0.12s steps(10, end) infinite;
 }
 
 /* Additional scanline effect for broken TV feel */
@@ -60,15 +60,15 @@ body {
 /* Keyframes with 10 random position shifts simulating broken TV horizontal/vertical hold issues */
 @keyframes broken-tv-noise {
   0%   { background-position: 0% 0%; transform: translate(0, 0); }
-  10%  { background-position: -25% 15%; transform: translate(-2px, 1px); }
-  20%  { background-position: 18% -22%; transform: translate(1px, -1px); }
-  30%  { background-position: -12% 8%; transform: translate(-1px, 2px); }
-  40%  { background-position: 30% -15%; transform: translate(2px, -2px); }
-  50%  { background-position: -8% 25%; transform: translate(-2px, 0px); }
-  60%  { background-position: 22% -8%; transform: translate(1px, 1px); }
-  70%  { background-position: -18% -20%; transform: translate(-1px, -1px); }
-  80%  { background-position: 15% 12%; transform: translate(0px, 2px); }
-  90%  { background-position: -30% -5%; transform: translate(2px, -1px); }
+  10%  { background-position: -25% 15%; transform: translate(-4px, 2px); }
+  20%  { background-position: 18% -22%; transform: translate(3px, -3px); }
+  30%  { background-position: -12% 8%; transform: translate(-3px, 4px); }
+  40%  { background-position: 30% -15%; transform: translate(4px, -4px); }
+  50%  { background-position: -8% 25%; transform: translate(-4px, 1px); }
+  60%  { background-position: 22% -8%; transform: translate(2px, 3px); }
+  70%  { background-position: -18% -20%; transform: translate(-3px, -2px); }
+  80%  { background-position: 15% 12%; transform: translate(1px, 4px); }
+  90%  { background-position: -30% -5%; transform: translate(4px, -3px); }
   100% { background-position: 5% 18%; transform: translate(0, 0); }
 }
 

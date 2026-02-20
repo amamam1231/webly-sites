@@ -504,7 +504,7 @@ function App() {
       {/* Infinite Canvas Container */}
       <div
         ref={containerRef}
-        className={cn( "absolute inset-0 overflow-hidden",
+        className={cn( "absolute inset-0 overflow-hidden z-10",
           isDragging ? "cursor-grabbing" : "cursor-grab"
         )}
         onMouseDown={handleMouseDown}
@@ -534,7 +534,7 @@ function App() {
               }}
               onClick={() => handlePhotoClick(photo)}
             >
-              <div className={cn( "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col",
+              <div className={cn( "relative w-full h-full overflow-hidden shadow-2xl flex flex-col",
                 !photo.isVertical && "justify-start"
               )}>
                 <img

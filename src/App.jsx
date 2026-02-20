@@ -254,9 +254,10 @@ function ConnectModal({ onClose }) {
       onClick={onClose}
     >
       {/* Gradient Background with Noise */}
-          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" seed="2">
-            <animate attributeName="baseFrequency" values="0.65;0.67;0.65" dur="4.8s" repeatCount="indefinite" />
-          </feTurbulence>
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-950 via-zinc-950 to-black">
+        <div className="absolute inset-0 opacity-40" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+        }} />
       </div>
 
       <button
@@ -520,29 +521,33 @@ function App() {
           </div>
 
           {/* Photos */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative w-full h-full max-w-4xl max-h-[600px]">
-                <AnimatePresence mode="wait">
-                  {currentPhoto && (
-                    <motion.div
-                      key={currentPhoto.id}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 0.8, scale: 1 }}
-                      exit={{ opacity: 0, scale: 1.2 }}
-                      transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      className="absolute inset-0 flex items-center justify-center"
-                    >
-                      <img
-                        src={currentPhoto.url}
-                        alt={currentPhoto.alt}
-                        className="max-w-full max-h-full object-contain rounded-lg"
-                        style={{ opacity: 0.8 }}
-                      />
-                    </motion.div>
+          {PHOTO_POSITIONS.map((photo) => (
+            <div
+              key={`${photo.id}-${photo.x}-${photo.y}`}
+              className="absolute cursor-pointer hover:opacity-50 transition-all duration-300 photo-item"
+              style={{
+                left: photo.x,
+                top: photo.y,
+                width: photo.width,
+                height: photo.height,
+                transform: `rotate(${photo.rotation}deg) scale(${photo.scale})`,
+              }}
+              onClick={() => handlePhotoClick(photo)}
+            >
+              <div className={cn( "relative w-full h-full overflow-hidden flex flex-col",
+                !photo.isVertical && "justify-start"
+              )}>
+                <img
+                  src={photo.src}
+                  alt={photo.title}
+                  className={cn(
+                    'w-full opacity-80 hover:opacity-50 transition-opacity duration-300',
+                    photo.isVertical ? 'h-full object-cover' : 'h-auto object-contain align-self-start'
                   )}
-                </AnimatePresence>
+                  draggable={false}
+                />
+                <div className="absolute inset-0 bg-black/0" />
               </div>
-            </div>
             </div>
           ))}
 

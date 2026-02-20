@@ -45,38 +45,48 @@ const PHOTOS = [
 ]
 
 // Generate random positions for photos
-const generatePositions = () => {
-  const positions = []
-  const isMobile = window.innerWidth < 768
-  const cellWidth = isMobile ? 160 : 400
-  const cellHeight = isMobile ? 240 : 600
-  const spacing = isMobile ? 20 : 80
-  const cols = isMobile ? 2 : 8
-  const rows = isMobile ? 15 : Math.ceil(PHOTOS.length * 3 / cols)
+const generatePositions = (photos, gridSize = 8) => {
+  const positions = [];
+  const doubledGridSize = gridSize * 2;
+  const centerOffset = Math.floor(doubledGridSize / 2);
 
-  // Create vertical grid layout
-  for (let i = 0; i < PHOTOS.length * 3; i++) {
-    const photo = PHOTOS[i % PHOTOS.length]
-    const col = Math.floor(i / rows)
-    const row = i % rows
-    const x = spacing + col * (cellWidth + spacing)
-    const y = spacing + row * (cellHeight + spacing)
+  // Начинаем с центра сетки
+  let currentX = centerOffset;
+  let currentY = centerOffset;
 
-    const isVertical = photo.height > photo.width
-    positions.push({
-      ...photo,
-      x,
-      y,
-      rotation: 0,
-      scale: 1,
-      width: cellWidth,
-      height: cellHeight,
-      isVertical,
-    })
+  positions.push({ x: currentX, y: currentY, photo: photos[0] });
+
+  const usedPositions = new Set([`${currentX},${currentY}`]);
+  const directions = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+  let directionIndex = 0;
+  let stepSize = 1;
+  let stepsTaken = 0;
+
+  for (let i = 1; i < photos.length; i++) {
+    for (let j = 0; j < 2; j++) {
+      const [dx, dy] = directions[directionIndex];
+      currentX += dx * stepSize;
+      currentY += dy * stepSize;
+
+      if (currentX >= 0 && currentX < doubledGridSize &&
+          currentY >= 0 && currentY < doubledGridSize &&
+          !usedPositions.has(`${currentX},${currentY}`)) {
+        positions.push({ x: currentX, y: currentY, photo: photos[i] });
+        usedPositions.add(`${currentX},${currentY}`);
+        i++;
+        if (i >= photos.length) break;
+      }
+    }
+
+    directionIndex = (directionIndex + 1) % 4;
+    stepsTaken++;
+    if (stepsTaken % 2 === 0) {
+      stepSize++;
+    }
   }
 
-  return positions
-}
+  return positions;
+};
 
 const PHOTO_POSITIONS = generatePositions()
 
@@ -328,234 +338,188 @@ function ConnectModal({ onClose }) {
 
 // Main App Component
 function App() {
-  const [activeModal, setActiveModal] = useState(null)
-  const [selectedPhoto, setSelectedPhoto] = useState(null)
-  const [isDragging, setIsDragging] = useState(false)
+  const [photos, setPhotos] = useState([]);
+  const [positions, setPositions] = useState([]);
+  const [draggedPhoto, setDraggedPhoto] = useState(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [lastPanPoint, setLastPanPoint] = useState({ x: 0, y: 0 });
+  const [gridSize] = useState(16); // Удвоенный размер сетки
+  const [cellSize] = useState(60);
+  const containerRef = useRef(null);
 
-  const containerRef = useRef(null)
-  const canvasRef = useRef(null)
-
-  // Motion values for smooth dragging with inertia
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-
-  // Spring physics for inertia
-  const springX = useSpring(x, { stiffness: 300, damping: 30, mass: 0.5 })
-  const springY = useSpring(y, { stiffness: 300, damping: 30, mass: 0.5 })
-
-  // Drag state refs
-  const dragStart = useRef({ x: 0, y: 0 })
-  const canvasStart = useRef({ x: 0, y: 0 })
-  const velocity = useRef({ x: 0, y: 0 })
-  const lastPos = useRef({ x: 0, y: 0 })
-  const rafId = useRef(null)
-
-  // Handle mouse down
-  const handleMouseDown = useCallback((e) => {
-    if (activeModal) return
-    if (e.target.closest('.photo-item')) return
-
-    setIsDragging(true)
-    dragStart.current = { x: e.clientX, y: e.clientY }
-    canvasStart.current = { x: springX.get(), y: springY.get() }
-    lastPos.current = { x: e.clientX, y: e.clientY }
-    velocity.current = { x: 0, y: 0 }
-
-    if (rafId.current) cancelAnimationFrame(rafId.current)
-  }, [activeModal, springX, springY])
-
-  // Handle mouse move
-  const handleMouseMove = useCallback((e) => {
-    if (!isDragging || activeModal) return
-
-    const dx = e.clientX - dragStart.current.x
-    const dy = e.clientY - dragStart.current.y
-
-    // Calculate velocity for inertia
-    velocity.current = {
-      x: e.clientX - lastPos.current.x,
-      y: e.clientY - lastPos.current.y
-    }
-    lastPos.current = { x: e.clientX, y: e.clientY }
-
-    // Update position directly for immediate response
-    x.set(canvasStart.current.x + dx)
-    y.set(canvasStart.current.y + dy)
-  }, [isDragging, activeModal, x, y])
-
-  // Handle mouse up with inertia
-  const handleMouseUp = useCallback(() => {
-    if (!isDragging) return
-    setIsDragging(false)
-
-    // Apply inertia
-    const decay = 0.95
-    const minVelocity = 0.5
-
-    const animate = () => {
-      if (Math.abs(velocity.current.x) > minVelocity || Math.abs(velocity.current.y) > minVelocity) {
-        x.set(x.get() + velocity.current.x)
-        y.set(y.get() + velocity.current.y)
-
-        velocity.current.x *= decay
-        velocity.current.y *= decay
-
-        rafId.current = requestAnimationFrame(animate)
-      }
-    }
-
-    animate()
-  }, [isDragging, x, y])
-
-  // Touch events for mobile
-  const handleTouchStart = useCallback((e) => {
-    if (activeModal) return
-    if (e.target.closest('.photo-item')) return
-
-    const touch = e.touches[0]
-    setIsDragging(true)
-    dragStart.current = { x: touch.clientX, y: touch.clientY }
-    canvasStart.current = { x: springX.get(), y: springY.get() }
-    lastPos.current = { x: touch.clientX, y: touch.clientY }
-    velocity.current = { x: 0, y: 0 }
-  }, [activeModal, springX, springY])
-
-  const handleTouchMove = useCallback((e) => {
-    if (!isDragging || activeModal) return
-
-    const touch = e.touches[0]
-    const dx = touch.clientX - dragStart.current.x
-    const dy = touch.clientY - dragStart.current.y
-
-    velocity.current = {
-      x: touch.clientX - lastPos.current.x,
-      y: touch.clientY - lastPos.current.y
-    }
-    lastPos.current = { x: touch.clientX, y: touch.clientY }
-
-    x.set(canvasStart.current.x + dx)
-    y.set(canvasStart.current.y + dy)
-  }, [isDragging, activeModal, x, y])
-
-  const handleTouchEnd = useCallback(() => {
-    handleMouseUp()
-  }, [handleMouseUp])
-
-  // Global event listeners
   useEffect(() => {
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('mouseup', handleMouseUp)
-    window.addEventListener('touchmove', handleTouchMove, { passive: false })
-    window.addEventListener('touchend', handleTouchEnd)
+    const samplePhotos = Array.from({ length: 100 }, (_, i) => ({
+      id: i + 1,
+      url: `https://picsum.photos/400/300?random=${i + 1}`,
+      title: `Photo ${i + 1}`,
+      description: `This is photo number ${i + 1}`
+    }));
 
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-      window.removeEventListener('touchmove', handleTouchMove)
-      window.removeEventListener('touchend', handleTouchEnd)
-      if (rafId.current) cancelAnimationFrame(rafId.current)
+    setPhotos(samplePhotos);
+    setPositions(generatePositions(samplePhotos, 8));
+  }, []);
+
+  useEffect(() => {
+    if (containerRef.current && positions.length > 0) {
+      const container = containerRef.current;
+      const gridWidth = gridSize * cellSize;
+      const gridHeight = gridSize * cellSize;
+
+      // Центрируем сетку на центральной фотографии
+      const centerPhoto = positions[0];
+      const centerX = (centerPhoto.x + 0.5) * cellSize;
+      const centerY = (centerPhoto.y + 0.5) * cellSize;
+
+      const offsetX = container.clientWidth / 2 - centerX;
+      const offsetY = container.clientHeight / 2 - centerY;
+
+      setPanOffset({ x: offsetX, y: offsetY });
     }
-  }, [handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
+  }, [positions, gridSize, cellSize]);
 
-  // Handle photo click
+  const handleMouseDown = (e, photo) => {
+    if (e.button === 0) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      setDraggedPhoto(photo);
+      setDragOffset({
+        x: e.clientX - rect.left - cellSize / 2,
+        y: e.clientY - rect.top - cellSize / 2
+      });
+    }
+  };
+
+  const handleMouseMove = (e) => {
+    if (draggedPhoto) {
+      const container = containerRef.current;
+      if (container) {
+        const rect = container.getBoundingClientRect();
+        const x = (e.clientX - rect.left - panOffset.x - dragOffset.x) / cellSize;
+        const y = (e.clientY - rect.top - panOffset.y - dragOffset.y) / cellSize;
+
+        const newX = Math.max(0, Math.min(gridSize - 1, Math.round(x)));
+        const newY = Math.max(0, Math.min(gridSize - 1, Math.round(y)));
+
+        setPositions(prev => prev.map(pos => {
+          if (pos.photo.id === draggedPhoto.id) {
+            return { ...pos, x: newX, y: newY };
+          }
+          if (pos.x === newX && pos.y === newY) {
+            const oldPos = prev.find(p => p.photo.id === draggedPhoto.id);
+            return { ...pos, x: oldPos.x, y: oldPos.y };
+          }
+          return pos;
+        }));
+      }
+    } else if (isPanning) {
+      const dx = e.clientX - lastPanPoint.x;
+      const dy = e.clientY - lastPanPoint.y;
+      setPanOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+      setLastPanPoint({ x: e.clientX, y: e.clientY });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setDraggedPhoto(null);
+    setDragOffset({ x: 0, y: 0 });
+  };
+
+  const handleWheel = (e) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    setZoomLevel(prev => Math.max(0.5, Math.min(3, prev * delta)));
+  };
+
+  const handleMouseDownPan = (e) => {
+    if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
+      e.preventDefault();
+      setIsPanning(true);
+      setLastPanPoint({ x: e.clientX, y: e.clientY });
+    }
+  };
+
   const handlePhotoClick = (photo) => {
-    if (isDragging) return
-    setSelectedPhoto(photo)
-    setActiveModal('photo')
-  }
+    setSelectedPhoto(photo);
+    setIsModalOpen(true);
+  };
 
-  // Close modal
-  const closeModal = () => {
-    setActiveModal(null)
-    setSelectedPhoto(null)
-  }
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPhoto(null);
+  };
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-zinc-900 select-none">
-      {/* Noise Overlay */}
-      <div className="noise-overlay" />
-      {/* Navigation */}
-      <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />
+    <div className="App">
+      <div className="header">
+        <h1>Photo Grid</h1>
+        <div className="controls">
+          <span>Zoom: {Math.round(zoomLevel * 100)}%</span>
+          <button onClick={() => setZoomLevel(1)}>Reset Zoom</button>
+        </div>
+      </div>
 
-      {/* Infinite Canvas Container */}
       <div
         ref={containerRef}
-        className={cn( "absolute inset-0 overflow-hidden",
-          isDragging ? "cursor-grabbing" : "cursor-grab"
-        )}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
+        className="grid-container"
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDownPan}
+        style={{ cursor: isPanning ? 'grabbing' : 'grab' }}
       >
-        <motion.div
-          className="absolute inset-0 select-none"
-          ref={canvasRef}
-          style={{ x: springX, y: springY }}
-          className="absolute w-[4000px] h-[4000px] bg-zinc-900"
+        <div
+          className="grid"
+          style={{
+            transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomLevel})`,
+            transformOrigin: '0 0'
+          }}
         >
-          {/* Grid lines for depth */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="w-full h-full" />
-          </div>
-
-          {/* Photos */}
-          {PHOTO_POSITIONS.map((photo) => (
+          {positions.map((pos, index) => (
             <div
-              key={photo.id}
-              className="absolute cursor-pointer hover:opacity-50 transition-all duration-300"
+              key={pos.photo.id}
+              className={`photo-cell ${draggedPhoto?.id === pos.photo.id ? 'dragging' : ''}`}
               style={{
-                left: photo.x,
-                top: photo.y,
-                width: photo.width,
-                height: photo.height,
-                transform: `rotate(${photo.rotation}deg) scale(${photo.scale})`,
+                left: pos.x * cellSize,
+                top: pos.y * cellSize,
+                width: cellSize - 4,
+                height: cellSize - 4,
+                zIndex: draggedPhoto?.id === pos.photo.id ? 1000 : index
               }}
-              onClick={() => handlePhotoClick(photo)}
+              onMouseDown={(e) => handleMouseDown(e, pos.photo)}
+              onClick={(e) => {
+                if (!draggedPhoto) {
+                  handlePhotoClick(pos.photo);
+                }
+              }}
             >
-              <div className={cn(
-                "relative w-full h-full overflow-hidden bg-zinc-800 shadow-2xl flex flex-col",
-                !photo.isVertical && "justify-start"
-              )}>
-                <img
-                  src={photo.src}
-                  alt={photo.title}
-                  className={cn(
-                    'w-full hover:opacity-50 transition-opacity duration-300',
-                    photo.isVertical ? 'h-full object-cover' : 'h-auto object-contain align-self-start'
-                  )}
-                  draggable={false}
-                />
-                <div className="absolute inset-0 bg-black/0" />
-              </div>
+              <img
+                src={pos.photo.url}
+                alt={pos.photo.title}
+                draggable={false}
+              />
             </div>
           ))}
-          ))}
-
-          {/* Canvas center marker */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 border border-orange-500/30 rounded-full" />
-        </motion.div>
+        </div>
       </div>
 
-      {/* Instructions overlay */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-        <p className="font-mono text-zinc-500 text-xs tracking-widest uppercase">
-          2026 made with Webly AI
-        </p>
-      </div>
-
-      {/* Modals */}
-      <AnimatePresence>
-        {activeModal === 'photo' && (
-          <PhotoModal photo={selectedPhoto} onClose={closeModal} />
-        )}
-        {activeModal === 'about' && (
-          <AboutModal onClose={closeModal} />
-        )}
-        {activeModal === 'connect' && (
-          <ConnectModal onClose={closeModal} />
-        )}
-      </AnimatePresence>
+      {isModalOpen && selectedPhoto && (
+        <div className="modal" onClick={handleCloseModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <span className="close" onClick={handleCloseModal}>&times;</span>
+            <img src={selectedPhoto.url} alt={selectedPhoto.title} />
+            <h3>{selectedPhoto.title}</h3>
+            <p>{selectedPhoto.description}</p>
+          </div>
+        </div>
+      )}
     </div>
-  )
+  );
+}
 }
 
 export default App

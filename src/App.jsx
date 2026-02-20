@@ -541,7 +541,7 @@ function App() {
                   src={photo.src}
                   alt={photo.title}
                   className={cn(
-                    'w-full hover:opacity-50 transition-opacity duration-300',
+                    'w-full opacity-80 hover:opacity-50 transition-opacity duration-300',
                     photo.isVertical ? 'h-full object-cover' : 'h-auto object-contain align-self-start'
                   )}
                   draggable={false}

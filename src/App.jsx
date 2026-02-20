@@ -45,59 +45,53 @@ const PHOTOS = [
 ]
 
 // Generate random positions for photos
-  const generatePositions = useCallback(() => {
+  const generatePositions = () => {
     const positions = [];
     const isMobile = window.innerWidth < 768;
 
     if (isMobile) {
-      // Мобильная версия: 8 строк x 60 столбцов (в 2 раза больше)
-      const rows = 8;
-      const cols = 60;
-      const cellSize = 120;
-      const spacing = 8;
+      // Mobile: 4 rows x 30 columns (doubled from 2x15)
+      const rows = 4;
+      const cols = 30;
+      const spacing = 120;
+      const startX = -(cols * spacing) / 2;
+      const startY = -(rows * spacing) / 2;
 
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-          const x = (col - (cols - 1) / 2) * (cellSize + spacing);
-          const y = (row - (rows - 1) / 2) * (cellSize + spacing);
-
           positions.push({
-            x,
-            y,
-            width: cellSize,
-            height: cellSize,
-            photoIndex: (row * cols + col) % PHOTOS.length,
-            id: `mobile-${row}-${col}`
+            x: startX + col * spacing,
+            y: startY + row * spacing,
+            scale: 0.8,
+            delay: (row + col) * 0.02
           });
         }
       }
     } else {
-      // Десктоп версия: 32 столбца (в 2 раза больше) x N строк
-      const cols = 32;
-      const cellSize = 150;
-      const spacing = 12;
-      const targetPhotos = 240; // Увеличено пропорционально
-      const rows = Math.ceil(targetPhotos / cols);
+      // Desktop: 16 columns x dynamic rows (doubled from 8xN)
+      const cols = 16;
+      const rows = Math.ceil(totalPhotos / cols);
+      const spacing = 200;
+      const startX = -(cols * spacing) / 2;
+      const startY = -(rows * spacing) / 2;
 
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-          const x = (col - (cols - 1) / 2) * (cellSize + spacing);
-          const y = (row - (rows - 1) / 2) * (cellSize + spacing);
-
-          positions.push({
-            x,
-            y,
-            width: cellSize,
-            height: cellSize,
-            photoIndex: (row * cols + col) % PHOTOS.length,
-            id: `desktop-${row}-${col}`
-          });
+          const index = row * cols + col;
+          if (index < totalPhotos) {
+            positions.push({
+              x: startX + col * spacing,
+              y: startY + row * spacing,
+              scale: 1,
+              delay: (row + col) * 0.01
+            });
+          }
         }
       }
     }
 
     return positions;
-  }, []);
+  };
 
 const PHOTO_POSITIONS = generatePositions()
 
@@ -348,53 +342,54 @@ function ConnectModal({ onClose }) {
 }
 
 // Main App Component
+  // Initialize positions and center view
   useEffect(() => {
-    const handleResize = () => {
-      const isMobile = window.innerWidth < 768;
-      const newPositions = generatePositions();
-      setPositions(newPositions);
+    const positions = generatePositions();
+    setPositions(positions);
 
-      // Центрирование на новой сетке
-      if (containerRef.current) {
-        const containerWidth = containerRef.current.offsetWidth;
-        const containerHeight = containerRef.current.offsetHeight;
+    // Calculate center coordinates for the new larger grid
+    const isMobile = window.innerWidth < 768;
+    let centerX, centerY;
 
-        // Новые размеры сетки
-        const cols = isMobile ? 60 : 32;
-        const rows = isMobile ? 8 : Math.ceil(240 / cols);
-        const cellSize = isMobile ? 120 : 150;
-        const spacing = isMobile ? 8 : 12;
+    if (isMobile) {
+      // Mobile center: 4x30 grid
+      centerX = 0;
+      centerY = 0;
+    } else {
+      // Desktop center: 16xN grid
+      const cols = 16;
+      const rows = Math.ceil(totalPhotos / cols);
+      const spacing = 200;
+      centerX = 0;
+      centerY = 0;
+    }
 
-        const gridWidth = cols * (cellSize + spacing) - spacing;
-        const gridHeight = rows * (cellSize + spacing) - spacing;
+    // Set initial position to center of grid
+    x.set(centerX);
+    y.set(centerY);
 
-        setOffset({
-          x: containerWidth / 2 - gridWidth / 2,
-          y: containerHeight / 2 - gridHeight / 2
-        });
+    // Update spring targets to maintain center position
+    springX.set(centerX);
+    springY.set(centerY);
 
-        // Масштабирование при старте
-        const scaleX = (containerWidth * 0.9) / gridWidth;
-        const scaleY = (containerHeight * 0.9) / gridHeight;
-        const initialScale = Math.min(scaleX, scaleY, 1);
-        setScale(initialScale);
-      }
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-
-    return () => window.removeEventListener('resize', handleResize);
-  }, [generatePositions]);
+    // Center the actual view
+    const container = containerRef.current;
+    if (container) {
+      const scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+      const scrollTop = (container.scrollHeight - container.clientHeight) / 2;
+      container.scrollLeft = scrollLeft;
+      container.scrollTop = scrollTop;
+    }
+  }, [totalPhotos]);
 
   // Mouse/touch handlers
-  const handleMouseDown = (e) => {
+  const handleMouseDown = (e: React.MouseEvent) => {
     isDragging.current = true;
     dragStart.current = { x: e.clientX - x.get(), y: e.clientY - y.get() };
     containerRef.current?.classList.add('cursor-grabbing');
   };
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging.current) return;
 
     const newX = e.clientX - dragStart.current.x;
@@ -411,13 +406,13 @@ function ConnectModal({ onClose }) {
     containerRef.current?.classList.remove('cursor-grabbing');
   };
 
-  const handleTouchStart = (e) => {
+  const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
     isDragging.current = true;
     dragStart.current = { x: touch.clientX - x.get(), y: touch.clientY - y.get() };
   };
 
-  const handleTouchMove = (e) => {
+  const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging.current) return;
 
     const touch = e.touches[0];
@@ -434,7 +429,7 @@ function ConnectModal({ onClose }) {
     isDragging.current = false;
   };
 
-  const handleWheel = (e) => {
+  const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
 
     const scaleAmount = e.deltaY > 0 ? 0.9 : 1.1;

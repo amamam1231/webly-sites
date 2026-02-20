@@ -97,7 +97,7 @@ function Navbar({ activeModal, setActiveModal }) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none">
       <div className="pointer-events-auto">
-        <h1 className="font-['Anton'] text-white text-xl md:text-2xl font-bold leading-tight tracking-tight uppercase">
+        <h1 className="font-['Times_New_Roman'] text-white text-xl md:text-2xl font-bold leading-tight tracking-tight uppercase">
           SERGIO<br/>MUSEL
         </h1>
       </div>
@@ -191,7 +191,7 @@ function AboutModal({ onClose }) {
                 </p>
               </div>
               <div>
-                <p className="text-zinc-400 leading-relaxed font-sans text-sm md:text-base">
+                <p className="text-zinc-400 leading-relaxed font-['IBM_Plex_Mono'] text-sm md:text-base">
                   Each photograph is a meditation on time and space, shot exclusively on
                   Leica rangefinders. I believe in the slow process of craft—the deliberate
                   click of the shutter, the anticipation of development, the tangible weight
@@ -255,8 +255,8 @@ function ConnectModal({ onClose }) {
     >
       {/* Gradient Background with Noise */}
       <div className="absolute inset-0 bg-gradient-to-br from-orange-950 via-zinc-950 to-black">
-        <div className="absolute inset-0 opacity-40" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='8' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+        <div className="absolute inset-0 opacity-60" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='8' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
         }} />
       </div>
 

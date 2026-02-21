@@ -481,11 +481,13 @@ function App() {
 
   // Handle photo click
   const handlePhotoClick = (e, photo) => {
+    if (!dragStart.current) return // Prevent errors if click without prior mousedown
+
     const dx = Math.abs(e.clientX - dragStart.current.x)
     const dy = Math.abs(e.clientY - dragStart.current.y)
 
-    // Если было значительное перемещение - считаем за драг
-    if (dx > 5 || dy > 5) return
+    // Only open modal on quick clicks (movement < 3px)
+    if (dx > 3 || dy > 3) return
 
     setSelectedPhoto(photo)
     setActiveModal('photo')
@@ -539,7 +541,7 @@ function App() {
                 height: photo.height,
                 transform: `rotate(${photo.rotation}deg) scale(${photo.scale})`,
               }}
-              onClick={() => handlePhotoClick(photo)}
+              onClick={(e) => handlePhotoClick(e, photo)}
             >
               <div className={cn( "relative w-full h-full overflow-hidden flex flex-col",
                 !photo.isVertical && "justify-start"

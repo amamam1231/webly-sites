@@ -97,7 +97,7 @@ function Navbar({ activeModal, setActiveModal }) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none">
       <div className="pointer-events-auto">
-        <h1 className="font-['Times_New_Roman'] text-white text-xl md:text-2xl font-bold leading-tight tracking-tight uppercase">
+        <h1 className="font-['Anton'] text-white text-xl md:text-2xl font-bold leading-none tracking-[-0.02em] uppercase">
           SERGIO<br/>MUSEL
         </h1>
       </div>
@@ -107,10 +107,10 @@ function Navbar({ activeModal, setActiveModal }) {
           <button
             key={item.id}
             onClick={item.action}
-            className={cn( "font-['IBM_Plex_Mono'] text-xs md:text-sm tracking-wide uppercase transition-colors duration-300 hover:text-orange-500",
+            className={cn( "font-['IBM_Plex_Mono'] text-xs md:text-sm tracking-[0.02em] text-white font-bold uppercase transition-colors duration-300 hover:text-orange-500",
               (activeModal === item.id || (item.id === 'portfolio' && !activeModal))
                 ? "text-orange-500"
-                : "text-zinc-400"
+                : "text-white"
             )}
           >
             {item.label}
@@ -177,7 +177,7 @@ function AboutModal({ onClose }) {
 
           {/* Right - Content */}
           <div className="flex flex-col justify-center">
-            <h2 className="font-mono text-white text-4xl md:text-5xl font-bold mb-8 tracking-tighter">
+            <h2 className="font-['IBM_Plex_Mono'] text-white text-4xl md:text-5xl font-bold mb-8 tracking-[0.02em]">
               ABOUT ME
             </h2>
 
@@ -277,7 +277,7 @@ function ConnectModal({ onClose }) {
           transition={{ delay: 0.2 }}
           className="max-w-2xl"
         >
-          <h2 className="font-mono text-white text-4xl md:text-6xl font-bold mb-4 tracking-tighter">
+          <h2 className="font-['IBM_Plex_Mono'] text-white text-4xl md:text-6xl font-bold mb-4 tracking-[0.02em]">
             LET'S CONNECT
           </h2>
 
@@ -592,7 +592,7 @@ function App() {
 
       {/* Copyright */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-        <p className="font-['IBM_Plex_Mono'] text-zinc-500 text-xs tracking-widest uppercase">
+        <p className="font-['IBM_Plex_Mono'] text-white font-bold text-xs tracking-[0.02em] uppercase">
           2026 made with Webly AI
         </p>
       </div>

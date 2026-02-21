@@ -97,7 +97,7 @@ function Navbar({ activeModal, setActiveModal }) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none">
       <div className="pointer-events-auto">
-        <h1 className="font-['Anton'] text-white text-4xl md:text-[120px] font-bold leading-[0.85] tracking-[-0.05em] uppercase">
+        <h1 className="font-['Times_New_Roman'] text-white text-xl md:text-2xl font-bold leading-tight tracking-tight uppercase">
           SERGIO<br/>MUSEL
         </h1>
       </div>
@@ -107,7 +107,7 @@ function Navbar({ activeModal, setActiveModal }) {
           <button
             key={item.id}
             onClick={item.action}
-            className={cn( "font-['IBM_Plex_Mono'] text-base md:text-lg font-bold leading-relaxed tracking-[0.02em] text-white uppercase transition-colors duration-300 hover:text-orange-500",
+            className={cn( "font-['IBM_Plex_Mono'] text-xs md:text-sm tracking-wide uppercase transition-colors duration-300 hover:text-orange-500",
               (activeModal === item.id || (item.id === 'portfolio' && !activeModal))
                 ? "text-orange-500"
                 : "text-zinc-400"
@@ -496,12 +496,12 @@ function App() {
   }
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-zinc-100 dark:bg-zinc-950 select-none transition-colors duration-500">
+    <div className="relative w-full h-full overflow-hidden bg-zinc-950 select-none transition-colors duration-500">
       {/* TV Noise Overlay */}
-      <div className={`tv-noise ${!isDarkTheme && 'hidden'}`} />
+      <div className={`tv-noise ${!isDarkTheme && 'opacity-0'}`} />
       {/* Gradient Noise Overlay */}
-      <div className="absolute top-0 left-0 w-full h-[200px] pointer-events-none z-20">
-        <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/90 via-zinc-950/50 to-transparent" />
+      <div className="absolute top-0 left-0 w-full h-[100px] pointer-events-none z-20">
+        <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 to-transparent" />
       </div>
       {/* Navigation */}
       <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />

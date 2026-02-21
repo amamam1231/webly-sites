@@ -378,12 +378,6 @@ function App() {
   const handleMouseDown = useCallback((e) => {
     if (activeModal) return
 
-    if (e.target.closest('.photo-item')) {
-      // Для фотографий только запоминаем начальную позицию для определения был ли драг
-      dragStart.current = { x: e.clientX, y: e.clientY }
-      return
-    }
-
     setIsDragging(true)
     dragStart.current = { x: e.clientX, y: e.clientY }
     canvasStart.current = { x: springX.get(), y: springY.get() }
@@ -439,7 +433,6 @@ function App() {
   // Touch events for mobile
   const handleTouchStart = useCallback((e) => {
     if (activeModal) return
-    if (e.target.closest('.photo-item')) return
 
     const touch = e.touches[0]
     setIsDragging(true)

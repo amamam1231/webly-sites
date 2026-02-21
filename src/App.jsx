@@ -50,11 +50,10 @@ const PHOTOS = [
 const generatePositions = () => {
   const positions = []
   const isMobile = window.innerWidth < 768
-  const cellWidth = isMobile ? 160 : 400
-  const cellHeight = isMobile ? 240 : 600
-  const spacing = isMobile ? 20 : 80
-  // Increased columns from 20 to 30 for wider grid
-  const cols = isMobile ? 2 : 30
+  const cellWidth = isMobile ? 120 : 400
+  const cellHeight = isMobile ? 180 : 600
+  const spacing = isMobile ? 10 : 80
+  const cols = 30 // Same number of columns for both mobile and desktop
   // Increased multiplier from 16 to 40 for more photos (1200 total)
   const totalPhotos = PHOTOS.length * 40
   const rows = Math.ceil(totalPhotos / cols)
@@ -378,7 +377,12 @@ function App() {
   // Handle mouse down
   const handleMouseDown = useCallback((e) => {
     if (activeModal) return
-    if (e.target.closest('.photo-item')) return
+
+    if (e.target.closest('.photo-item')) {
+      // Для фотографий только запоминаем начальную позицию для определения был ли драг
+      dragStart.current = { x: e.clientX, y: e.clientY }
+      return
+    }
 
     setIsDragging(true)
     dragStart.current = { x: e.clientX, y: e.clientY }
@@ -483,8 +487,13 @@ function App() {
   }, [handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
 
   // Handle photo click
-  const handlePhotoClick = (photo) => {
-    if (isDragging) return
+  const handlePhotoClick = (e, photo) => {
+    const dx = Math.abs(e.clientX - dragStart.current.x)
+    const dy = Math.abs(e.clientY - dragStart.current.y)
+
+    // Если было значительное перемещение - считаем за драг
+    if (dx > 5 || dy > 5) return
+
     setSelectedPhoto(photo)
     setActiveModal('photo')
   }

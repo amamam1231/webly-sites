@@ -417,11 +417,11 @@ function App() {
         <div className="container mx-auto max-w-7xl px-4 md:px-6">
           <div className="flex items-center justify-between h-16 md:h-20">
             <a href="#hero" onClick={(e) => { e.preventDefault(); scrollToSection('hero') }} className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-yellow-400 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center">
                 <SafeIcon name="flame" size={24} className="text-slate-950" />
               </div>
               <span className="font-black text-xl tracking-tight">
-                CHAMPION<span className="text-amber-400">MUAY</span>THAI
+                CHAMPION<span className="text-red-500">MUAY</span>THAI
               </span>
             </a>
 
@@ -430,14 +430,14 @@ function App() {
                 <button
                   key={link.id}
                   onClick={() => scrollToSection(link.id)}
-                  className="text-sm font-medium text-slate-300 hover:text-amber-400 transition-colors"
+                  className="text-sm font-medium text-slate-300 hover:text-red-500 transition-colors"
                 >
                   {link.name}
                 </button>
               ))}
               <button
                 onClick={() => scrollToSection('contact')}
-                className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm rounded-full transition-all hover:scale-105"
+                className="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-slate-950 font-bold text-sm rounded-full transition-all hover:scale-105"
               >
                 Записаться
               </button>
@@ -488,8 +488,8 @@ function App() {
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900/50 to-slate-950 z-10" />
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1555597673-b21d5c935865?w=1920&q=80"
-            alt="Muay Thai Training"
+            src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1920&q=80"
+            alt="Professional Muay Thai Fighter"
             className="w-full h-full object-cover opacity-40"
           />
         </div>
@@ -501,9 +501,9 @@ function App() {
             animate={heroInView ? 'visible' : 'hidden'}
             className="max-w-3xl"
           >
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-full mb-6">
-              <SafeIcon name="trophy" size={16} className="text-amber-400" />
-              <span className="text-sm font-semibold text-amber-400">Многократный чемпион мира</span>
+            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/30 rounded-full mb-6">
+              <SafeIcon name="trophy" size={16} className="text-red-500" />
+              <span className="text-sm font-semibold text-red-500">Многократный чемпион мира</span>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 leading-none">
@@ -519,7 +519,7 @@ function App() {
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={() => scrollToSection('contact')}
-                className="group px-8 py-4 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-bold text-lg rounded-full hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:scale-105 flex items-center justify-center gap-2"
+                className="group px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 text-slate-950 font-bold text-lg rounded-full hover:shadow-lg hover:shadow-red-500/30 transition-all hover:scale-105 flex items-center justify-center gap-2"
               >
                 Начать тренироваться
                 <SafeIcon name="chevron-right" size={20} className="group-hover:translate-x-1 transition-transform" />

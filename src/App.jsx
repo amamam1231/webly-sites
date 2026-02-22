@@ -97,7 +97,7 @@ function Navbar({ activeModal, setActiveModal, isDarkTheme }) {
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none">
       <div className="pointer-events-auto">
         <h1 className={cn(
-          "font-['Anton'] text-xl md:text-2xl lg:text-3xl font-bold leading-none tracking-[0.05em] uppercase",
+          "font-['Anton'] text-2xl md:text-3xl lg:text-4xl font-bold leading-none tracking-[0.05em] uppercase",
           isDarkTheme ? "text-white" : "text-zinc-900"
         )}>
           SERGIO<br/>MUSEL
@@ -584,8 +584,8 @@ function App() {
       <div className={cn(
         "absolute top-0 left-0 w-full h-[80px] pointer-events-none z-20",
         isDarkTheme
-          ? "bg-gradient-to-b from-zinc-950/95 via-zinc-950/40 to-transparent"
-          : "bg-gradient-to-b from-zinc-100/95 via-zinc-100/40 to-transparent"
+          ? "bg-gradient-to-b from-zinc-950/60 via-zinc-950/20 to-transparent"
+          : "bg-gradient-to-b from-zinc-100/60 via-zinc-100/20 to-transparent"
       )} />
 
       {/* Navigation */}

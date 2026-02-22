@@ -85,7 +85,7 @@ const generatePositions = () => {
 const PHOTO_POSITIONS = generatePositions()
 
 // Navbar Component
-function Navbar({ activeModal, setActiveModal }) {
+function Navbar({ activeModal, setActiveModal, isDarkTheme }) {
   const navItems = [
     { label: 'Portfolio', id: 'portfolio', action: () => setActiveModal(null) },
     { label: 'About Me', id: 'about', action: () => setActiveModal('about') },
@@ -96,20 +96,24 @@ function Navbar({ activeModal, setActiveModal }) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none">
       <div className="pointer-events-auto">
-        <h1 className="font-['Anton'] text-white text-2xl md:text-3xl font-bold leading-none tracking-[0.05em] uppercase">
+        <h1 className={cn(
+          "font-['Anton'] text-3xl md:text-4xl lg:text-5xl font-bold leading-none tracking-[0.05em] uppercase",
+          isDarkTheme ? "text-white" : "text-zinc-900"
+        )}>
           SERGIO<br/>MUSEL
         </h1>
       </div>
 
-      <div className="flex flex-col gap-4 pointer-events-auto items-end">
+      <div className="flex flex-col pointer-events-auto items-end" style={{ lineHeight: '1.2' }}>
         {navItems.map((item) => (
           <button
             key={item.id}
             onClick={item.action}
-            className={cn( "font-['IBM_Plex_Mono'] text-xs md:text-sm tracking-[0.02em] text-white font-bold capitalize leading-tight transition-colors duration-300 hover:text-orange-500",
-              (activeModal === item.id || (item.id === 'portfolio' && !activeModal))
-                ? "text-orange-500"
-                : "text-white"
+            className={cn(
+              "font-['IBM_Plex_Mono'] text-xs md:text-sm tracking-[0.02em] font-bold capitalize transition-colors duration-300 hover:text-orange-500 py-0.5",
+              isDarkTheme
+                ? ((activeModal === item.id || (item.id === 'portfolio' && !activeModal)) ? "text-orange-500" : "text-white")
+                : ((activeModal === item.id || (item.id === 'portfolio' && !activeModal)) ? "text-orange-600" : "text-zinc-900")
             )}
           >
             {item.label}
@@ -121,12 +125,15 @@ function Navbar({ activeModal, setActiveModal }) {
 }
 
 // Photo Modal Component
-function PhotoModal({ photo, onClose }) {
+function PhotoModal({ photo, onClose, isDarkTheme }) {
   if (!photo) return null
 
   return (
     <div
-      className="fixed inset-0 z-40 bg-black/60 flex items-center justify-center"
+      className={cn(
+        "fixed inset-0 z-40 flex items-center justify-center",
+        isDarkTheme ? "bg-black/60" : "bg-white/80"
+      )}
       onClick={onClose}
     >
       <div className="relative w-full h-full flex items-center justify-center">
@@ -135,24 +142,37 @@ function PhotoModal({ photo, onClose }) {
           alt={photo.title}
           className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain grayscale"
         />
+        <div className={cn(
+          "absolute bottom-8 left-1/2 -translate-x-1/2 text-center font-['IBM_Plex_Mono'] text-xs",
+          isDarkTheme ? "text-zinc-400" : "text-zinc-600"
+        )}>
+          <p className="font-bold">{photo.title}</p>
+          <p>{photo.date} — {photo.camera}</p>
+        </div>
       </div>
     </div>
   )
 }
 
 // About Modal Component
-function AboutModal({ onClose }) {
+function AboutModal({ onClose, isDarkTheme }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-40 bg-zinc-950/98 overflow-y-auto"
+      className={cn(
+        "fixed inset-0 z-40 overflow-y-auto",
+        isDarkTheme ? "bg-zinc-950/98" : "bg-zinc-50/98"
+      )}
       onClick={onClose}
     >
       <button
         onClick={onClose}
-        className="fixed top-6 right-6 text-zinc-400 hover:text-white transition-colors z-50"
+        className={cn(
+          "fixed top-6 right-6 transition-colors z-50",
+          isDarkTheme ? "text-zinc-400 hover:text-white" : "text-zinc-500 hover:text-zinc-900"
+        )}
       >
         <SafeIcon name="X" size={32} />
       </button>
@@ -164,7 +184,10 @@ function AboutModal({ onClose }) {
         <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
           {/* Left - Photo */}
           <div className="relative">
-            <div className="aspect-[3/4] bg-zinc-900 overflow-hidden">
+            <div className={cn(
+              "aspect-[3/4] overflow-hidden",
+              isDarkTheme ? "bg-zinc-900" : "bg-zinc-200"
+            )}>
               <img
                 src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5768.jpg?"
                 alt="Sergio Musel"
@@ -176,13 +199,19 @@ function AboutModal({ onClose }) {
 
           {/* Right - Content */}
           <div className="flex flex-col justify-center">
-            <h2 className="font-['IBM_Plex_Mono'] text-white text-4xl md:text-5xl font-bold mb-8 tracking-[0.02em]">
+            <h2 className={cn(
+              "font-['IBM_Plex_Mono'] text-4xl md:text-5xl font-bold mb-8 tracking-[0.02em]",
+              isDarkTheme ? "text-white" : "text-zinc-900"
+            )}>
               ABOUT ME
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
               <div>
-                <p className="text-zinc-400 leading-relaxed font-['IBM_Plex_Mono'] text-sm md:text-base">
+                <p className={cn(
+                  "leading-relaxed font-['IBM_Plex_Mono'] text-sm md:text-base",
+                  isDarkTheme ? "text-zinc-400" : "text-zinc-600"
+                )}>
                   Born in Prague and trained in the traditions of analog photography,
                   I have spent the last decade capturing the raw essence of urban landscapes.
                   My work explores the intersection of light and shadow, finding beauty in
@@ -190,7 +219,10 @@ function AboutModal({ onClose }) {
                 </p>
               </div>
               <div>
-                <p className="text-zinc-400 leading-relaxed font-['IBM_Plex_Mono'] text-sm md:text-base">
+                <p className={cn(
+                  "leading-relaxed font-['IBM_Plex_Mono'] text-sm md:text-base",
+                  isDarkTheme ? "text-zinc-400" : "text-zinc-600"
+                )}>
                   Each photograph is a meditation on time and space, shot exclusively on
                   Leica rangefinders. I believe in the slow process of craft—the deliberate
                   click of the shutter, the anticipation of development, the tangible weight
@@ -200,27 +232,45 @@ function AboutModal({ onClose }) {
             </div>
 
             {/* Awards */}
-            <div className="border-t border-zinc-800 pt-8">
-              <h3 className="font-mono text-orange-500 text-sm tracking-widest mb-6 flex items-center gap-2">
+            <div className={cn(
+              "border-t pt-8",
+              isDarkTheme ? "border-zinc-800" : "border-zinc-300"
+            )}>
+              <h3 className={cn(
+                "font-mono text-sm tracking-widest mb-6 flex items-center gap-2",
+                isDarkTheme ? "text-orange-500" : "text-orange-600"
+              )}>
                 <SafeIcon name="Award" size={16} />
                 LEICA AWARDS
               </h3>
               <div className="space-y-3 font-mono text-sm">
-                <div className="flex justify-between text-zinc-300">
+                <div className={cn(
+                  "flex justify-between",
+                  isDarkTheme ? "text-zinc-300" : "text-zinc-700"
+                )}>
                   <span>Leica Oskar Barnack Award</span>
-                  <span className="text-zinc-600">2023</span>
+                  <span className={isDarkTheme ? "text-zinc-600" : "text-zinc-400"}>2023</span>
                 </div>
-                <div className="flex justify-between text-zinc-300">
+                <div className={cn(
+                  "flex justify-between",
+                  isDarkTheme ? "text-zinc-300" : "text-zinc-700"
+                )}>
                   <span>Leica Street Photography Contest</span>
-                  <span className="text-zinc-600">2022</span>
+                  <span className={isDarkTheme ? "text-zinc-600" : "text-zinc-400"}>2022</span>
                 </div>
-                <div className="flex justify-between text-zinc-300">
+                <div className={cn(
+                  "flex justify-between",
+                  isDarkTheme ? "text-zinc-300" : "text-zinc-700"
+                )}>
                   <span>World Press Photo</span>
-                  <span className="text-zinc-600">2021</span>
+                  <span className={isDarkTheme ? "text-zinc-600" : "text-zinc-400"}>2021</span>
                 </div>
-                <div className="flex justify-between text-zinc-300">
+                <div className={cn(
+                  "flex justify-between",
+                  isDarkTheme ? "text-zinc-300" : "text-zinc-700"
+                )}>
                   <span>Prague Photo Festival</span>
-                  <span className="text-zinc-600">2020</span>
+                  <span className={isDarkTheme ? "text-zinc-600" : "text-zinc-400"}>2020</span>
                 </div>
               </div>
             </div>
@@ -232,7 +282,7 @@ function AboutModal({ onClose }) {
 }
 
 // Connect Modal Component
-function ConnectModal({ onClose }) {
+function ConnectModal({ onClose, isDarkTheme }) {
   const [currentDate, setCurrentDate] = useState('')
 
   useEffect(() => {
@@ -253,15 +303,24 @@ function ConnectModal({ onClose }) {
       onClick={onClose}
     >
       {/* Gradient Background with Noise */}
-      <div className="absolute inset-0 bg-gradient-to-br from-zinc-100 via-zinc-200 to-white">
-        <div className="absolute inset-0 opacity-30" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-        }} />
+      <div className={cn(
+        "absolute inset-0",
+        isDarkTheme
+          ? "bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900"
+          : "bg-gradient-to-br from-zinc-100 via-zinc-200 to-white"
+      )}>
+        <div className={cn(
+          "absolute inset-0",
+          isDarkTheme ? "tv-noise-dark" : "tv-noise-light"
+        )} style={{ opacity: 0.3 }} />
       </div>
 
       <button
         onClick={onClose}
-        className="fixed top-6 right-6 text-zinc-400 hover:text-white transition-colors z-50"
+        className={cn(
+          "fixed top-6 right-6 transition-colors z-50",
+          isDarkTheme ? "text-zinc-400 hover:text-white" : "text-zinc-500 hover:text-zinc-900"
+        )}
       >
         <SafeIcon name="X" size={32} />
       </button>
@@ -276,11 +335,17 @@ function ConnectModal({ onClose }) {
           transition={{ delay: 0.2 }}
           className="max-w-2xl"
         >
-          <h2 className="font-['IBM_Plex_Mono'] text-white text-4xl md:text-6xl font-bold mb-4 tracking-[0.02em]">
+          <h2 className={cn(
+            "font-['IBM_Plex_Mono'] text-4xl md:text-6xl font-bold mb-4 tracking-[0.02em]",
+            isDarkTheme ? "text-white" : "text-zinc-900"
+          )}>
             LET'S CONNECT
           </h2>
 
-          <p className="text-zinc-400 font-['IBM_Plex_Mono'] mb-12 text-lg">
+          <p className={cn(
+            "font-['IBM_Plex_Mono'] mb-12 text-lg",
+            isDarkTheme ? "text-zinc-400" : "text-zinc-600"
+          )}>
             Open for collaborations, exhibitions, and commissioned work.
           </p>
 
@@ -289,7 +354,10 @@ function ConnectModal({ onClose }) {
               href="https://instagram.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 text-zinc-300 hover:text-orange-500 transition-colors font-mono"
+              className={cn(
+                "flex items-center gap-3 transition-colors font-mono",
+                isDarkTheme ? "text-zinc-300 hover:text-orange-500" : "text-zinc-700 hover:text-orange-600"
+              )}
             >
               <SafeIcon name="Instagram" size={24} />
               <span>@sergiomusel</span>
@@ -298,21 +366,30 @@ function ConnectModal({ onClose }) {
               href="https://twitter.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 text-zinc-300 hover:text-orange-500 transition-colors font-mono"
+              className={cn(
+                "flex items-center gap-3 transition-colors font-mono",
+                isDarkTheme ? "text-zinc-300 hover:text-orange-500" : "text-zinc-700 hover:text-orange-600"
+              )}
             >
               <SafeIcon name="Twitter" size={24} />
               <span>@sergiomusel</span>
             </a>
             <a
               href="mailto:hello@sergiomusel.com"
-              className="flex items-center gap-3 text-zinc-300 hover:text-orange-500 transition-colors font-mono"
+              className={cn(
+                "flex items-center gap-3 transition-colors font-mono",
+                isDarkTheme ? "text-zinc-300 hover:text-orange-500" : "text-zinc-700 hover:text-orange-600"
+              )}
             >
               <SafeIcon name="Mail" size={24} />
               <span>hello@sergiomusel.com</span>
             </a>
           </div>
 
-          <div className="flex items-center justify-center gap-8 text-zinc-500 font-mono text-sm">
+          <div className={cn(
+            "flex items-center justify-center gap-8 font-mono text-sm",
+            isDarkTheme ? "text-zinc-500" : "text-zinc-500"
+          )}>
             <div className="flex items-center gap-2">
               <SafeIcon name="MapPin" size={14} />
               <span>Prague, CZ</span>
@@ -500,20 +577,32 @@ function App() {
   }
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-zinc-950 select-none transition-colors duration-500">
-      {/* TV Noise Overlay */}
-      <div className={`tv-noise ${!isDarkTheme && 'opacity-0'}`} />
-      {/* Gradient Noise Overlay */}
-      <div className="absolute top-0 left-0 w-full h-[100px] pointer-events-none z-20">
-        <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 to-transparent" />
-      </div>
+    <div className={cn(
+      "relative w-full h-full overflow-hidden select-none transition-colors duration-500",
+      isDarkTheme ? "bg-zinc-950" : "bg-zinc-100"
+    )}>
+      {/* TV Noise Overlay - Theme Aware */}
+      <div className={cn(
+        "fixed inset-0 pointer-events-none z-[1]",
+        isDarkTheme ? "tv-noise-dark" : "tv-noise-light"
+      )} />
+
+      {/* Gradient Noise Overlay - Increased height and smoother transition */}
+      <div className={cn(
+        "absolute top-0 left-0 w-full h-[200px] pointer-events-none z-20",
+        isDarkTheme
+          ? "bg-gradient-to-b from-zinc-950 via-zinc-950/80 to-transparent"
+          : "bg-gradient-to-b from-zinc-100 via-zinc-100/80 to-transparent"
+      )} />
+
       {/* Navigation */}
-      <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />
+      <Navbar activeModal={activeModal} setActiveModal={setActiveModal} isDarkTheme={isDarkTheme} />
 
       {/* Infinite Canvas Container */}
       <div
         ref={containerRef}
-        className={cn( "absolute inset-0 overflow-hidden z-10",
+        className={cn(
+          "absolute inset-0 overflow-hidden z-10",
           isDragging ? "cursor-grabbing" : "cursor-grab"
         )}
         onMouseDown={handleMouseDown}
@@ -543,7 +632,8 @@ function App() {
               }}
               onClick={(e) => handlePhotoClick(e, photo)}
             >
-              <div className={cn( "relative w-full h-full overflow-hidden flex flex-col",
+              <div className={cn(
+                "relative w-full h-full overflow-hidden flex flex-col",
                 !photo.isVertical && "justify-start"
               )}>
                 <img
@@ -569,9 +659,19 @@ function App() {
       <div className="fixed bottom-6 left-6 z-30">
         <button
           onClick={() => setIsDarkTheme(!isDarkTheme)}
-          className="p-2 rounded-full hover:bg-zinc-800/20 transition-colors"
+          className={cn(
+            "p-2 rounded-full transition-colors",
+            isDarkTheme ? "hover:bg-zinc-800/20" : "hover:bg-zinc-300/50"
+          )}
         >
-          <SafeIcon name={isDarkTheme ? "Sun" : "Moon"} size={24} className="text-zinc-500 hover:text-orange-500" />
+          <SafeIcon
+            name={isDarkTheme ? "Sun" : "Moon"}
+            size={24}
+            className={cn(
+              "transition-colors",
+              isDarkTheme ? "text-zinc-500 hover:text-orange-500" : "text-zinc-600 hover:text-orange-600"
+            )}
+          />
         </button>
       </div>
 
@@ -580,37 +680,60 @@ function App() {
           href="https://t.me/sergiomusel"
           target="_blank"
           rel="noopener noreferrer"
-          className="p-2 rounded-full hover:bg-zinc-800/20 transition-colors"
+          className={cn(
+            "p-2 rounded-full transition-colors",
+            isDarkTheme ? "hover:bg-zinc-800/20" : "hover:bg-zinc-300/50"
+          )}
         >
-          <SafeIcon name="Send" size={24} className="text-zinc-500 hover:text-orange-500" />
+          <SafeIcon
+            name="Send"
+            size={24}
+            className={cn(
+              "transition-colors",
+              isDarkTheme ? "text-zinc-500 hover:text-orange-500" : "text-zinc-600 hover:text-orange-600"
+            )}
+          />
         </a>
         <a
           href="https://instagram.com/sergiomusel"
           target="_blank"
           rel="noopener noreferrer"
-          className="p-2 rounded-full hover:bg-zinc-800/20 transition-colors"
+          className={cn(
+            "p-2 rounded-full transition-colors",
+            isDarkTheme ? "hover:bg-zinc-800/20" : "hover:bg-zinc-300/50"
+          )}
         >
-          <SafeIcon name="Instagram" size={24} className="text-zinc-500 hover:text-orange-500" />
+          <SafeIcon
+            name="Instagram"
+            size={24}
+            className={cn(
+              "transition-colors",
+              isDarkTheme ? "text-zinc-500 hover:text-orange-500" : "text-zinc-600 hover:text-orange-600"
+            )}
+          />
         </a>
       </div>
 
-      {/* Copyright */}
+      {/* Copyright - lowercase and normal weight */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-        <p className="font-['Courier New'] text-zinc-500 font-bold text-xs tracking-[0.02em] uppercase">
-          2026 made with Webly AI
+        <p className={cn(
+          "font-['Courier_New'] text-xs tracking-[0.02em]",
+          isDarkTheme ? "text-zinc-500" : "text-zinc-500"
+        )}>
+          2026 made with webly AI
         </p>
       </div>
 
       {/* Modals */}
       <AnimatePresence>
         {activeModal === 'photo' && (
-          <PhotoModal photo={selectedPhoto} onClose={closeModal} />
+          <PhotoModal photo={selectedPhoto} onClose={closeModal} isDarkTheme={isDarkTheme} />
         )}
         {activeModal === 'about' && (
-          <AboutModal onClose={closeModal} />
+          <AboutModal onClose={closeModal} isDarkTheme={isDarkTheme} />
         )}
         {activeModal === 'connect' && (
-          <ConnectModal onClose={closeModal} />
+          <ConnectModal onClose={closeModal} isDarkTheme={isDarkTheme} />
         )}
       </AnimatePresence>
     </div>

@@ -97,7 +97,7 @@ function Navbar({ activeModal, setActiveModal, isDarkTheme }) {
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none">
       <div className="pointer-events-auto">
         <h1 className={cn(
-          "font-['Anton'] text-3xl md:text-4xl lg:text-5xl font-bold leading-none tracking-[0.05em] uppercase",
+          "font-['Anton'] text-xl md:text-2xl lg:text-3xl font-bold leading-none tracking-[0.05em] uppercase",
           isDarkTheme ? "text-white" : "text-zinc-900"
         )}>
           SERGIO<br/>MUSEL
@@ -142,13 +142,6 @@ function PhotoModal({ photo, onClose, isDarkTheme }) {
           alt={photo.title}
           className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain grayscale"
         />
-        <div className={cn(
-          "absolute bottom-8 left-1/2 -translate-x-1/2 text-center font-['IBM_Plex_Mono'] text-xs",
-          isDarkTheme ? "text-zinc-400" : "text-zinc-600"
-        )}>
-          <p className="font-bold">{photo.title}</p>
-          <p>{photo.date} — {photo.camera}</p>
-        </div>
       </div>
     </div>
   )
@@ -587,12 +580,12 @@ function App() {
         isDarkTheme ? "tv-noise-dark" : "tv-noise-light"
       )} />
 
-      {/* Gradient Noise Overlay - Increased height and smoother transition */}
+      {/* Gradient Noise Overlay - Small height with smooth transition, darkest only at top */}
       <div className={cn(
-        "absolute top-0 left-0 w-full h-[200px] pointer-events-none z-20",
+        "absolute top-0 left-0 w-full h-[80px] pointer-events-none z-20",
         isDarkTheme
-          ? "bg-gradient-to-b from-zinc-950 via-zinc-950/80 to-transparent"
-          : "bg-gradient-to-b from-zinc-100 via-zinc-100/80 to-transparent"
+          ? "bg-gradient-to-b from-zinc-950/95 via-zinc-950/40 to-transparent"
+          : "bg-gradient-to-b from-zinc-100/95 via-zinc-100/40 to-transparent"
       )} />
 
       {/* Navigation */}
@@ -714,13 +707,13 @@ function App() {
         </a>
       </div>
 
-      {/* Copyright - lowercase and normal weight */}
+      {/* Copyright - Capitalized Made */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
         <p className={cn(
           "font-['Courier_New'] text-xs tracking-[0.02em]",
           isDarkTheme ? "text-zinc-500" : "text-zinc-500"
         )}>
-          2026 made with webly AI
+          2026 Made with webly AI
         </p>
       </div>
 

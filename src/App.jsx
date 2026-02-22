@@ -96,20 +96,20 @@ function Navbar({ activeModal, setActiveModal }) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none">
       <div className="pointer-events-auto">
-        <h1 className="font-['Anton'] text-zinc-900 text-3xl md:text-5xl font-bold leading-none tracking-[0.05em] uppercase drop-shadow-[0_0_15px_rgba(249,115,22,0.5)]">
+        <h1 className="font-['Anton'] text-white text-2xl md:text-3xl font-bold leading-none tracking-[0.05em] uppercase">
           SERGIO<br/>MUSEL
         </h1>
       </div>
 
-      <div className="flex flex-col gap-1 pointer-events-auto items-end">
+      <div className="flex flex-col gap-4 pointer-events-auto items-end">
         {navItems.map((item) => (
           <button
             key={item.id}
             onClick={item.action}
-            className={cn( "font-['IBM_Plex_Mono'] text-xs md:text-sm tracking-[0.02em] text-zinc-700 font-bold capitalize leading-tight transition-colors duration-300 hover:text-orange-500",
+            className={cn( "font-['IBM_Plex_Mono'] text-xs md:text-sm tracking-[0.02em] text-white font-bold capitalize leading-tight transition-colors duration-300 hover:text-orange-500",
               (activeModal === item.id || (item.id === 'portfolio' && !activeModal))
                 ? "text-orange-500"
-                : "text-zinc-700"
+                : "text-white"
             )}
           >
             {item.label}
@@ -126,7 +126,7 @@ function PhotoModal({ photo, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-40 bg-zinc-100/95 backdrop-blur-sm flex items-center justify-center"
+      className="fixed inset-0 z-40 bg-black/60 flex items-center justify-center"
       onClick={onClose}
     >
       <div className="relative w-full h-full flex items-center justify-center">
@@ -135,10 +135,6 @@ function PhotoModal({ photo, onClose }) {
           alt={photo.title}
           className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain grayscale"
         />
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-center">
-          <p className="font-['IBM_Plex_Mono'] text-zinc-900 text-lg font-bold">{photo.title}</p>
-          <p className="font-['IBM_Plex_Mono'] text-zinc-600 text-sm">{photo.date} — {photo.camera}</p>
-        </div>
       </div>
     </div>
   )
@@ -151,12 +147,12 @@ function AboutModal({ onClose }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-40 bg-white/98 overflow-y-auto"
+      className="fixed inset-0 z-40 bg-zinc-950/98 overflow-y-auto"
       onClick={onClose}
     >
       <button
         onClick={onClose}
-        className="fixed top-6 right-6 text-zinc-400 hover:text-zinc-900 transition-colors z-50"
+        className="fixed top-6 right-6 text-zinc-400 hover:text-white transition-colors z-50"
       >
         <SafeIcon name="X" size={32} />
       </button>
@@ -168,7 +164,7 @@ function AboutModal({ onClose }) {
         <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
           {/* Left - Photo */}
           <div className="relative">
-            <div className="aspect-[3/4] bg-zinc-100 overflow-hidden">
+            <div className="aspect-[3/4] bg-zinc-900 overflow-hidden">
               <img
                 src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5768.jpg?"
                 alt="Sergio Musel"
@@ -180,13 +176,13 @@ function AboutModal({ onClose }) {
 
           {/* Right - Content */}
           <div className="flex flex-col justify-center">
-            <h2 className="font-['IBM_Plex_Mono'] text-zinc-900 text-4xl md:text-5xl font-bold mb-8 tracking-[0.02em]">
+            <h2 className="font-['IBM_Plex_Mono'] text-white text-4xl md:text-5xl font-bold mb-8 tracking-[0.02em]">
               ABOUT ME
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
               <div>
-                <p className="text-zinc-600 leading-relaxed font-['IBM_Plex_Mono'] text-sm md:text-base">
+                <p className="text-zinc-400 leading-relaxed font-['IBM_Plex_Mono'] text-sm md:text-base">
                   Born in Prague and trained in the traditions of analog photography,
                   I have spent the last decade capturing the raw essence of urban landscapes.
                   My work explores the intersection of light and shadow, finding beauty in
@@ -194,7 +190,7 @@ function AboutModal({ onClose }) {
                 </p>
               </div>
               <div>
-                <p className="text-zinc-600 leading-relaxed font-['IBM_Plex_Mono'] text-sm md:text-base">
+                <p className="text-zinc-400 leading-relaxed font-['IBM_Plex_Mono'] text-sm md:text-base">
                   Each photograph is a meditation on time and space, shot exclusively on
                   Leica rangefinders. I believe in the slow process of craft—the deliberate
                   click of the shutter, the anticipation of development, the tangible weight
@@ -204,27 +200,27 @@ function AboutModal({ onClose }) {
             </div>
 
             {/* Awards */}
-            <div className="border-t border-zinc-200 pt-8">
+            <div className="border-t border-zinc-800 pt-8">
               <h3 className="font-mono text-orange-500 text-sm tracking-widest mb-6 flex items-center gap-2">
                 <SafeIcon name="Award" size={16} />
                 LEICA AWARDS
               </h3>
               <div className="space-y-3 font-mono text-sm">
-                <div className="flex justify-between text-zinc-700">
+                <div className="flex justify-between text-zinc-300">
                   <span>Leica Oskar Barnack Award</span>
-                  <span className="text-zinc-400">2023</span>
+                  <span className="text-zinc-600">2023</span>
                 </div>
-                <div className="flex justify-between text-zinc-700">
+                <div className="flex justify-between text-zinc-300">
                   <span>Leica Street Photography Contest</span>
-                  <span className="text-zinc-400">2022</span>
+                  <span className="text-zinc-600">2022</span>
                 </div>
-                <div className="flex justify-between text-zinc-700">
+                <div className="flex justify-between text-zinc-300">
                   <span>World Press Photo</span>
-                  <span className="text-zinc-400">2021</span>
+                  <span className="text-zinc-600">2021</span>
                 </div>
-                <div className="flex justify-between text-zinc-700">
+                <div className="flex justify-between text-zinc-300">
                   <span>Prague Photo Festival</span>
-                  <span className="text-zinc-400">2020</span>
+                  <span className="text-zinc-600">2020</span>
                 </div>
               </div>
             </div>
@@ -265,7 +261,7 @@ function ConnectModal({ onClose }) {
 
       <button
         onClick={onClose}
-        className="fixed top-6 right-6 text-zinc-400 hover:text-zinc-900 transition-colors z-50"
+        className="fixed top-6 right-6 text-zinc-400 hover:text-white transition-colors z-50"
       >
         <SafeIcon name="X" size={32} />
       </button>
@@ -280,11 +276,11 @@ function ConnectModal({ onClose }) {
           transition={{ delay: 0.2 }}
           className="max-w-2xl"
         >
-          <h2 className="font-['IBM_Plex_Mono'] text-zinc-900 text-4xl md:text-6xl font-bold mb-4 tracking-[0.02em]">
+          <h2 className="font-['IBM_Plex_Mono'] text-white text-4xl md:text-6xl font-bold mb-4 tracking-[0.02em]">
             LET'S CONNECT
           </h2>
 
-          <p className="text-zinc-600 font-['IBM_Plex_Mono'] mb-12 text-lg">
+          <p className="text-zinc-400 font-['IBM_Plex_Mono'] mb-12 text-lg">
             Open for collaborations, exhibitions, and commissioned work.
           </p>
 
@@ -293,7 +289,7 @@ function ConnectModal({ onClose }) {
               href="https://instagram.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 text-zinc-700 hover:text-orange-500 transition-colors font-mono"
+              className="flex items-center gap-3 text-zinc-300 hover:text-orange-500 transition-colors font-mono"
             >
               <SafeIcon name="Instagram" size={24} />
               <span>@sergiomusel</span>
@@ -302,14 +298,14 @@ function ConnectModal({ onClose }) {
               href="https://twitter.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 text-zinc-700 hover:text-orange-500 transition-colors font-mono"
+              className="flex items-center gap-3 text-zinc-300 hover:text-orange-500 transition-colors font-mono"
             >
               <SafeIcon name="Twitter" size={24} />
               <span>@sergiomusel</span>
             </a>
             <a
               href="mailto:hello@sergiomusel.com"
-              className="flex items-center gap-3 text-zinc-700 hover:text-orange-500 transition-colors font-mono"
+              className="flex items-center gap-3 text-zinc-300 hover:text-orange-500 transition-colors font-mono"
             >
               <SafeIcon name="Mail" size={24} />
               <span>hello@sergiomusel.com</span>
@@ -336,6 +332,8 @@ function ConnectModal({ onClose }) {
 function App() {
   const [activeModal, setActiveModal] = useState(null)
   const [selectedPhoto, setSelectedPhoto] = useState(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [isDarkTheme, setIsDarkTheme] = useState(true)
 
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
@@ -354,7 +352,6 @@ function App() {
   const velocity = useRef({ x: 0, y: 0 })
   const lastPos = useRef({ x: 0, y: 0 })
   const rafId = useRef(null)
-  const [isDragging, setIsDragging] = useState(false)
 
   // Set initial position to center of grid content on mount
   useEffect(() => {
@@ -503,10 +500,13 @@ function App() {
   }
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-zinc-100 select-none transition-colors duration-500">
-      {/* TV Noise Overlay - Always visible for light theme */}
-      <div className="tv-noise" />
-
+    <div className="relative w-full h-full overflow-hidden bg-zinc-950 select-none transition-colors duration-500">
+      {/* TV Noise Overlay */}
+      <div className={`tv-noise ${!isDarkTheme && 'opacity-0'}`} />
+      {/* Gradient Noise Overlay */}
+      <div className="absolute top-0 left-0 w-full h-[100px] pointer-events-none z-20">
+        <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 to-transparent" />
+      </div>
       {/* Navigation */}
       <Navbar activeModal={activeModal} setActiveModal={setActiveModal} />
 
@@ -568,9 +568,10 @@ function App() {
       {/* Theme toggle and social links */}
       <div className="fixed bottom-6 left-6 z-30">
         <button
-          className="p-2 rounded-full hover:bg-zinc-200/20 transition-colors"
+          onClick={() => setIsDarkTheme(!isDarkTheme)}
+          className="p-2 rounded-full hover:bg-zinc-800/20 transition-colors"
         >
-          <SafeIcon name="Sun" size={24} className="text-zinc-600 hover:text-orange-500" />
+          <SafeIcon name={isDarkTheme ? "Sun" : "Moon"} size={24} className="text-zinc-500 hover:text-orange-500" />
         </button>
       </div>
 
@@ -579,23 +580,23 @@ function App() {
           href="https://t.me/sergiomusel"
           target="_blank"
           rel="noopener noreferrer"
-          className="p-2 rounded-full hover:bg-zinc-200/20 transition-colors"
+          className="p-2 rounded-full hover:bg-zinc-800/20 transition-colors"
         >
-          <SafeIcon name="Send" size={24} className="text-zinc-600 hover:text-orange-500" />
+          <SafeIcon name="Send" size={24} className="text-zinc-500 hover:text-orange-500" />
         </a>
         <a
           href="https://instagram.com/sergiomusel"
           target="_blank"
           rel="noopener noreferrer"
-          className="p-2 rounded-full hover:bg-zinc-200/20 transition-colors"
+          className="p-2 rounded-full hover:bg-zinc-800/20 transition-colors"
         >
-          <SafeIcon name="Instagram" size={24} className="text-zinc-600 hover:text-orange-500" />
+          <SafeIcon name="Instagram" size={24} className="text-zinc-500 hover:text-orange-500" />
         </a>
       </div>
 
       {/* Copyright */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-        <p className="font-['Courier New'] text-zinc-400 font-bold text-xs tracking-[0.02em] uppercase">
+        <p className="font-['Courier New'] text-zinc-500 font-bold text-xs tracking-[0.02em] uppercase">
           2026 made with Webly AI
         </p>
       </div>

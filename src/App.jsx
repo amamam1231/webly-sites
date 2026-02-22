@@ -302,10 +302,15 @@ function ConnectModal({ onClose, isDarkTheme }) {
           ? "bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900"
           : "bg-gradient-to-br from-zinc-100 via-zinc-200 to-white"
       )}>
-        <div className={cn(
-          "absolute inset-0",
-          isDarkTheme ? "tv-noise-dark" : "tv-noise-light"
-        )} style={{ opacity: 0.3 }} />
+        {/* Animated SVG Noise */}
+        <img
+          src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-svg-1771804372-3563.svg?"
+          alt="Noise texture"
+          className={cn(
+            "absolute inset-0 w-full h-full object-cover animate-noise",
+            isDarkTheme ? "invert opacity-30" : "opacity-20"
+          )}
+        />
       </div>
 
       <button
@@ -574,11 +579,15 @@ function App() {
       "relative w-full h-full overflow-hidden select-none transition-colors duration-500",
       isDarkTheme ? "bg-zinc-950" : "bg-zinc-100"
     )}>
-      {/* TV Noise Overlay - Theme Aware */}
-      <div className={cn(
-        "fixed inset-0 pointer-events-none z-[1]",
-        isDarkTheme ? "tv-noise-dark" : "tv-noise-light"
-      )} />
+      {/* Animated SVG Noise Texture - Theme Aware */}
+      <img
+        src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-svg-1771804372-3563.svg?"
+        alt="Noise texture"
+        className={cn(
+          "fixed inset-0 w-full h-full pointer-events-none z-[1] object-cover animate-noise",
+          isDarkTheme ? "invert opacity-20" : "opacity-10"
+        )}
+      />
 
       {/* Gradient Noise Overlay - Small height with smooth transition, darkest only at top */}
       <div className={cn(

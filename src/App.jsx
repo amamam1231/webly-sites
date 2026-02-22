@@ -96,7 +96,7 @@ function Navbar({ activeModal, setActiveModal }) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none">
       <div className="pointer-events-auto">
-        <h1 className="font-['Anton'] text-white text-xl md:text-2xl font-bold leading-none tracking-[-0.02em] uppercase">
+        <h1 className="font-['Anton'] text-white text-2xl md:text-3xl font-bold leading-none tracking-[0.05em] uppercase">
           SERGIO<br/>MUSEL
         </h1>
       </div>
@@ -106,7 +106,7 @@ function Navbar({ activeModal, setActiveModal }) {
           <button
             key={item.id}
             onClick={item.action}
-            className={cn( "font-['IBM_Plex_Mono'] text-xs md:text-sm tracking-[0.02em] text-white font-bold uppercase transition-colors duration-300 hover:text-orange-500",
+            className={cn( "font-['IBM_Plex_Mono'] text-xs md:text-sm tracking-[0.02em] text-white font-bold capitalize leading-tight transition-colors duration-300 hover:text-orange-500",
               (activeModal === item.id || (item.id === 'portfolio' && !activeModal))
                 ? "text-orange-500"
                 : "text-white"
@@ -253,9 +253,9 @@ function ConnectModal({ onClose }) {
       onClick={onClose}
     >
       {/* Gradient Background with Noise */}
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-950 via-zinc-950 to-black">
-        <div className="absolute inset-0 opacity-80" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+      <div className="absolute inset-0 bg-gradient-to-br from-zinc-100 via-zinc-200 to-white">
+        <div className="absolute inset-0 opacity-30" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
         }} />
       </div>
 
@@ -596,7 +596,7 @@ function App() {
 
       {/* Copyright */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-        <p className="font-['IBM_Plex_Mono'] text-white font-bold text-xs tracking-[0.02em] uppercase">
+        <p className="font-['Courier New'] text-zinc-500 font-bold text-xs tracking-[0.02em] uppercase">
           2026 made with Webly AI
         </p>
       </div>

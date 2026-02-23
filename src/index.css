@@ -18,20 +18,91 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Animated Noise Effect - Living/Trembling Animation */
-.animate-noise {
-  animation: noise-shake 0.15s steps(6) infinite;
-  image-rendering: pixelated;
+/* Dark Theme TV Noise Effect - Living monochrome noise */
+.tv-noise-dark {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  opacity: 0.22;
+
+  /* Monochrome noise texture using SVG data URI for better quality */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 512px 512px;
+
+  /* Static noise animation without transform to prevent edge flickering */
+  animation: static-noise 0.2s steps(8, end) infinite;
 }
 
-@keyframes noise-shake {
-  0% { transform: translate(0, 0); }
-  16.66% { transform: translate(-2px, 2px); }
-  33.33% { transform: translate(2px, -1px); }
-  50% { transform: translate(-1px, -2px); }
-  66.66% { transform: translate(2px, 1px); }
-  83.33% { transform: translate(-2px, -1px); }
-  100% { transform: translate(0, 0); }
+/* Light Theme TV Noise Effect - Gray noise for light backgrounds */
+.tv-noise-light {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  opacity: 0.20;
+
+  /* Gray noise texture using SVG data URI with #D3D3D3 color matrix */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilterLight'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0.25 0 0 0 0.7 0.25 0 0 0 0.7 0.25 0 0 0 0.7 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilterLight)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 512px 512px;
+
+  /* Static noise animation without transform to prevent edge flickering */
+  animation: static-noise 0.2s steps(8, end) infinite;
+}
+
+/* Additional scanline effect for broken TV feel - dark theme */
+.tv-noise-dark::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  pointer-events: none;
+}
+
+/* Additional scanline effect for light theme */
+.tv-noise-light::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.05) 0px,
+    rgba(0, 0, 0, 0.05) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  pointer-events: none;
+}
+
+/* Keyframes with background-position shifts only - no transform to prevent edge artifacts */
+@keyframes static-noise {
+  0%   { background-position: 0% 0%; }
+  12.5% { background-position: 10% 10%; }
+  25%  { background-position: -10% 5%; }
+  37.5% { background-position: 5% -10%; }
+  50%  { background-position: -5% 15%; }
+  62.5% { background-position: 15% -5%; }
+  75%  { background-position: -15% -10%; }
+  87.5% { background-position: 10% 10%; }
+  100% { background-position: 0% 0%; }
 }
 
 /* Custom scrollbar hide */

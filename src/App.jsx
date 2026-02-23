@@ -94,10 +94,10 @@ function Navbar({ activeModal, setActiveModal, isDarkTheme }) {
   ]
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-4 md:px-12 md:py-6 flex justify-between items-start pointer-events-none">
+    <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none">
       <div className="pointer-events-auto">
         <h1 className={cn(
-          "font-['Anton'] text-xl md:text-3xl lg:text-4xl font-bold leading-none tracking-[0.05em] uppercase",
+          "font-['Anton'] text-2xl md:text-3xl lg:text-4xl font-bold leading-none tracking-[0.05em] uppercase",
           isDarkTheme ? "text-white" : "text-zinc-900"
         )}>
           SERGIO<br/>MUSEL
@@ -110,7 +110,7 @@ function Navbar({ activeModal, setActiveModal, isDarkTheme }) {
             key={item.id}
             onClick={item.action}
             className={cn(
-              "font-['IBM_Plex_Mono'] text-[10px] md:text-sm tracking-[0.02em] font-bold capitalize transition-colors duration-300 hover:text-orange-500 py-0.5",
+              "font-['IBM_Plex_Mono'] text-xs md:text-sm tracking-[0.02em] font-bold capitalize transition-colors duration-300 hover:text-orange-500 py-0.5",
               isDarkTheme
                 ? ((activeModal === item.id || (item.id === 'portfolio' && !activeModal)) ? "text-orange-500" : "text-white")
                 : ((activeModal === item.id || (item.id === 'portfolio' && !activeModal)) ? "text-orange-600" : "text-zinc-900")
@@ -193,7 +193,7 @@ function AboutModal({ onClose, isDarkTheme }) {
           {/* Right - Content */}
           <div className="flex flex-col justify-center">
             <h2 className={cn(
-              "font-['IBM_Plex_Mono'] text-3xl md:text-5xl font-bold mb-8 tracking-[0.02em]",
+              "font-['IBM_Plex_Mono'] text-4xl md:text-5xl font-bold mb-8 tracking-[0.02em]",
               isDarkTheme ? "text-white" : "text-zinc-900"
             )}>
               ABOUT ME
@@ -202,7 +202,7 @@ function AboutModal({ onClose, isDarkTheme }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
               <div>
                 <p className={cn(
-                  "leading-relaxed font-['IBM_Plex_Mono'] text-xs md:text-base",
+                  "leading-relaxed font-['IBM_Plex_Mono'] text-sm md:text-base",
                   isDarkTheme ? "text-zinc-400" : "text-zinc-600"
                 )}>
                   Born in Prague and trained in the traditions of analog photography,
@@ -213,7 +213,7 @@ function AboutModal({ onClose, isDarkTheme }) {
               </div>
               <div>
                 <p className={cn(
-                  "leading-relaxed font-['IBM_Plex_Mono'] text-xs md:text-base",
+                  "leading-relaxed font-['IBM_Plex_Mono'] text-sm md:text-base",
                   isDarkTheme ? "text-zinc-400" : "text-zinc-600"
                 )}>
                   Each photograph is a meditation on time and space, shot exclusively on
@@ -230,13 +230,13 @@ function AboutModal({ onClose, isDarkTheme }) {
               isDarkTheme ? "border-zinc-800" : "border-zinc-300"
             )}>
               <h3 className={cn(
-                "font-mono text-xs md:text-sm tracking-widest mb-6 flex items-center gap-2",
+                "font-mono text-sm tracking-widest mb-6 flex items-center gap-2",
                 isDarkTheme ? "text-orange-500" : "text-orange-600"
               )}>
                 <SafeIcon name="Award" size={16} />
                 LEICA AWARDS
               </h3>
-              <div className="space-y-3 font-mono text-xs md:text-sm">
+              <div className="space-y-3 font-mono text-sm">
                 <div className={cn(
                   "flex justify-between",
                   isDarkTheme ? "text-zinc-300" : "text-zinc-700"
@@ -334,30 +334,30 @@ function ConnectModal({ onClose, isDarkTheme }) {
           className="max-w-2xl"
         >
           <h2 className={cn(
-            "font-['IBM_Plex_Mono'] text-3xl md:text-6xl font-bold mb-4 tracking-[0.02em]",
+            "font-['IBM_Plex_Mono'] text-4xl md:text-6xl font-bold mb-4 tracking-[0.02em]",
             isDarkTheme ? "text-white" : "text-zinc-900"
           )}>
             LET'S CONNECT
           </h2>
 
           <p className={cn(
-            "font-['IBM_Plex_Mono'] mb-12 text-sm md:text-lg",
+            "font-['IBM_Plex_Mono'] mb-12 text-lg",
             isDarkTheme ? "text-zinc-400" : "text-zinc-600"
           )}>
             Open for collaborations, exhibitions, and commissioned work.
           </p>
 
-          <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 mb-16">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-16">
             <a
               href="https://instagram.com"
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                "flex items-center gap-3 transition-colors font-mono text-sm md:text-base",
+                "flex items-center gap-3 transition-colors font-mono",
                 isDarkTheme ? "text-zinc-300 hover:text-orange-500" : "text-zinc-700 hover:text-orange-600"
               )}
             >
-              <SafeIcon name="Instagram" size={20} className="md:w-6 md:h-6" />
+              <SafeIcon name="Instagram" size={24} />
               <span>@sergiomusel</span>
             </a>
             <a
@@ -365,27 +365,27 @@ function ConnectModal({ onClose, isDarkTheme }) {
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                "flex items-center gap-3 transition-colors font-mono text-sm md:text-base",
+                "flex items-center gap-3 transition-colors font-mono",
                 isDarkTheme ? "text-zinc-300 hover:text-orange-500" : "text-zinc-700 hover:text-orange-600"
               )}
             >
-              <SafeIcon name="Twitter" size={20} className="md:w-6 md:h-6" />
+              <SafeIcon name="Twitter" size={24} />
               <span>@sergiomusel</span>
             </a>
             <a
               href="mailto:hello@sergiomusel.com"
               className={cn(
-                "flex items-center gap-3 transition-colors font-mono text-sm md:text-base",
+                "flex items-center gap-3 transition-colors font-mono",
                 isDarkTheme ? "text-zinc-300 hover:text-orange-500" : "text-zinc-700 hover:text-orange-600"
               )}
             >
-              <SafeIcon name="Mail" size={20} className="md:w-6 md:h-6" />
+              <SafeIcon name="Mail" size={24} />
               <span>hello@sergiomusel.com</span>
             </a>
           </div>
 
           <div className={cn(
-            "flex items-center justify-center gap-8 font-mono text-xs md:text-sm",
+            "flex items-center justify-center gap-8 font-mono text-sm",
             isDarkTheme ? "text-zinc-500" : "text-zinc-500"
           )}>
             <div className="flex items-center gap-2">
@@ -584,20 +584,18 @@ function App() {
         src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-svg-1771804372-3563.svg?"
         alt="Noise texture"
         className={cn(
-          "fixed inset-0 w-full h-full pointer-events-none z-[1] object-cover animate-noise animate-static",
+          "fixed inset-0 w-full h-full pointer-events-none z-[1] object-cover animate-noise",
           isDarkTheme ? "invert opacity-20" : "opacity-10"
         )}
       />
 
-      {/* Gradient Noise Overlay - 20% black-gray, 50% gray-almost transparent, 30% almost transparent-transparent */}
-      <div
-        className="absolute top-0 left-0 w-full h-[400px] pointer-events-none z-20"
-        style={{
-          background: isDarkTheme
-            ? 'linear-gradient(to bottom, rgb(9,9,11) 0%, rgb(39,39,42) 20%, rgba(39,39,42,0.1) 70%, transparent 100%)'
-            : 'linear-gradient(to bottom, rgb(244,244,245) 0%, rgb(228,228,231) 20%, rgba(228,228,231,0.1) 70%, transparent 100%)'
-        }}
-      />
+      {/* Gradient Noise Overlay - Small height with smooth transition, darkest only at top */}
+      <div className={cn(
+        "absolute top-0 left-0 w-full h-[80px] pointer-events-none z-20",
+        isDarkTheme
+          ? "bg-gradient-to-b from-zinc-950/60 via-zinc-950/20 to-transparent"
+          : "bg-gradient-to-b from-zinc-100/60 via-zinc-100/20 to-transparent"
+      )} />
 
       {/* Navigation */}
       <Navbar activeModal={activeModal} setActiveModal={setActiveModal} isDarkTheme={isDarkTheme} />
@@ -659,8 +657,8 @@ function App() {
         </motion.div>
       </div>
 
-      {/* Theme toggle and social links - Smaller icons on mobile */}
-      <div className="fixed bottom-4 left-4 md:bottom-6 md:left-6 z-30">
+      {/* Theme toggle and social links */}
+      <div className="fixed bottom-6 left-6 z-30">
         <button
           onClick={() => setIsDarkTheme(!isDarkTheme)}
           className={cn(
@@ -670,16 +668,16 @@ function App() {
         >
           <SafeIcon
             name={isDarkTheme ? "Sun" : "Moon"}
-            size={20}
+            size={24}
             className={cn(
-              "transition-colors w-5 h-5 md:w-6 md:h-6",
+              "transition-colors",
               isDarkTheme ? "text-zinc-500 hover:text-orange-500" : "text-zinc-600 hover:text-orange-600"
             )}
           />
         </button>
       </div>
 
-      <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-30 flex gap-3 md:gap-4">
+      <div className="fixed bottom-6 right-6 z-30 flex gap-4">
         <a
           href="https://t.me/sergiomusel"
           target="_blank"
@@ -691,9 +689,9 @@ function App() {
         >
           <SafeIcon
             name="Send"
-            size={20}
+            size={24}
             className={cn(
-              "transition-colors w-5 h-5 md:w-6 md:h-6",
+              "transition-colors",
               isDarkTheme ? "text-zinc-500 hover:text-orange-500" : "text-zinc-600 hover:text-orange-600"
             )}
           />
@@ -709,9 +707,9 @@ function App() {
         >
           <SafeIcon
             name="Instagram"
-            size={20}
+            size={24}
             className={cn(
-              "transition-colors w-5 h-5 md:w-6 md:h-6",
+              "transition-colors",
               isDarkTheme ? "text-zinc-500 hover:text-orange-500" : "text-zinc-600 hover:text-orange-600"
             )}
           />
@@ -719,9 +717,9 @@ function App() {
       </div>
 
       {/* Copyright - Capitalized Made */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none md:bottom-6">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
         <p className={cn(
-          "font-['Courier_New'] text-[10px] md:text-xs tracking-[0.02em]",
+          "font-['Courier_New'] text-xs tracking-[0.02em]",
           isDarkTheme ? "text-zinc-500" : "text-zinc-500"
         )}>
           2026 Made with webly AI

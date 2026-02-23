@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -20,7 +18,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Dark Theme TV Noise Effect - Old Television Static */
+/* Dark Theme TV Noise Effect - Living monochrome noise */
 .tv-noise-dark {
   position: fixed;
   top: 0;
@@ -28,19 +26,18 @@ body {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  opacity: 0.18; /* Increased brightness for old TV effect */
-  z-index: 1;
+  opacity: 0.22;
 
-  /* Monochrome noise texture */
+  /* Monochrome noise texture using SVG data URI for better quality */
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   background-repeat: repeat;
-  background-size: 300px 300px; /* Larger grain size for old TV effect */
+  background-size: 512px 512px;
 
-  /* Jittery TV static animation with steps for sharp flickering */
-  animation: tv-static 0.15s steps(5) end infinite;
+  /* Static noise animation without transform to prevent edge flickering */
+  animation: static-noise 0.2s steps(8, end) infinite;
 }
 
-/* Light Theme TV Noise Effect */
+/* Light Theme TV Noise Effect - Gray noise for light backgrounds */
 .tv-noise-light {
   position: fixed;
   top: 0;
@@ -48,16 +45,15 @@ body {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  opacity: 0.15; /* Within requested 0.15-0.2 range */
-  z-index: 1;
+  opacity: 0.20;
 
-  /* Gray noise texture */
+  /* Gray noise texture using SVG data URI with #D3D3D3 color matrix */
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilterLight'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0.25 0 0 0 0.7 0.25 0 0 0 0.7 0.25 0 0 0 0.7 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilterLight)'/%3E%3C/svg%3E");
   background-repeat: repeat;
-  background-size: 300px 300px; /* Larger grain size */
+  background-size: 512px 512px;
 
-  /* Jittery animation */
-  animation: tv-static 0.15s steps(5) end infinite;
+  /* Static noise animation without transform to prevent edge flickering */
+  animation: static-noise 0.2s steps(8, end) infinite;
 }
 
 /* Additional scanline effect for broken TV feel - dark theme */
@@ -70,10 +66,10 @@ body {
   height: 100%;
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 0, 0, 0.2) 0px,
-    rgba(0, 0, 0, 0.2) 1px,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
     transparent 1px,
-    transparent 3px
+    transparent 4px
   );
   pointer-events: none;
 }
@@ -88,22 +84,25 @@ body {
   height: 100%;
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 0, 0, 0.08) 0px,
-    rgba(0, 0, 0, 0.08) 1px,
+    rgba(0, 0, 0, 0.05) 0px,
+    rgba(0, 0, 0, 0.05) 1px,
     transparent 1px,
-    transparent 3px
+    transparent 4px
   );
   pointer-events: none;
 }
 
-/* Sharp jittery keyframes for old TV effect - random jumps between positions */
-@keyframes tv-static {
-  0% { background-position: 0 0; }
-  20% { background-position: 100px 50px; }
-  40% { background-position: -50px 100px; }
-  60% { background-position: 100px -50px; }
-  80% { background-position: -100px -100px; }
-  100% { background-position: 0 0; }
+/* Keyframes with background-position shifts only - no transform to prevent edge artifacts */
+@keyframes static-noise {
+  0%   { background-position: 0% 0%; }
+  12.5% { background-position: 10% 10%; }
+  25%  { background-position: -10% 5%; }
+  37.5% { background-position: 5% -10%; }
+  50%  { background-position: -5% 15%; }
+  62.5% { background-position: 15% -5%; }
+  75%  { background-position: -15% -10%; }
+  87.5% { background-position: 10% 10%; }
+  100% { background-position: 0% 0%; }
 }
 
 /* Custom scrollbar hide */
@@ -128,13 +127,8 @@ img {
   image-rendering: -webkit-optimize-contrast;
 }
 
-/* Selection color */
+/* Selection color - theme aware */
 ::selection {
-  background-color: rgba(255, 68, 0, 0.3);
+  background-color: rgba(249, 115, 22, 0.3);
   color: inherit;
-}
-
-/* Ensure proper font loading */
-.font-mono {
-  font-family: 'IBM Plex Mono', monospace;
 }

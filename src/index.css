@@ -18,21 +18,39 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* SVG Noise with feTurbulence - static texture with animated background-position */
-.bg-noise {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  animation: noise-position 0.15s steps(5) infinite;
+/* Animated Noise Effect - Living/Trembling Animation */
+.animate-noise {
+  animation: noise-shake 0.15s steps(6) infinite;
   image-rendering: pixelated;
 }
 
-/* Keyframes for sharp background-position changes - creates trembling pixel effect */
-@keyframes noise-position {
-  0% { background-position: 0 0; }
-  20% { background-position: 100px 100px; }
-  40% { background-position: 200px -100px; }
-  60% { background-position: -100px 200px; }
-  80% { background-position: -200px -100px; }
-  100% { background-position: 0 0; }
+/* TV Static Effect - Rapid opacity flickering */
+.animate-static {
+  animation: tv-static 0.1s steps(10) infinite, noise-shake 0.15s steps(6) infinite;
+}
+
+@keyframes noise-shake {
+  0% { transform: translate(0, 0); }
+  16.66% { transform: translate(-2px, 2px); }
+  33.33% { transform: translate(2px, -1px); }
+  50% { transform: translate(-1px, -2px); }
+  66.66% { transform: translate(2px, 1px); }
+  83.33% { transform: translate(-2px, -1px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes tv-static {
+  0% { opacity: 0.15; }
+  10% { opacity: 0.25; }
+  20% { opacity: 0.1; }
+  30% { opacity: 0.3; }
+  40% { opacity: 0.15; }
+  50% { opacity: 0.2; }
+  60% { opacity: 0.25; }
+  70% { opacity: 0.1; }
+  80% { opacity: 0.3; }
+  90% { opacity: 0.15; }
+  100% { opacity: 0.2; }
 }
 
 /* Custom scrollbar hide */

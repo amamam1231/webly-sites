@@ -1,4 +1,3 @@
-// === IMPORTS ===
 import { SafeIcon } from './components/SafeIcon';
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
@@ -29,35 +28,55 @@ const PHOTOS = [
   { id: 12, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9947.jpg?', title: 'Still Life', date: '2023.10.05', camera: 'Leica M6' },
   { id: 13, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9719.jpg?', title: 'Geometry', date: '2024.02.20', camera: 'Leica M10-R' },
   { id: 14, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-1425.jpg?', title: 'Light Study', date: '2023.09.22', camera: 'Leica Q2' },
+  { id: 15, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5244.jpg?', title: 'Fragments', date: '2024.01.30', camera: 'Leica M6' },
+  { id: 16, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453880-2918.jpg?', title: 'Urban Echo', date: '2023.12.15', camera: 'Leica M10-R' },
+  { id: 17, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-2291.jpg?', title: 'Shadow Dance', date: '2024.03.01', camera: 'Leica Q2' },
+  { id: 18, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-7476.jpg?', title: 'Golden Hour', date: '2023.11.20', camera: 'Leica M6' },
+  { id: 19, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453881-3765.jpg?', title: 'Night Walk', date: '2024.02.28', camera: 'Leica M10-R' },
+  { id: 20, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8936.jpg?', title: 'Monochrome', date: '2023.10.10', camera: 'Leica Q2 Monochrom' },
+  { id: 21, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-7385.jpg?', title: 'Film Memories', date: '2024.01.25', camera: 'Leica M6' },
+  { id: 22, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8284.jpg?', title: 'Mirror World', date: '2023.09.05', camera: 'Leica M10-R' },
+  { id: 23, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453882-8710.jpg?', title: 'Eternal', date: '2024.03.10', camera: 'Leica Q2' },
+  { id: 24, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-2278.jpg?', title: 'Pure Feeling', date: '2023.12.20', camera: 'Leica M6' },
+  { id: 25, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453883-1442.jpg?', title: 'Captured Time', date: '2024.02.05', camera: 'Leica M10-R' },
+  { id: 26, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-8417.jpg?', title: 'Deep Focus', date: '2023.11.05', camera: 'Leica Q2 Monochrom' },
+  { id: 27, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9947.jpg?', title: 'Quiet Objects', date: '2024.01.18', camera: 'Leica M6' },
+  { id: 28, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-9719.jpg?', title: 'Lines & Curves', date: '2023.10.15', camera: 'Leica M10-R' },
+  { id: 29, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453924-1425.jpg?', title: 'Luminous Study', date: '2024.03.15', camera: 'Leica Q2' },
+  { id: 30, src: 'https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5244.jpg?', title: 'Broken Pieces', date: '2023.12.28', camera: 'Leica M6' },
 ]
 
-// Random grid positions for photos
+// Generate random positions for photos - INCREASED GRID SIZE
 const generatePositions = () => {
   const positions = []
-  const usedRects = []
-  const padding = 100
-  const photoWidth = 320
-  const photoHeight = 400
+  const isMobile = window.innerWidth < 768
+  const cellWidth = isMobile ? 120 : 400
+  const cellHeight = isMobile ? 180 : 600
+  const spacing = isMobile ? 10 : 80
+  const cols = 30 // Same number of columns for both mobile and desktop
+  // Increased multiplier from 16 to 40 for more photos (1200 total)
+  const totalPhotos = PHOTOS.length * 40
+  const rows = Math.ceil(totalPhotos / cols)
 
-  for (let i = 0; i < PHOTOS.length; i++) {
-    let attempts = 0
-    let pos
+  // Create vertical grid layout with more rows and columns
+  for (let i = 0; i < totalPhotos; i++) {
+    const photo = PHOTOS[i % PHOTOS.length]
+    const col = Math.floor(i / rows)
+    const row = i % rows
+    const x = spacing + col * (cellWidth + spacing)
+    const y = spacing + row * (cellHeight + spacing)
 
-    do {
-      pos = {
-        x: Math.random() * (CANVAS_SIZE - photoWidth - padding * 2) + padding,
-        y: Math.random() * (CANVAS_SIZE - photoHeight - padding * 2) + padding,
-      }
-      attempts++
-    } while (attempts < 50 && usedRects.some(rect =>
-      pos.x < rect.x + rect.width + padding &&
-      pos.x + photoWidth > rect.x - padding &&
-      pos.y < rect.y + rect.height + padding &&
-      pos.y + photoHeight > rect.y - padding
-    ))
-
-    usedRects.push({ x: pos.x, y: pos.y, width: photoWidth, height: photoHeight })
-    positions.push(pos)
+    const isVertical = photo.height > photo.width
+    positions.push({
+      ...photo,
+      x,
+      y,
+      rotation: 0,
+      scale: 1,
+      width: cellWidth,
+      height: cellHeight,
+      isVertical,
+    })
   }
 
   return positions
@@ -65,61 +84,41 @@ const generatePositions = () => {
 
 const PHOTO_POSITIONS = generatePositions()
 
-// === COMPONENTS ===
-
-// Navigation Component
-function Navigation({ onNavigate, activeModal, isDarkTheme, toggleTheme }) {
+// Navbar Component
+function Navbar({ activeModal, setActiveModal, isDarkTheme }) {
   const navItems = [
-    { id: 'portfolio', label: 'Portfolio' },
-    { id: 'about', label: 'About Me' },
-    { id: 'connect', label: 'Connect' },
-    { id: 'blog', label: 'Blog' },
+    { label: 'Portfolio', id: 'portfolio', action: () => setActiveModal(null) },
+    { label: 'About Me', id: 'about', action: () => setActiveModal('about') },
+    { label: 'Connect', id: 'connect', action: () => setActiveModal('connect') },
+    { label: 'Blog', id: 'blog', action: () => window.open('https://medium.com', '_blank') },
   ]
 
   return (
-    <nav className={cn(
-      "fixed top-0 left-0 right-0 z-[100] px-6 py-6 flex justify-between items-start pointer-events-none",
-      isDarkTheme ? "text-white" : "text-zinc-900"
-    )}>
-      {/* Logo */}
+    <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 flex justify-between items-start pointer-events-none">
       <div className="pointer-events-auto">
-        <h1
-          className={cn(
-            "text-2xl md:text-3xl font-bold leading-tight tracking-tight cursor-pointer select-none",
-            isDarkTheme ? "text-white" : "text-zinc-900"
-          )}
-          style={{ fontFamily: 'Anton, sans-serif' }}
-          onClick={() => onNavigate('portfolio')}
-        >
+        <h1 className={cn(
+          "font-['Anton'] text-2xl md:text-3xl lg:text-4xl font-bold leading-none tracking-[0.05em] uppercase",
+          isDarkTheme ? "text-white" : "text-zinc-900"
+        )}>
           SERGIO<br/>MUSEL
         </h1>
       </div>
 
-      {/* Nav Links */}
-      <div className="flex gap-6 md:gap-8 pointer-events-auto">
+      <div className="flex flex-col pointer-events-auto items-end" style={{ lineHeight: '1.2' }}>
         {navItems.map((item) => (
           <button
             key={item.id}
-            onClick={() => onNavigate(item.id)}
+            onClick={item.action}
             className={cn(
-              "text-xs md:text-sm uppercase tracking-widest transition-colors duration-0 hover:text-orange-500",
-              activeModal === item.id ? "text-orange-500" : isDarkTheme ? "text-zinc-400" : "text-zinc-600"
+              "font-['IBM_Plex_Mono'] text-xs md:text-sm tracking-[0.02em] font-bold capitalize transition-colors duration-300 hover:text-orange-500 py-0.5",
+              isDarkTheme
+                ? ((activeModal === item.id || (item.id === 'portfolio' && !activeModal)) ? "text-orange-500" : "text-white")
+                : ((activeModal === item.id || (item.id === 'portfolio' && !activeModal)) ? "text-orange-600" : "text-zinc-900")
             )}
-            style={{ fontFamily: 'IBM Plex Mono, monospace' }}
           >
             {item.label}
           </button>
         ))}
-        <button
-          onClick={toggleTheme}
-          className={cn(
-            "text-xs md:text-sm uppercase tracking-widest transition-colors duration-0 hover:text-orange-500",
-            isDarkTheme ? "text-zinc-400" : "text-zinc-600"
-          )}
-          style={{ fontFamily: 'IBM Plex Mono, monospace' }}
-        >
-          {isDarkTheme ? 'Light' : 'Dark'}
-        </button>
       </div>
     </nav>
   )
@@ -130,165 +129,143 @@ function PhotoModal({ photo, onClose, isDarkTheme }) {
   if (!photo) return null
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+    <div
       className={cn(
-        "fixed inset-0 z-[60] flex items-center justify-center p-4 md:p-8",
-        isDarkTheme ? "bg-black/95" : "bg-white/95"
+        "fixed inset-0 z-40 flex items-center justify-center",
+        isDarkTheme ? "bg-black/60" : "bg-white/80"
       )}
       onClick={onClose}
     >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        transition={{ duration: 0.2 }}
-        className={cn(
-          "relative max-w-5xl w-full max-h-full overflow-auto",
-          isDarkTheme ? "text-white" : "text-zinc-900"
-        )}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={onClose}
-          className={cn(
-            "absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full text-sm uppercase tracking-widest transition-colors duration-0",
-            isDarkTheme
-              ? "bg-zinc-800 text-white hover:bg-zinc-700"
-              : "bg-zinc-200 text-zinc-900 hover:bg-zinc-300"
-          )}
-          style={{ fontFamily: 'IBM Plex Mono, monospace' }}
-        >
-          <SafeIcon name="x" size={20} />
-        </button>
-
+      <div className="relative w-full h-full flex items-center justify-center">
         <img
           src={photo.src}
           alt={photo.title}
-          className="w-full h-auto max-h-[80vh] object-contain"
+          className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain grayscale"
         />
-
-        <div className={cn(
-          "mt-4 pt-4 border-t",
-          isDarkTheme ? "border-zinc-800" : "border-zinc-200"
-        )}>
-          <h2 className="text-xl font-bold mb-1" style={{ fontFamily: 'Anton, sans-serif' }}>{photo.title}</h2>
-          <p className="text-sm opacity-60" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-            {photo.date} — {photo.camera}
-          </p>
-        </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   )
 }
 
 // About Modal Component
 function AboutModal({ onClose, isDarkTheme }) {
-  const awards = [
-    'Leica Oskar Barnack Award 2023 — Finalist',
-    'World Press Photo 2023 — Honorable Mention',
-    'Sony World Photography Awards 2022 — Shortlist',
-    'LensCulture Street Photography Awards 2022 — Finalist',
-  ]
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className={cn(
-        "fixed inset-0 z-[60] overflow-y-auto",
-        isDarkTheme ? "bg-zinc-950/98" : "bg-white/98"
+        "fixed inset-0 z-40 overflow-y-auto",
+        isDarkTheme ? "bg-zinc-950/98" : "bg-zinc-50/98"
       )}
       onClick={onClose}
     >
+      <button
+        onClick={onClose}
+        className={cn(
+          "fixed top-6 right-6 transition-colors z-50",
+          isDarkTheme ? "text-zinc-400 hover:text-white" : "text-zinc-500 hover:text-zinc-900"
+        )}
+      >
+        <SafeIcon name="X" size={32} />
+      </button>
+
       <div
-        className="min-h-screen px-6 py-24 md:px-12 md:py-32"
+        className="min-h-screen flex items-center justify-center p-6 md:p-12 lg:p-24"
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          onClick={onClose}
-          className={cn(
-            "fixed top-6 right-6 z-50 w-12 h-12 flex items-center justify-center rounded-full text-sm uppercase tracking-widest transition-colors duration-0",
-            isDarkTheme
-              ? "bg-zinc-800 text-white hover:bg-zinc-700"
-              : "bg-zinc-200 text-zinc-900 hover:bg-zinc-300"
-          )}
-          style={{ fontFamily: 'IBM Plex Mono, monospace' }}
-        >
-          <SafeIcon name="x" size={20} />
-        </button>
-
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
-          {/* Photo */}
+        <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+          {/* Left - Photo */}
           <div className="relative">
             <div className={cn(
-              "aspect-[3/4] w-full",
-              isDarkTheme ? "bg-zinc-900" : "bg-zinc-100"
+              "aspect-[3/4] overflow-hidden",
+              isDarkTheme ? "bg-zinc-900" : "bg-zinc-200"
             )}>
               <img
-                src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453880-2918.jpg?"
+                src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_347995964/edit-photo-1771453925-5768.jpg?"
                 alt="Sergio Musel"
                 className="w-full h-full object-cover grayscale"
               />
             </div>
+            <div className="absolute -bottom-4 -right-4 w-24 h-24 border border-orange-500/30" />
           </div>
 
-          {/* Content */}
-          <div className={cn(
-            "flex flex-col justify-center",
-            isDarkTheme ? "text-white" : "text-zinc-900"
-          )}>
-            <h2
-              className="text-5xl md:text-7xl font-bold mb-8 uppercase tracking-tight"
-              style={{ fontFamily: 'Anton, sans-serif' }}
-            >
-              About Me
+          {/* Right - Content */}
+          <div className="flex flex-col justify-center">
+            <h2 className={cn(
+              "font-['IBM_Plex_Mono'] text-4xl md:text-5xl font-bold mb-8 tracking-[0.02em]",
+              isDarkTheme ? "text-white" : "text-zinc-900"
+            )}>
+              ABOUT ME
             </h2>
 
-            <div className="grid grid-cols-1 gap-6 mb-12">
-              <p className={cn(
-                "text-sm md:text-base leading-relaxed",
-                isDarkTheme ? "text-zinc-400" : "text-zinc-600"
-              )} style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                Sergio Musel is a Prague-based photographer specializing in black and white street photography.
-                With over a decade of experience capturing urban landscapes and human emotions,
-                his work explores the intersection of light, shadow, and the human condition.
-              </p>
-              <p className={cn(
-                "text-sm md:text-base leading-relaxed",
-                isDarkTheme ? "text-zinc-400" : "text-zinc-600"
-              )} style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                Working exclusively with Leica cameras, Sergio brings an analog sensibility to digital photography,
-                creating images that feel timeless and deeply personal. His photographs have been exhibited
-                across Europe and featured in numerous international publications.
-              </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+              <div>
+                <p className={cn(
+                  "leading-relaxed font-['IBM_Plex_Mono'] text-sm md:text-base",
+                  isDarkTheme ? "text-zinc-400" : "text-zinc-600"
+                )}>
+                  Born in Prague and trained in the traditions of analog photography,
+                  I have spent the last decade capturing the raw essence of urban landscapes.
+                  My work explores the intersection of light and shadow, finding beauty in
+                  the overlooked corners of metropolitan life.
+                </p>
+              </div>
+              <div>
+                <p className={cn(
+                  "leading-relaxed font-['IBM_Plex_Mono'] text-sm md:text-base",
+                  isDarkTheme ? "text-zinc-400" : "text-zinc-600"
+                )}>
+                  Each photograph is a meditation on time and space, shot exclusively on
+                  Leica rangefinders. I believe in the slow process of craft—the deliberate
+                  click of the shutter, the anticipation of development, the tangible weight
+                  of silver gelatin prints.
+                </p>
+              </div>
             </div>
 
             {/* Awards */}
-            <div>
-              <h3
-                className="text-xs uppercase tracking-widest mb-4 text-orange-500"
-                style={{ fontFamily: 'IBM Plex Mono, monospace' }}
-              >
-                Recognition
+            <div className={cn(
+              "border-t pt-8",
+              isDarkTheme ? "border-zinc-800" : "border-zinc-300"
+            )}>
+              <h3 className={cn(
+                "font-mono text-sm tracking-widest mb-6 flex items-center gap-2",
+                isDarkTheme ? "text-orange-500" : "text-orange-600"
+              )}>
+                <SafeIcon name="Award" size={16} />
+                LEICA AWARDS
               </h3>
-              <ul className="space-y-2">
-                {awards.map((award, index) => (
-                  <li
-                    key={index}
-                    className={cn(
-                      "text-sm",
-                      isDarkTheme ? "text-zinc-500" : "text-zinc-600"
-                    )}
-                    style={{ fontFamily: 'IBM Plex Mono, monospace' }}
-                  >
-                    {award}
-                  </li>
-                ))}
-              </ul>
+              <div className="space-y-3 font-mono text-sm">
+                <div className={cn(
+                  "flex justify-between",
+                  isDarkTheme ? "text-zinc-300" : "text-zinc-700"
+                )}>
+                  <span>Leica Oskar Barnack Award</span>
+                  <span className={isDarkTheme ? "text-zinc-600" : "text-zinc-400"}>2023</span>
+                </div>
+                <div className={cn(
+                  "flex justify-between",
+                  isDarkTheme ? "text-zinc-300" : "text-zinc-700"
+                )}>
+                  <span>Leica Street Photography Contest</span>
+                  <span className={isDarkTheme ? "text-zinc-600" : "text-zinc-400"}>2022</span>
+                </div>
+                <div className={cn(
+                  "flex justify-between",
+                  isDarkTheme ? "text-zinc-300" : "text-zinc-700"
+                )}>
+                  <span>World Press Photo</span>
+                  <span className={isDarkTheme ? "text-zinc-600" : "text-zinc-400"}>2021</span>
+                </div>
+                <div className={cn(
+                  "flex justify-between",
+                  isDarkTheme ? "text-zinc-300" : "text-zinc-700"
+                )}>
+                  <span>Prague Photo Festival</span>
+                  <span className={isDarkTheme ? "text-zinc-600" : "text-zinc-400"}>2020</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -297,409 +274,459 @@ function AboutModal({ onClose, isDarkTheme }) {
   )
 }
 
-// Connect Modal Component - REDESIGNED
-function ConnectModal({ onClose }) {
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).replace(/\//g, '.')
+// Connect Modal Component
+function ConnectModal({ onClose, isDarkTheme }) {
+  const [currentDate, setCurrentDate] = useState('')
 
-  const links = [
-    { label: '[ IG ]', value: '@sergiomusel', href: 'https://instagram.com/sergiomusel' },
-    { label: '[ X  ]', value: '@sergiomusel', href: 'https://x.com/sergiomusel' },
-    { label: '[ MAIL ]', value: 'hello@sergiomusel.com', href: 'mailto:hello@sergiomusel.com' },
-  ]
+  useEffect(() => {
+    const date = new Date()
+    setCurrentDate(date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }))
+  }, [])
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-[#101010]"
+      className="fixed inset-0 z-40 overflow-y-auto"
       onClick={onClose}
     >
-      {/* Close button - top right */}
+      {/* Gradient Background with Noise */}
+      <div className={cn(
+        "absolute inset-0",
+        isDarkTheme
+          ? "bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900"
+          : "bg-gradient-to-br from-zinc-100 via-zinc-200 to-white"
+      )}>
+        <div className={cn(
+          "absolute inset-0",
+          isDarkTheme ? "tv-noise-dark" : "tv-noise-light"
+        )} style={{ opacity: 0.3 }} />
+      </div>
+
       <button
         onClick={onClose}
-        className="fixed top-6 right-6 z-50 w-12 h-12 flex items-center justify-center bg-transparent text-white text-xs uppercase tracking-widest font-mono hover:bg-white hover:text-[#101010] transition-none duration-0 border border-white/20"
-        style={{ fontFamily: 'IBM Plex Mono, monospace' }}
+        className={cn(
+          "fixed top-6 right-6 transition-colors z-50",
+          isDarkTheme ? "text-zinc-400 hover:text-white" : "text-zinc-500 hover:text-zinc-900"
+        )}
       >
-        <SafeIcon name="x" size={20} />
+        <SafeIcon name="X" size={32} />
       </button>
 
-      {/* Main content container */}
       <div
-        className="h-full w-full flex flex-col justify-center px-6 md:px-12 lg:px-24"
+        className="relative min-h-screen flex flex-col items-center justify-center p-6 text-center"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="max-w-6xl w-full">
-          {/* Main Title - Anton font, brutalist styling */}
-          <h1
-            className="text-white uppercase text-6xl md:text-8xl mb-8 md:mb-12"
-            style={{
-              fontFamily: 'Anton, sans-serif',
-              letterSpacing: '-0.03em',
-              lineHeight: '0.85'
-            }}
-          >
-            LET'S CONNECT
-          </h1>
-
-          {/* Subtext - IBM Plex Mono */}
-          <p
-            className="text-zinc-500 text-sm md:text-base mb-12 md:mb-16 font-mono"
-            style={{ fontFamily: 'IBM Plex Mono, monospace' }}
-          >
-            AVAILABLE FOR PROJECTS AND COLLABORATIONS
-          </p>
-
-          {/* Contact Links - Terminal style */}
-          <div className="space-y-0 border-t border-zinc-800">
-            {links.map((link, index) => (
-              <a
-                key={index}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center justify-between py-4 md:py-6 border-b border-zinc-800 bg-transparent hover:bg-white transition-none duration-0"
-              >
-                <span
-                  className="text-zinc-500 text-sm md:text-base font-mono group-hover:text-[#101010]"
-                  style={{ fontFamily: 'IBM Plex Mono, monospace' }}
-                >
-                  {link.label}
-                </span>
-                <span
-                  className="text-white text-sm md:text-base font-mono group-hover:text-[#101010]"
-                  style={{ fontFamily: 'IBM Plex Mono, monospace' }}
-                >
-                  {link.value}
-                </span>
-              </a>
-            ))}
-          </div>
-
-          {/* Footer info - Terminal coordinates */}
-          <div className="mt-12 md:mt-16 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div
-              className="text-zinc-600 text-xs font-mono"
-              style={{ fontFamily: 'IBM Plex Mono, monospace' }}
-            >
-              LOC: PRAGUE, CZ
-            </div>
-            <div
-              className="text-zinc-600 text-xs font-mono"
-              style={{ fontFamily: 'IBM Plex Mono, monospace' }}
-            >
-              {currentDate}
-            </div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  )
-}
-
-// Blog Modal Component
-function BlogModal({ onClose, isDarkTheme }) {
-  const posts = [
-    { title: 'The Art of Seeing', date: '2024.01.15', excerpt: 'On developing a photographer\'s eye in the digital age.' },
-    { title: 'Leica M6: A Love Letter', date: '2023.12.02', excerpt: 'Why I keep returning to film photography.' },
-    { title: 'Prague Shadows', date: '2023.10.18', excerpt: 'Finding contrast in the city of a hundred spires.' },
-    { title: 'Monochrome Philosophy', date: '2023.08.30', excerpt: 'The decision to shoot exclusively in black and white.' },
-  ]
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className={cn(
-        "fixed inset-0 z-[60] overflow-y-auto",
-        isDarkTheme ? "bg-zinc-950/98" : "bg-white/98"
-      )}
-      onClick={onClose}
-    >
-      <div
-        className="min-h-screen px-6 py-24 md:px-12 md:py-32"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={onClose}
-          className={cn(
-            "fixed top-6 right-6 z-50 w-12 h-12 flex items-center justify-center rounded-full text-sm uppercase tracking-widest transition-colors duration-0",
-            isDarkTheme
-              ? "bg-zinc-800 text-white hover:bg-zinc-700"
-              : "bg-zinc-200 text-zinc-900 hover:bg-zinc-300"
-          )}
-          style={{ fontFamily: 'IBM Plex Mono, monospace' }}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="max-w-2xl"
         >
-          <SafeIcon name="x" size={20} />
-        </button>
-
-        <div className="max-w-4xl mx-auto">
-          <h2
-            className={cn(
-              "text-5xl md:text-7xl font-bold mb-12 uppercase tracking-tight",
-              isDarkTheme ? "text-white" : "text-zinc-900"
-            )}
-            style={{ fontFamily: 'Anton, sans-serif' }}
-          >
-            Blog
+          <h2 className={cn(
+            "font-['IBM_Plex_Mono'] text-4xl md:text-6xl font-bold mb-4 tracking-[0.02em]",
+            isDarkTheme ? "text-white" : "text-zinc-900"
+          )}>
+            LET'S CONNECT
           </h2>
 
-          <div className="space-y-8">
-            {posts.map((post, index) => (
-              <article
-                key={index}
-                className={cn(
-                  "group cursor-pointer border-b pb-8 transition-colors duration-0",
-                  isDarkTheme ? "border-zinc-800 hover:border-zinc-600" : "border-zinc-200 hover:border-zinc-400"
-                )}
-              >
-                <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-2 mb-3">
-                  <h3
-                    className={cn(
-                      "text-xl md:text-2xl font-bold group-hover:text-orange-500 transition-colors duration-0",
-                      isDarkTheme ? "text-white" : "text-zinc-900"
-                    )}
-                    style={{ fontFamily: 'Anton, sans-serif' }}
-                  >
-                    {post.title}
-                  </h3>
-                  <span
-                    className={cn(
-                      "text-xs",
-                      isDarkTheme ? "text-zinc-500" : "text-zinc-500"
-                    )}
-                    style={{ fontFamily: 'IBM Plex Mono, monospace' }}
-                  >
-                    {post.date}
-                  </span>
-                </div>
-                <p
-                  className={cn(
-                    "text-sm",
-                    isDarkTheme ? "text-zinc-400" : "text-zinc-600"
-                  )}
-                  style={{ fontFamily: 'IBM Plex Mono, monospace' }}
-                >
-                  {post.excerpt}
-                </p>
-              </article>
-            ))}
+          <p className={cn(
+            "font-['IBM_Plex_Mono'] mb-12 text-lg",
+            isDarkTheme ? "text-zinc-400" : "text-zinc-600"
+          )}>
+            Open for collaborations, exhibitions, and commissioned work.
+          </p>
+
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-16">
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                "flex items-center gap-3 transition-colors font-mono",
+                isDarkTheme ? "text-zinc-300 hover:text-orange-500" : "text-zinc-700 hover:text-orange-600"
+              )}
+            >
+              <SafeIcon name="Instagram" size={24} />
+              <span>@sergiomusel</span>
+            </a>
+            <a
+              href="https://twitter.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                "flex items-center gap-3 transition-colors font-mono",
+                isDarkTheme ? "text-zinc-300 hover:text-orange-500" : "text-zinc-700 hover:text-orange-600"
+              )}
+            >
+              <SafeIcon name="Twitter" size={24} />
+              <span>@sergiomusel</span>
+            </a>
+            <a
+              href="mailto:hello@sergiomusel.com"
+              className={cn(
+                "flex items-center gap-3 transition-colors font-mono",
+                isDarkTheme ? "text-zinc-300 hover:text-orange-500" : "text-zinc-700 hover:text-orange-600"
+              )}
+            >
+              <SafeIcon name="Mail" size={24} />
+              <span>hello@sergiomusel.com</span>
+            </a>
           </div>
-        </div>
+
+          <div className={cn(
+            "flex items-center justify-center gap-8 font-mono text-sm",
+            isDarkTheme ? "text-zinc-500" : "text-zinc-500"
+          )}>
+            <div className="flex items-center gap-2">
+              <SafeIcon name="MapPin" size={14} />
+              <span>Prague, CZ</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <SafeIcon name="Calendar" size={14} />
+              <span>{currentDate}</span>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </motion.div>
   )
 }
 
-// === MAIN APP COMPONENT ===
+// Main App Component
 function App() {
   const [activeModal, setActiveModal] = useState(null)
   const [selectedPhoto, setSelectedPhoto] = useState(null)
-  const [isDarkTheme, setIsDarkTheme] = useState(true)
-  const containerRef = useRef(null)
-
-  // Motion values for canvas position
-  const x = useMotionValue(-CANVAS_SIZE / 2 + window.innerWidth / 2)
-  const y = useMotionValue(-CANVAS_SIZE / 2 + window.innerHeight / 2)
-
-  // Spring config for inertia
-  const springConfig = { damping: 30, stiffness: 200 }
-  const xSpring = useSpring(x, springConfig)
-  const ySpring = useSpring(y, springConfig)
-
-  // Drag state
   const [isDragging, setIsDragging] = useState(false)
+  const [isDarkTheme, setIsDarkTheme] = useState(true)
+
+  const containerRef = useRef(null)
+  const canvasRef = useRef(null)
+
+  // Motion values for smooth dragging with inertia
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+
+  // Spring physics for inertia
+  const springX = useSpring(x, { stiffness: 300, damping: 30, mass: 0.5 })
+  const springY = useSpring(y, { stiffness: 300, damping: 30, mass: 0.5 })
+
+  // Drag state refs
   const dragStart = useRef({ x: 0, y: 0 })
   const canvasStart = useRef({ x: 0, y: 0 })
+  const velocity = useRef({ x: 0, y: 0 })
+  const lastPos = useRef({ x: 0, y: 0 })
+  const rafId = useRef(null)
 
-  // Initialize canvas position to center
+  // Set initial position to center of grid content on mount
   useEffect(() => {
-    const centerX = -CANVAS_SIZE / 2 + window.innerWidth / 2
-    const centerY = -CANVAS_SIZE / 2 + window.innerHeight / 2
+    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight
+
+    // Calculate bounds from generated positions to find center of content
+    const maxX = Math.max(...PHOTO_POSITIONS.map(p => p.x + p.width))
+    const maxY = Math.max(...PHOTO_POSITIONS.map(p => p.y + p.height))
+
+    // Center of the grid content
+    const contentCenterX = maxX / 2
+    const contentCenterY = maxY / 2
+
+    // Position viewport to show center of content
+    const centerX = -contentCenterX + (viewportWidth / 2)
+    const centerY = -contentCenterY + (viewportHeight / 2)
+
     x.set(centerX)
     y.set(centerY)
   }, [])
 
-  // Mouse event handlers for drag
+  // Handle mouse down
   const handleMouseDown = useCallback((e) => {
-    if (e.target.closest('button') || e.target.closest('img')) return
+    if (activeModal) return
+
     setIsDragging(true)
     dragStart.current = { x: e.clientX, y: e.clientY }
-    canvasStart.current = { x: x.get(), y: y.get() }
-  }, [x])
+    canvasStart.current = { x: springX.get(), y: springY.get() }
+    lastPos.current = { x: e.clientX, y: e.clientY }
+    velocity.current = { x: 0, y: 0 }
 
+    if (rafId.current) cancelAnimationFrame(rafId.current)
+  }, [activeModal, springX, springY])
+
+  // Handle mouse move
   const handleMouseMove = useCallback((e) => {
-    if (!isDragging) return
+    if (!isDragging || activeModal) return
+
     const dx = e.clientX - dragStart.current.x
     const dy = e.clientY - dragStart.current.y
+
+    // Calculate velocity for inertia
+    velocity.current = {
+      x: e.clientX - lastPos.current.x,
+      y: e.clientY - lastPos.current.y
+    }
+    lastPos.current = { x: e.clientX, y: e.clientY }
+
+    // Update position directly for immediate response
     x.set(canvasStart.current.x + dx)
     y.set(canvasStart.current.y + dy)
+  }, [isDragging, activeModal, x, y])
+
+  // Handle mouse up with inertia
+  const handleMouseUp = useCallback(() => {
+    if (!isDragging) return
+    setIsDragging(false)
+
+    // Apply inertia
+    const decay = 0.95
+    const minVelocity = 0.5
+
+    const animate = () => {
+      if (Math.abs(velocity.current.x) > minVelocity || Math.abs(velocity.current.y) > minVelocity) {
+        x.set(x.get() + velocity.current.x)
+        y.set(y.get() + velocity.current.y)
+
+        velocity.current.x *= decay
+        velocity.current.y *= decay
+
+        rafId.current = requestAnimationFrame(animate)
+      }
+    }
+
+    animate()
   }, [isDragging, x, y])
 
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false)
-  }, [])
-
-  // Touch event handlers for mobile
+  // Touch events for mobile
   const handleTouchStart = useCallback((e) => {
-    if (e.target.closest('button') || e.target.closest('img')) return
-    setIsDragging(true)
+    if (activeModal) return
+
     const touch = e.touches[0]
+    setIsDragging(true)
     dragStart.current = { x: touch.clientX, y: touch.clientY }
-    canvasStart.current = { x: x.get(), y: y.get() }
-  }, [x])
+    canvasStart.current = { x: springX.get(), y: springY.get() }
+    lastPos.current = { x: touch.clientX, y: touch.clientY }
+    velocity.current = { x: 0, y: 0 }
+  }, [activeModal, springX, springY])
 
   const handleTouchMove = useCallback((e) => {
-    if (!isDragging) return
+    if (!isDragging || activeModal) return
+
     const touch = e.touches[0]
     const dx = touch.clientX - dragStart.current.x
     const dy = touch.clientY - dragStart.current.y
+
+    velocity.current = {
+      x: touch.clientX - lastPos.current.x,
+      y: touch.clientY - lastPos.current.y
+    }
+    lastPos.current = { x: touch.clientX, y: touch.clientY }
+
     x.set(canvasStart.current.x + dx)
     y.set(canvasStart.current.y + dy)
-  }, [isDragging, x, y])
+  }, [isDragging, activeModal, x, y])
 
   const handleTouchEnd = useCallback(() => {
-    setIsDragging(false)
-  }, [])
+    handleMouseUp()
+  }, [handleMouseUp])
 
-  // Navigation handler
-  const handleNavigate = useCallback((section) => {
-    if (section === 'portfolio') {
-      setActiveModal(null)
-      // Reset canvas to center
-      const centerX = -CANVAS_SIZE / 2 + window.innerWidth / 2
-      const centerY = -CANVAS_SIZE / 2 + window.innerHeight / 2
-      x.set(centerX)
-      y.set(centerY)
-    } else {
-      setActiveModal(section)
+  // Global event listeners
+  useEffect(() => {
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    window.addEventListener('touchmove', handleTouchMove, { passive: false })
+    window.addEventListener('touchend', handleTouchEnd)
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchend', handleTouchEnd)
+      if (rafId.current) cancelAnimationFrame(rafId.current)
     }
-  }, [x, y])
+  }, [handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
 
-  // Close modal handler
-  const closeModal = useCallback(() => {
+  // Handle photo click
+  const handlePhotoClick = (e, photo) => {
+    if (!dragStart.current) return // Prevent errors if click without prior mousedown
+
+    const dx = Math.abs(e.clientX - dragStart.current.x)
+    const dy = Math.abs(e.clientY - dragStart.current.y)
+
+    // Only open modal on quick clicks (movement < 3px)
+    if (dx > 3 || dy > 3) return
+
+    setSelectedPhoto(photo)
+    setActiveModal('photo')
+  }
+
+  // Close modal
+  const closeModal = () => {
     setActiveModal(null)
     setSelectedPhoto(null)
-  }, [])
-
-  // Photo click handler
-  const handlePhotoClick = useCallback((photo) => {
-    setSelectedPhoto(photo)
-  }, [])
-
-  // Toggle theme
-  const toggleTheme = useCallback(() => {
-    setIsDarkTheme(prev => !prev)
-  }, [])
+  }
 
   return (
     <div className={cn(
-      "relative w-full h-full overflow-hidden",
+      "relative w-full h-full overflow-hidden select-none transition-colors duration-500",
       isDarkTheme ? "bg-zinc-950" : "bg-zinc-100"
     )}>
-      {/* Noise overlay */}
-      <div className={isDarkTheme ? "tv-noise-dark" : "tv-noise-light"} />
+      {/* TV Noise Overlay - Theme Aware */}
+      <div className={cn(
+        "fixed inset-0 pointer-events-none z-[1]",
+        isDarkTheme ? "tv-noise-dark" : "tv-noise-light"
+      )} />
+
+      {/* Gradient Noise Overlay - Small height with smooth transition, darkest only at top */}
+      <div className={cn(
+        "absolute top-0 left-0 w-full h-[80px] pointer-events-none z-20",
+        isDarkTheme
+          ? "bg-gradient-to-b from-zinc-950/60 via-zinc-950/20 to-transparent"
+          : "bg-gradient-to-b from-zinc-100/60 via-zinc-100/20 to-transparent"
+      )} />
 
       {/* Navigation */}
-      <Navigation
-        onNavigate={handleNavigate}
-        activeModal={activeModal}
-        isDarkTheme={isDarkTheme}
-        toggleTheme={toggleTheme}
-      />
+      <Navbar activeModal={activeModal} setActiveModal={setActiveModal} isDarkTheme={isDarkTheme} />
 
-      {/* Infinite Canvas */}
-      <motion.div
+      {/* Infinite Canvas Container */}
+      <div
         ref={containerRef}
         className={cn(
-          "absolute cursor-grab active:cursor-grabbing",
+          "absolute inset-0 overflow-hidden z-10",
           isDragging ? "cursor-grabbing" : "cursor-grab"
         )}
-        style={{
-          width: CANVAS_SIZE,
-          height: CANVAS_SIZE,
-          x: xSpring,
-          y: ySpring,
-        }}
         onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
         onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
       >
-        {/* Photos */}
-        {PHOTOS.map((photo, index) => {
-          const pos = PHOTO_POSITIONS[index]
-          return (
-            <motion.div
-              key={photo.id}
-              className="absolute"
+        <motion.div
+          ref={canvasRef}
+          style={{ x: springX, y: springY }}
+          className="absolute w-[30000px] h-[30000px] select-none"
+        >
+          {/* Grid lines for depth */}
+          <div className="absolute inset-0 opacity-5">
+            <div className="w-full h-full" />
+          </div>
+
+          {/* Photos */}
+          {PHOTO_POSITIONS.map((photo) => (
+            <div
+              key={`${photo.id}-${photo.x}-${photo.y}`}
+              className="absolute cursor-pointer hover:opacity-50 transition-all duration-300 photo-item"
               style={{
-                left: pos.x,
-                top: pos.y,
-                width: 320,
+                left: photo.x,
+                top: photo.y,
+                width: photo.width,
+                height: photo.height,
+                transform: `rotate(${photo.rotation}deg) scale(${photo.scale})`,
               }}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.05, duration: 0.3 }}
+              onClick={(e) => handlePhotoClick(e, photo)}
             >
-              <div
-                className={cn(
-                  "group relative overflow-hidden transition-transform duration-0",
-                  isDarkTheme ? "bg-zinc-900" : "bg-zinc-200"
-                )}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handlePhotoClick(photo)
-                }}
-              >
+              <div className={cn(
+                "relative w-full h-full overflow-hidden flex flex-col",
+                !photo.isVertical && "justify-start"
+              )}>
                 <img
                   src={photo.src}
                   alt={photo.title}
-                  className="w-full h-auto grayscale hover:grayscale-0 transition-all duration-500 cursor-pointer"
+                  className={cn(
+                    'w-full opacity-80 hover:opacity-100 transition-opacity duration-300',
+                    photo.isVertical ? 'h-full object-cover' : 'h-auto object-contain align-self-start'
+                  )}
                   draggable={false}
                 />
-                <div className={cn(
-                  "absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300",
-                  isDarkTheme ? "bg-gradient-to-t from-black/80 to-transparent" : "bg-gradient-to-t from-white/80 to-transparent"
-                )}>
-                  <p className={cn(
-                    "text-xs uppercase tracking-widest",
-                    isDarkTheme ? "text-white" : "text-zinc-900"
-                  )} style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                    {photo.title}
-                  </p>
-                </div>
+                <div className="absolute inset-0 bg-black/0" />
               </div>
-            </motion.div>
-          )
-        })}
-      </motion.div>
+            </div>
+          ))}
+
+          {/* Canvas center marker */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 border border-orange-500/30 rounded-full" />
+        </motion.div>
+      </div>
+
+      {/* Theme toggle and social links */}
+      <div className="fixed bottom-6 left-6 z-30">
+        <button
+          onClick={() => setIsDarkTheme(!isDarkTheme)}
+          className={cn(
+            "p-2 rounded-full transition-colors",
+            isDarkTheme ? "hover:bg-zinc-800/20" : "hover:bg-zinc-300/50"
+          )}
+        >
+          <SafeIcon
+            name={isDarkTheme ? "Sun" : "Moon"}
+            size={24}
+            className={cn(
+              "transition-colors",
+              isDarkTheme ? "text-zinc-500 hover:text-orange-500" : "text-zinc-600 hover:text-orange-600"
+            )}
+          />
+        </button>
+      </div>
+
+      <div className="fixed bottom-6 right-6 z-30 flex gap-4">
+        <a
+          href="https://t.me/sergiomusel"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn(
+            "p-2 rounded-full transition-colors",
+            isDarkTheme ? "hover:bg-zinc-800/20" : "hover:bg-zinc-300/50"
+          )}
+        >
+          <SafeIcon
+            name="Send"
+            size={24}
+            className={cn(
+              "transition-colors",
+              isDarkTheme ? "text-zinc-500 hover:text-orange-500" : "text-zinc-600 hover:text-orange-600"
+            )}
+          />
+        </a>
+        <a
+          href="https://instagram.com/sergiomusel"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn(
+            "p-2 rounded-full transition-colors",
+            isDarkTheme ? "hover:bg-zinc-800/20" : "hover:bg-zinc-300/50"
+          )}
+        >
+          <SafeIcon
+            name="Instagram"
+            size={24}
+            className={cn(
+              "transition-colors",
+              isDarkTheme ? "text-zinc-500 hover:text-orange-500" : "text-zinc-600 hover:text-orange-600"
+            )}
+          />
+        </a>
+      </div>
+
+      {/* Copyright - Capitalized Made */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+        <p className={cn(
+          "font-['Courier_New'] text-xs tracking-[0.02em]",
+          isDarkTheme ? "text-zinc-500" : "text-zinc-500"
+        )}>
+          2026 Made with webly AI
+        </p>
+      </div>
 
       {/* Modals */}
       <AnimatePresence>
-        {selectedPhoto && (
-          <PhotoModal
-            photo={selectedPhoto}
-            onClose={closeModal}
-            isDarkTheme={isDarkTheme}
-          />
+        {activeModal === 'photo' && (
+          <PhotoModal photo={selectedPhoto} onClose={closeModal} isDarkTheme={isDarkTheme} />
         )}
         {activeModal === 'about' && (
           <AboutModal onClose={closeModal} isDarkTheme={isDarkTheme} />
         )}
         {activeModal === 'connect' && (
-          <ConnectModal onClose={closeModal} />
-        )}
-        {activeModal === 'blog' && (
-          <BlogModal onClose={closeModal} isDarkTheme={isDarkTheme} />
+          <ConnectModal onClose={closeModal} isDarkTheme={isDarkTheme} />
         )}
       </AnimatePresence>
     </div>

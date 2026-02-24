@@ -5,13 +5,13 @@ import { clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
 function cn(...inputs) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(...inputs))
 }
 
 const FAQ_DATA = [
   {
     question: "Jak zapisać się na wizytę?",
-    answer: "Możesz zapisać się przez formularz na stronie, telefon +48 123 456 789 lub czat. Pracujemy codziennie od 9:00 do 21:00.",
+    answer: "Możesz zapisać się przez formularz na stronie, telefon +48 453 279 138 lub czat. Pracujemy codziennie od 9:00 do 21:00.",
     keywords: ["zapisać", "wizyta", "rejestracja", "telefon", "jak dostać"]
   },
   {
@@ -26,7 +26,7 @@ const FAQ_DATA = [
   }
 ]
 
-const SITE_CONTEXT = "Stomatologia M - nowoczesna klinika premium w Warszawie. Specjalizacja: leczenie, protetyka, implantologia, ortodoncja. Godziny otwarcia: 9:00-21:00. Adres: Warszawa, Złota 12. Telefon: +48 123 456 789."
+const SITE_CONTEXT = "Stomatologia M - nowoczesna klinika premium w Warszawie. Specjalizacja: leczenie, protetyka, implantologia, ortodoncja. Godziny otwarcia: 9:00-21:00. Adres: Warszawa, Złota 12. Telefon: +48 453 279 138."
 
 function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false)
@@ -85,7 +85,7 @@ function ChatWidget() {
       } catch (error) {
         setMessages(prev => [...prev, {
           type: 'bot',
-          text: 'Przepraszam, nie znalazłem odpowiedzi na to pytanie. Proszę zadzwoń do nas pod numer +48 123 456 789 lub zostaw wiadomość na stronie.'
+          text: 'Przepraszam, nie znalazłem odpowiedzi na to pytanie. Proszę zadzwoń do nas pod numer +48 453 279 138 lub zostaw wiadomość na stronie.'
         }])
       } finally {
         setIsLoading(false)
@@ -269,7 +269,7 @@ function ContactForm() {
             value={formData.phone}
             onChange={(e) => setFormData({...formData, phone: e.target.value})}
             className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 outline-none transition-all"
-            placeholder="+48 123 456 789"
+            placeholder="+48 453 279 138"
           />
         </div>
       </div>
@@ -462,9 +462,9 @@ function App() {
             </nav>
 
             <div className="hidden md:flex items-center gap-4">
-              <a href="tel:+48123456789" className="flex items-center gap-2 text-slate-900 font-semibold hover:text-slate-700 transition-colors">
+              <a href="tel:+48453279138" className="flex items-center gap-2 text-slate-900 font-semibold hover:text-slate-700 transition-colors">
                 <SafeIcon name="phone" size={18} />
-                +48 123 456 789
+                +48 453 279 138
               </a>
               <button
                 onClick={(e) => scrollToSection(e, 'contact')}
@@ -509,9 +509,9 @@ function App() {
                   </a>
                 ))}
                 <div className="pt-4 border-t border-slate-100">
-                  <a href="tel:+48123456789" className="flex items-center gap-2 text-slate-900 font-semibold mb-3">
+                  <a href="tel:+48453279138" className="flex items-center gap-2 text-slate-900 font-semibold mb-3">
                     <SafeIcon name="phone" size={18} />
-                    +48 123 456 789
+                    +48 453 279 138
                   </a>
                   <button
                     onClick={(e) => scrollToSection(e, 'contact')}
@@ -756,8 +756,8 @@ function App() {
                   </div>
                   <div>
                     <div className="text-sm text-slate-500 mb-1">Telefon</div>
-                    <a href="tel:+48123456789" className="text-lg font-bold text-slate-900 hover:text-slate-700 transition-colors">
-                      +48 123 456 789
+                    <a href="tel:+48453279138" className="text-lg font-bold text-slate-900 hover:text-slate-700 transition-colors">
+                      +48 453 279 138
                     </a>
                   </div>
                 </div>
@@ -826,7 +826,7 @@ function App() {
             <div>
               <h4 className="font-bold mb-4">Kontakt</h4>
               <ul className="space-y-2 text-slate-400 text-sm">
-                <li>+48 123 456 789</li>
+                <li>+48 453 279 138</li>
                 <li>Warszawa, Złota 12</li>
                 <li>Codziennie 9:00 — 21:00</li>
                 <li>info@stomatologia-m.pl</li>

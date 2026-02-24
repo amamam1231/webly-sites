@@ -3,22 +3,6 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import { clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import {
-  Phone,
-  MapPin,
-  Clock,
-  Calendar,
-  CheckCircle2,
-  ChevronDown,
-  Send,
-  X,
-  Bot,
-  MessageSquare,
-  Star,
-  Shield,
-  Heart,
-  Award
-} from 'lucide-react'
 
 function cn(...inputs) {
   return twMerge(clsx(inputs))
@@ -26,33 +10,28 @@ function cn(...inputs) {
 
 const FAQ_DATA = [
   {
-    question: "Как записаться на прием?",
-    answer: "Вы можете записаться на прием через форму на сайте, по телефону +7 (999) 123-45-67 или через чат. Мы работаем ежедневно с 9:00 до 21:00.",
-    keywords: ["записаться", "прием", "запись", "телефон", "как попасть"]
+    question: "Jak zapisać się na wizytę?",
+    answer: "Możesz zapisać się przez formularz na stronie, telefon +48 123 456 789 lub czat. Pracujemy codziennie od 9:00 do 21:00.",
+    keywords: ["zapisać", "wizyta", "rejestracja", "telefon", "jak dostać"]
   },
   {
-    question: "Какие услуги вы оказываете?",
-    answer: "Мы предоставляем полный спектр стоматологических услуг: лечение кариеса, протезирование, имплантация, отбеливание, исправление прикуса и профессиональная гигиена.",
-    keywords: ["услуги", "лечение", "чем занимаетесь", "что делаете", "имплантация", "протезирование"]
+    question: "Jakie usługi świadczycie?",
+    answer: "Oferujemy pełen zakres usług stomatologicznych: leczenie próchnicy, protetyka, implantologia, wybielanie, korekta zgryzu i higiena profesjonalna.",
+    keywords: ["usługi", "leczenie", "czym się zajmujecie", "implanty", "protetyka"]
   },
   {
-    question: "Есть ли рассрочка на лечение?",
-    answer: "Да, мы предоставляем рассрочку платежа до 12 месяцев без первоначального взноса. Также работаем со многими страховыми компаниями.",
-    keywords: ["рассрочка", "кредит", "оплата", "цена", "сколько стоит", "дорого"]
-  },
-  {
-    question: "Больно ли делать имплантацию?",
-    answer: "Имплантация проводится под местной анестезией, поэтому вы не почувствуете боли. После процедуры может быть легкий дискомфорт, который проходит за 1-2 дня.",
-    keywords: ["больно", "боль", "имплантация", "страшно", "анестезия", "безболезненно"]
+    question: "Czy implantacja jest bolesna?",
+    answer: "Implantacja wykonywana jest w znieczuleniu miejscowym, więc nie poczujesz bólu. Po zabiegu może wystąpić lekki dyskomfort, który mija po 1-2 dniach.",
+    keywords: ["boli", "ból", "implantacja", "strach", "znieczulenie", "bezbolesnie"]
   }
 ]
 
-const SITE_CONTEXT = "Стоматологическая клиника M - современная клиника премиум-класса. Специализация: лечение, протезирование, имплантация, ортодонтия. Работаем с 9:00 до 21:00. Адрес: г. Москва, ул. Улыбки, 1. Телефон: +7 (999) 123-45-67. Есть рассрочка до 12 месяцев."
+const SITE_CONTEXT = "Stomatologia M - nowoczesna klinika premium w Warszawie. Specjalizacja: leczenie, protetyka, implantologia, ortodoncja. Godziny otwarcia: 9:00-21:00. Adres: Warszawa, Złota 12. Telefon: +48 123 456 789."
 
 function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState([
-    { type: 'bot', text: 'Здравствуйте! Я помогу ответить на ваши вопросы о нашей клинике. Что вас интересует?' }
+    { type: 'bot', text: 'Cześć! Pomogę odpowiedzieć na Twoje pytania o naszą klinikę. Co Cię interesuje?' }
   ])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -106,7 +85,7 @@ function ChatWidget() {
       } catch (error) {
         setMessages(prev => [...prev, {
           type: 'bot',
-          text: 'Извините, я не нашел ответа на этот вопрос. Пожалуйста, позвоните нам по телефону +7 (999) 123-45-67 или оставьте заявку на сайте.'
+          text: 'Przepraszam, nie znalazłem odpowiedzi na to pytanie. Proszę zadzwoń do nas pod numer +48 123 456 789 lub zostaw wiadomość na stronie.'
         }])
       } finally {
         setIsLoading(false)
@@ -141,7 +120,7 @@ function ChatWidget() {
             <div className="bg-slate-900 p-4 flex items-center justify-between">
               <div className="flex items-center gap-2 text-white">
                 <SafeIcon name="bot" size={20} />
-                <span className="font-semibold">Ассистент клиники</span>
+                <span className="font-semibold">Asystent kliniki</span>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
@@ -205,7 +184,7 @@ function ChatWidget() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                  placeholder="Напишите вопрос..."
+                  placeholder="Napisz pytanie..."
                   className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-900 transition-all"
                 />
                 <button
@@ -247,7 +226,7 @@ function ContactForm() {
     data.append('phone', formData.phone)
     data.append('service', formData.service)
     data.append('message', formData.message)
-    data.append('subject', 'Новая заявка с сайта стоматологии')
+    data.append('subject', 'Nowa wiadomość ze strony Stomatologia M')
 
     try {
       const response = await fetch('https://api.web3forms.com/submit', {
@@ -272,54 +251,54 @@ function ContactForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Ваше имя</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Imię i nazwisko</label>
           <input
             type="text"
             required
             value={formData.name}
             onChange={(e) => setFormData({...formData, name: e.target.value})}
             className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 outline-none transition-all"
-            placeholder="Иван Иванов"
+            placeholder="Jan Kowalski"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Телефон</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Telefon</label>
           <input
             type="tel"
             required
             value={formData.phone}
             onChange={(e) => setFormData({...formData, phone: e.target.value})}
             className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 outline-none transition-all"
-            placeholder="+7 (999) 123-45-67"
+            placeholder="+48 123 456 789"
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">Услуга</label>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Usługa</label>
         <select
           value={formData.service}
           onChange={(e) => setFormData({...formData, service: e.target.value})}
           className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 outline-none transition-all bg-white"
         >
-          <option value="">Выберите услугу</option>
-          <option value="therapy">Лечение кариеса</option>
-          <option value="implantation">Имплантация</option>
-          <option value="prosthetics">Протезирование</option>
-          <option value="whitening">Отбеливание</option>
-          <option value="hygiene">Профессиональная гигиена</option>
-          <option value="orthodontics">Исправление прикуса</option>
+          <option value="">Wybierz usługę</option>
+          <option value="therapy">Leczenie próchnicy</option>
+          <option value="implantation">Implantologia</option>
+          <option value="prosthetics">Protetyka</option>
+          <option value="whitening">Wybielanie</option>
+          <option value="hygiene">Higienizacja</option>
+          <option value="orthodontics">Ortodoncja</option>
         </select>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">Сообщение (необязательно)</label>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Wiadomość (opcjonalnie)</label>
         <textarea
           rows={4}
           value={formData.message}
           onChange={(e) => setFormData({...formData, message: e.target.value})}
           className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 outline-none transition-all resize-none"
-          placeholder="Опишите вашу проблему или вопрос..."
+          placeholder="Opisz swój problem lub pytanie..."
         />
       </div>
 
@@ -332,7 +311,7 @@ function ContactForm() {
             className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2"
           >
             <SafeIcon name="checkCircle2" size={20} />
-            <span>Спасибо! Мы свяжемся с вами в ближайшее время.</span>
+            <span>Dziękujemy! Skontaktujemy się z Tobą wkrótce.</span>
           </motion.div>
         ) : (
           <motion.button
@@ -345,12 +324,12 @@ function ContactForm() {
             {isSubmitting ? (
               <>
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Отправка...
+                Wysyłanie...
               </>
             ) : (
               <>
                 <SafeIcon name="calendar" size={20} />
-                Записаться на прием
+                Zapisz się na wizytę
               </>
             )}
           </motion.button>
@@ -363,7 +342,7 @@ function ContactForm() {
           animate={{ opacity: 1 }}
           className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm"
         >
-          Произошла ошибка. Пожалуйста, позвоните нам напрямую или попробуйте позже.
+          Wystąpił błąd. Proszę zadzwoń do nas bezpośrednio lub spróbuj później.
         </motion.div>
       )}
     </form>
@@ -406,39 +385,39 @@ function App() {
   const services = [
     {
       icon: 'shield',
-      title: 'Лечение кариеса',
-      description: 'Современные методы лечения с использованием качественных материалов. Безболезненно и надежно.',
-      price: 'от 3 500 ₽'
+      title: 'Leczenie próchnicy',
+      description: 'Nowoczesne metody leczenia z wykorzystaniem wysokiej jakości materiałów. Bezbolesnie i niezawodnie.',
+      price: 'od 300 zł'
     },
     {
       icon: 'award',
-      title: 'Имплантация',
-      description: 'Установка имплантатов премиум-класса. Гарантия на работу до 10 лет.',
-      price: 'от 25 000 ₽'
+      title: 'Implantologia',
+      description: 'Wszczepianie implantów klasy premium. Gwarancja na pracę do 10 lat.',
+      price: 'od 2500 zł'
     },
     {
       icon: 'heart',
-      title: 'Протезирование',
-      description: 'Коронки, мосты и протезы любой сложности. Натуральный внешний вид.',
-      price: 'от 15 000 ₽'
+      title: 'Protetyka',
+      description: 'Korony, mosty i protezy dowolnej złożoności. Naturalny wygląd.',
+      price: 'od 1500 zł'
     },
     {
       icon: 'star',
-      title: 'Отбеливание',
-      description: 'Профессиональное отбеливание Zoom 4. Результат после первой процедуры.',
-      price: 'от 20 000 ₽'
+      title: 'Wybielanie',
+      description: 'Profesjonalne wybielanie Zoom 4. Efekt już po pierwszym zabiegu.',
+      price: 'od 1000 zł'
     },
     {
       icon: 'checkCircle2',
-      title: 'Профгигиена',
-      description: 'Ультразвуковая чистка, AirFlow, полировка. Профилактика заболеваний.',
-      price: 'от 5 000 ₽'
+      title: 'Higienizacja',
+      description: 'Czyszczenie ultradźwiękowe, AirFlow, polerowanie. Profilaktyka chorób.',
+      price: 'od 300 zł'
     },
     {
       icon: 'shield',
-      title: 'Исправление прикуса',
-      description: 'Брекеты и капы Invisalign. Индивидуальный план лечения.',
-      price: 'от 150 000 ₽'
+      title: 'Ortodoncja',
+      description: 'Aparaty stałe i nakładki Invisalign. Indywidualny plan leczenia.',
+      price: 'od 8000 zł'
     }
   ]
 
@@ -455,20 +434,20 @@ function App() {
             <a href="#" className="flex items-center gap-3">
               <img
                 src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_387814377/user-photo-1.jpg"
-                alt="Логотип клиники M"
+                alt="Logo Stomatologia M"
                 className="h-12 w-auto"
               />
               <div className="hidden sm:block">
-                <div className="font-bold text-slate-900 text-lg leading-tight">Стоматология M</div>
-                <div className="text-xs text-slate-500">Премиум класса</div>
+                <div className="font-bold text-slate-900 text-lg leading-tight">Stomatologia M</div>
+                <div className="text-xs text-slate-500">Klasa premium</div>
               </div>
             </a>
 
             <nav className="hidden md:flex items-center gap-8">
               {[
-                { label: 'Услуги', id: 'services' },
-                { label: 'О нас', id: 'about' },
-                { label: 'Контакты', id: 'contact' }
+                { label: 'Usługi', id: 'services' },
+                { label: 'O nas', id: 'about' },
+                { label: 'Kontakt', id: 'contact' }
               ].map((item) => (
                 <a
                   key={item.id}
@@ -483,15 +462,15 @@ function App() {
             </nav>
 
             <div className="hidden md:flex items-center gap-4">
-              <a href="tel:+79991234567" className="flex items-center gap-2 text-slate-900 font-semibold hover:text-slate-700 transition-colors">
+              <a href="tel:+48123456789" className="flex items-center gap-2 text-slate-900 font-semibold hover:text-slate-700 transition-colors">
                 <SafeIcon name="phone" size={18} />
-                +7 (999) 123-45-67
+                +48 123 456 789
               </a>
               <button
                 onClick={(e) => scrollToSection(e, 'contact')}
                 className="bg-slate-900 text-white px-5 py-2.5 rounded-full font-medium hover:bg-slate-800 transition-colors"
               >
-                Записаться
+                Zapisz się
               </button>
             </div>
 
@@ -516,9 +495,9 @@ function App() {
             >
               <div className="container mx-auto px-4 py-4 space-y-4">
                 {[
-                  { label: 'Услуги', id: 'services' },
-                  { label: 'О нас', id: 'about' },
-                  { label: 'Контакты', id: 'contact' }
+                  { label: 'Usługi', id: 'services' },
+                  { label: 'O nas', id: 'about' },
+                  { label: 'Kontakt', id: 'contact' }
                 ].map((item) => (
                   <a
                     key={item.id}
@@ -530,15 +509,15 @@ function App() {
                   </a>
                 ))}
                 <div className="pt-4 border-t border-slate-100">
-                  <a href="tel:+79991234567" className="flex items-center gap-2 text-slate-900 font-semibold mb-3">
+                  <a href="tel:+48123456789" className="flex items-center gap-2 text-slate-900 font-semibold mb-3">
                     <SafeIcon name="phone" size={18} />
-                    +7 (999) 123-45-67
+                    +48 123 456 789
                   </a>
                   <button
                     onClick={(e) => scrollToSection(e, 'contact')}
                     className="w-full bg-slate-900 text-white px-5 py-3 rounded-full font-medium"
                   >
-                    Записаться на прием
+                    Zapisz się na wizytę
                   </button>
                 </div>
               </div>
@@ -563,18 +542,18 @@ function App() {
             >
               <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-6">
                 <SafeIcon name="star" size={16} className="text-yellow-400" />
-                <span className="text-white/90 text-sm font-medium">Топ-10 клиник Москвы</span>
+                <span className="text-white/90 text-sm font-medium">Top 10 klinik w Warszawie</span>
               </div>
 
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-tight mb-6">
-                Ваша улыбка —<br />
+                Twój uśmiech —<br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300">
-                  наша забота
+                  nasza troska
                 </span>
               </h1>
 
               <p className="text-lg md:text-xl text-slate-300 mb-8 max-w-lg leading-relaxed">
-                Современная стоматология премиум-класса. Безболезненное лечение, передовые технологии, индивидуальный подход к каждому пациенту.
+                Nowoczesna stomatologia klasy premium. Bezbolesne leczenie, nowoczesne technologie, indywidualne podejście do każdego pacjenta.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -583,13 +562,13 @@ function App() {
                   className="bg-white text-slate-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition-all hover:scale-105 flex items-center justify-center gap-2"
                 >
                   <SafeIcon name="calendar" size={20} />
-                  Записаться онлайн
+                  Zapisz się online
                 </button>
                 <button
                   onClick={(e) => scrollToSection(e, 'services')}
                   className="bg-transparent border-2 border-white/30 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-2"
                 >
-                  Наши услуги
+                  Nasze usługi
                   <SafeIcon name="chevronDown" size={18} />
                 </button>
               </div>
@@ -597,15 +576,15 @@ function App() {
               <div className="flex items-center gap-8 mt-12 pt-8 border-t border-white/10">
                 <div>
                   <div className="text-3xl font-bold text-white">15+</div>
-                  <div className="text-slate-400 text-sm">лет опыта</div>
+                  <div className="text-slate-400 text-sm">lat doświadczenia</div>
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-white">5000+</div>
-                  <div className="text-slate-400 text-sm">довольных пациентов</div>
+                  <div className="text-slate-400 text-sm">zadowolonych pacjentów</div>
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-white">4.9</div>
-                  <div className="text-slate-400 text-sm">рейтинг на Яндексе</div>
+                  <div className="text-slate-400 text-sm">ocena w Google</div>
                 </div>
               </div>
             </motion.div>
@@ -620,7 +599,7 @@ function App() {
                 <div className="absolute inset-0 bg-white/5 rounded-full blur-3xl" />
                 <img
                   src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_387814377/user-photo-1.jpg"
-                  alt="Логотип стоматологии M"
+                  alt="Logo Stomatologia M"
                   className="relative z-10 w-full h-full object-contain drop-shadow-2xl"
                 />
                 <motion.div
@@ -629,8 +608,8 @@ function App() {
                   className="absolute -top-4 -right-4 bg-white text-slate-900 p-4 rounded-2xl shadow-xl"
                 >
                   <SafeIcon name="checkCircle2" size={32} className="text-green-500" />
-                  <div className="font-bold mt-1">Гарантия</div>
-                  <div className="text-xs text-slate-500">на все услуги</div>
+                  <div className="font-bold mt-1">Gwarancja</div>
+                  <div className="text-xs text-slate-500">na wszystkie usługi</div>
                 </motion.div>
               </div>
             </motion.div>
@@ -646,10 +625,10 @@ function App() {
             className="text-center max-w-3xl mx-auto mb-16"
           >
             <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-4">
-              Наши услуги
+              Nasze usługi
             </h2>
             <p className="text-lg text-slate-600">
-              Предоставляем полный спектр стоматологических услуг с использованием современного оборудования и материалов премиум-класса
+              Oferujemy pełen zakres usług stomatologicznych z wykorzystaniem nowoczesnego sprzętu i materiałów premium
             </p>
           </motion.div>
 
@@ -674,7 +653,7 @@ function App() {
                     onClick={(e) => scrollToSection(e, 'contact')}
                     className="text-slate-900 font-medium text-sm hover:underline flex items-center gap-1"
                   >
-                    Подробнее
+                    Więcej
                     <SafeIcon name="chevronDown" size={14} className="-rotate-90" />
                   </button>
                 </div>
@@ -695,18 +674,18 @@ function App() {
               transition={{ duration: 0.6 }}
             >
               <h2 className="text-3xl md:text-5xl font-black mb-6">
-                Почему выбирают нас?
+                Dlaczego warto nas wybrać?
               </h2>
               <p className="text-slate-300 text-lg mb-8 leading-relaxed">
-                Клиника M — это сочетание многолетнего опыта, современных технологий и заботы о каждом пациенте. Мы создаем атмосферу доверия и комфорта.
+                Klinika M to połączenie wieloletniego doświadczenia, nowoczesnych technologii i troski o każdego pacjenta. Tworzymy atmosferę zaufania i komfortu.
               </p>
 
               <div className="space-y-6">
                 {[
-                  { title: 'Безболезненное лечение', desc: 'Современная анестезия и щадящие методы' },
-                  { title: 'Передовое оборудование', desc: '3D-диагностика и цифровые технологии' },
-                  { title: 'Индивидуальный подход', desc: 'Персональный план лечения для каждого' },
-                  { title: 'Гарантия результата', desc: 'Долгосрочная гарантия на все работы' }
+                  { title: 'Bezbolesne leczenie', desc: 'Nowoczesna anestezja i delikatne metody' },
+                  { title: 'Nowoczesny sprzęt', desc: 'Diagnostyka 3D i technologie cyfrowe' },
+                  { title: 'Indywidualne podejście', desc: 'Personalizowany plan leczenia dla każdego' },
+                  { title: 'Gwarancja rezultatu', desc: 'Długoterminowa gwarancja na wszystkie prace' }
                 ].map((item, idx) => (
                   <div key={idx} className="flex gap-4">
                     <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
@@ -731,24 +710,24 @@ function App() {
                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
                   <SafeIcon name="shield" size={32} className="text-blue-400 mb-4" />
                   <div className="text-3xl font-black mb-1">100%</div>
-                  <div className="text-slate-400 text-sm">стерильность</div>
+                  <div className="text-slate-400 text-sm">sterylność</div>
                 </div>
                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
                   <SafeIcon name="clock" size={32} className="text-yellow-400 mb-4" />
                   <div className="text-3xl font-black mb-1">24/7</div>
-                  <div className="text-slate-400 text-sm">экстренная помощь</div>
+                  <div className="text-slate-400 text-sm">pomoc doraźna</div>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
                   <SafeIcon name="award" size={32} className="text-purple-400 mb-4" />
                   <div className="text-3xl font-black mb-1">20+</div>
-                  <div className="text-slate-400 text-sm">сертифицированных врачей</div>
+                  <div className="text-slate-400 text-sm">certyfikowanych lekarzy</div>
                 </div>
                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
                   <SafeIcon name="heart" size={32} className="text-red-400 mb-4" />
                   <div className="text-3xl font-black mb-1">99%</div>
-                  <div className="text-slate-400 text-sm">довольных пациентов</div>
+                  <div className="text-slate-400 text-sm">zadowolonych pacjentów</div>
                 </div>
               </div>
             </motion.div>
@@ -764,10 +743,10 @@ function App() {
               animate={isContactInView ? { opacity: 1, y: 0 } : {}}
             >
               <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-6">
-                Запишитесь на прием
+                Zapisz się na wizytę
               </h2>
               <p className="text-lg text-slate-600 mb-8">
-                Оставьте заявку, и мы свяжемся с вами в ближайшее время для подтверждения записи. Или позвоните нам напрямую.
+                Zostaw wiadomość, a skontaktujemy się z Tobą wkrótce w celu potwierdzenia wizyty. Lub zadzwoń do nas bezpośrednio.
               </p>
 
               <div className="space-y-6 mb-8">
@@ -776,9 +755,9 @@ function App() {
                     <SafeIcon name="phone" size={24} className="text-white" />
                   </div>
                   <div>
-                    <div className="text-sm text-slate-500 mb-1">Телефон</div>
-                    <a href="tel:+79991234567" className="text-lg font-bold text-slate-900 hover:text-slate-700 transition-colors">
-                      +7 (999) 123-45-67
+                    <div className="text-sm text-slate-500 mb-1">Telefon</div>
+                    <a href="tel:+48123456789" className="text-lg font-bold text-slate-900 hover:text-slate-700 transition-colors">
+                      +48 123 456 789
                     </a>
                   </div>
                 </div>
@@ -788,8 +767,8 @@ function App() {
                     <SafeIcon name="mapPin" size={24} className="text-white" />
                   </div>
                   <div>
-                    <div className="text-sm text-slate-500 mb-1">Адрес</div>
-                    <div className="text-lg font-bold text-slate-900">г. Москва, ул. Улыбки, 1</div>
+                    <div className="text-sm text-slate-500 mb-1">Adres</div>
+                    <div className="text-lg font-bold text-slate-900">Warszawa, Złota 12</div>
                   </div>
                 </div>
 
@@ -798,20 +777,10 @@ function App() {
                     <SafeIcon name="clock" size={24} className="text-white" />
                   </div>
                   <div>
-                    <div className="text-sm text-slate-500 mb-1">Режим работы</div>
-                    <div className="text-lg font-bold text-slate-900">Ежедневно 9:00 — 21:00</div>
+                    <div className="text-sm text-slate-500 mb-1">Godziny otwarcia</div>
+                    <div className="text-lg font-bold text-slate-900">Codziennie 9:00 — 21:00</div>
                   </div>
                 </div>
-              </div>
-
-              <div className="bg-slate-900 text-white rounded-2xl p-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <SafeIcon name="star" size={24} className="text-yellow-400" />
-                  <span className="font-bold text-lg">Рассрочка 0%</span>
-                </div>
-                <p className="text-slate-300 text-sm">
-                  Лечение в рассрочку до 12 месяцев без первоначального взноса и переплат
-                </p>
               </div>
             </motion.div>
 
@@ -834,42 +803,42 @@ function App() {
               <div className="flex items-center gap-3 mb-4">
                 <img
                   src="https://oejgkvftpbinliuopipr.supabase.co/storage/v1/object/public/assets/user_387814377/user-photo-1.jpg"
-                  alt="Логотип"
+                  alt="Logo"
                   className="h-10 w-auto"
                 />
-                <span className="font-bold text-xl">Стоматология M</span>
+                <span className="font-bold text-xl">Stomatologia M</span>
               </div>
               <p className="text-slate-400 max-w-sm">
-                Современная стоматологическая клиника премиум-класса. Заботимся о вашей улыбке с 2009 года.
+                Nowoczesna klinika stomatologiczna premium. Dbamy o Twój uśmiech od 2009 roku.
               </p>
             </div>
 
             <div>
-              <h4 className="font-bold mb-4">Услуги</h4>
+              <h4 className="font-bold mb-4">Usługi</h4>
               <ul className="space-y-2 text-slate-400 text-sm">
-                <li><a href="#services" onClick={(e) => scrollToSection(e, 'services')} className="hover:text-white transition-colors">Лечение кариеса</a></li>
-                <li><a href="#services" onClick={(e) => scrollToSection(e, 'services')} className="hover:text-white transition-colors">Имплантация</a></li>
-                <li><a href="#services" onClick={(e) => scrollToSection(e, 'services')} className="hover:text-white transition-colors">Протезирование</a></li>
-                <li><a href="#services" onClick={(e) => scrollToSection(e, 'services')} className="hover:text-white transition-colors">Отбеливание</a></li>
+                <li><a href="#services" onClick={(e) => scrollToSection(e, 'services')} className="hover:text-white transition-colors">Leczenie próchnicy</a></li>
+                <li><a href="#services" onClick={(e) => scrollToSection(e, 'services')} className="hover:text-white transition-colors">Implantologia</a></li>
+                <li><a href="#services" onClick={(e) => scrollToSection(e, 'services')} className="hover:text-white transition-colors">Protetyka</a></li>
+                <li><a href="#services" onClick={(e) => scrollToSection(e, 'services')} className="hover:text-white transition-colors">Wybielanie</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-bold mb-4">Контакты</h4>
+              <h4 className="font-bold mb-4">Kontakt</h4>
               <ul className="space-y-2 text-slate-400 text-sm">
-                <li>+7 (999) 123-45-67</li>
-                <li>г. Москва, ул. Улыбки, 1</li>
-                <li>Ежедневно 9:00 — 21:00</li>
-                <li>info@stomatology-m.ru</li>
+                <li>+48 123 456 789</li>
+                <li>Warszawa, Złota 12</li>
+                <li>Codziennie 9:00 — 21:00</li>
+                <li>info@stomatologia-m.pl</li>
               </ul>
             </div>
           </div>
 
           <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
-            <div>© 2024 Стоматология M. Все права защищены.</div>
+            <div>© 2024 Stomatologia M. Wszelkie prawa zastrzeżone.</div>
             <div className="flex gap-6">
-              <a href="#" className="hover:text-white transition-colors">Политика конфиденциальности</a>
-              <a href="#" className="hover:text-white transition-colors">Лицензии</a>
+              <a href="#" className="hover:text-white transition-colors">Polityka prywatności</a>
+              <a href="#" className="hover:text-white transition-colors">Licencje</a>
             </div>
           </div>
         </div>

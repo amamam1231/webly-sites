@@ -1,4 +1,4 @@
--- Initial Database Schema
+-- Inicializační schéma databáze
 CREATE TABLE IF NOT EXISTS site_settings (
     key TEXT PRIMARY KEY,
     value TEXT,
@@ -12,5 +12,5 @@ CREATE TABLE IF NOT EXISTS leads (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Вставляем дефолтную настройку для Telegram Chat ID
+-- Vložení výchozího nastavení pro Telegram Chat ID
 INSERT OR IGNORE INTO site_settings (key, value) VALUES ('telegram_chat_id', '');

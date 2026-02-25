@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-slate-950 text-slate-100 antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-slate-900/60 backdrop-blur-md border border-slate-800/50 rounded-2xl;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold px-8 py-4 rounded-full transition-all duration-300 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-105;
+  }
+
+  .btn-secondary {
+    @apply bg-slate-800/80 hover:bg-slate-700/80 text-slate-100 font-medium px-8 py-4 rounded-full transition-all duration-300 border border-slate-700 hover:border-slate-600;
+  }
+
+  .section-padding {
+    @apply py-20 md:py-32 px-4 sm:px-6 lg:px-8;
+  }
+
+  .container-main {
+    @apply max-w-7xl mx-auto;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+}
+
+/* MapLibre custom styles */
+.maplibregl-ctrl-logo {
+  display: none !important;
+}
+
+.maplibregl-ctrl-attrib-inner {
+  font-size: 10px;
+  color: #64748b;
+}

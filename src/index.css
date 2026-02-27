@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'maplibre-gl/dist/maplibre-gl.css';
+
+html {
+  scroll-behavior: smooth;
+}
+
+.maplibregl-ctrl-logo {
+  display: none !important;
+}
+
+.maplibregl-ctrl-attrib {
+  display: none !important;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}

@@ -1,0 +1,9 @@
+name = "landing-site"
+compatibility_date = "2024-02-24"
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "webly_shared_db"
+database_id = "f322c737-1234-42e6-bba7-93f9c91b0a3d"
+preview_database_id = "f322c737-1234-42e6-bba7-93f9c91b0a3d"

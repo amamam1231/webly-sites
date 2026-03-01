@@ -57,7 +57,6 @@ function App() {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <SafeIcon name="zap" size={20} className="text-white" />
               </div>
-              <span className="font-bold text-xl">Brand</span>
             </div>
 
             <nav className="hidden md:flex items-center gap-8">
@@ -309,7 +308,6 @@ function App() {
               <div className="w-6 h-6 bg-blue-600 rounded-md flex items-center justify-center">
                 <SafeIcon name="zap" size={14} className="text-white" />
               </div>
-              <span className="font-bold">Brand</span>
             </div>
             <p className="text-slate-500 text-sm">
               © 2024 Все права защищены.

@@ -1,6 +1,6 @@
 export const AdminConfig = {
-  siteName: "Минималистичный Лендинг",
-  accentColor: "#3b82f6",
+  siteName: "Layer Studio",
+  accentColor: "#059669",
 
   editableFields: [
     {

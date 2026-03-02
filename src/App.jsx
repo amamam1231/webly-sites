@@ -1,3 +1,4 @@
+// === IMPORTS ===
 import { SafeIcon } from './components/SafeIcon';
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -32,426 +33,216 @@ function App() {
         setSettings(data)
         setLocalSettings(data)
       })
-      .catch(() => {
-        const defaults = { show_features: true, show_contact: true }
-        setSettings(defaults)
-        setLocalSettings(defaults)
-      })
+      .catch(console.error)
   }, [])
-
-  useEffect(() => {
-    if (isAdmin && adminTab === 'inbox') {
-      loadLeads()
-    }
-  }, [isAdmin, adminTab])
-
-  const loadLeads = async () => {
-    setIsLoadingLeads(true)
-    try {
-      const response = await fetch('/api/leads')
-      if (response.ok) {
-        const data = await response.json()
-        setLeads(data.leads || [])
-      }
-    } catch (error) {
-      console.error('Failed to load leads')
-    }
-    setIsLoadingLeads(false)
-  }
-
-  const handleAdminLogin = (e) => {
-    e.preventDefault()
-    // Simple password protection - in production this should be server-side
-    if (adminPassword === 'admin123') {
-      setIsAdmin(true)
-      setAdminError('')
-    } else {
-      setAdminError('Неверный пароль')
-    }
-  }
-
-  const handleSaveSettings = async () => {
-    setSaveStatus('saving')
-    try {
-      const response = await fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(localSettings)
-      })
-
-      if (response.ok) {
-        setSettings(localSettings)
-        setSaveStatus('success')
-        setTimeout(() => setSaveStatus(null), 2000)
-      } else {
-        setSaveStatus('error')
-      }
-    } catch (error) {
-      setSaveStatus('error')
-    }
-  }
-
-  const handleDeleteLead = async (id) => {
-    try {
-      const response = await fetch(`/api/leads/${id}`, { method: 'DELETE' })
-      if (response.ok) {
-        setLeads(leads.filter(lead => lead.id !== id))
-      }
-    } catch (error) {
-      console.error('Failed to delete lead')
-    }
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
-
     try {
-      const response = await fetch('/api/leads', {
+      const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
-
-      if (response.ok) {
+      if (res.ok) {
         setSubmitStatus('success')
         setFormData({ name: '', email: '', message: '' })
       } else {
         setSubmitStatus('error')
       }
-    } catch (error) {
+    } catch (err) {
       setSubmitStatus('error')
     }
-
     setIsSubmitting(false)
     setTimeout(() => setSubmitStatus(null), 3000)
   }
 
-  // Admin Panel View
+  const handleAdminLogin = async (e) => {
+    e.preventDefault()
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: adminPassword })
+      })
+      if (res.ok) {
+        setIsAdmin(true)
+        setAdminError('')
+        fetchLeads()
+      } else {
+        setAdminError('Неверный пароль')
+      }
+    } catch (err) {
+      setAdminError('Ошибка авторизации')
+    }
+  }
+
+  const fetchLeads = async () => {
+    setIsLoadingLeads(true)
+    try {
+      const res = await fetch('/api/admin/leads', {
+        headers: { 'Authorization': `Bearer ${adminPassword}` }
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setLeads(data)
+      }
+    } catch (err) {
+      console.error('Failed to fetch leads')
+    }
+    setIsLoadingLeads(false)
+  }
+
+  const saveSettings = async () => {
+    setSaveStatus('saving')
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminPassword}`
+        },
+        body: JSON.stringify(localSettings)
+      })
+      if (res.ok) {
+        setSettings(localSettings)
+        setSaveStatus('saved')
+        setTimeout(() => setSaveStatus(null), 2000)
+      } else {
+        setSaveStatus('error')
+      }
+    } catch (err) {
+      setSaveStatus('error')
+    }
+  }
+
+  // Admin Panel
   if (isAdmin) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white">
-        {/* Admin Header */}
-        <header className="bg-slate-900 border-b border-slate-800">
-          <div className="container mx-auto max-w-7xl px-4 md:px-6">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-                  <SafeIcon name="settings" size={20} className="text-white" />
-                </div>
-                <span className="font-bold text-lg">Админ-панель</span>
+      <div className="min-h-screen bg-stone-50 text-stone-900">
+        <div className="container mx-auto max-w-6xl p-4 md:p-8">
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              <SafeIcon name="settings" size={24} className="text-emerald-600" />
+              Админ-панель
+            </h1>
+            <button
+              onClick={() => setIsAdmin(false)}
+              className="px-4 py-2 bg-stone-200 hover:bg-stone-300 rounded-lg transition-colors text-sm font-medium"
+            >
+              Выйти
+            </button>
+          </div>
+
+          <div className="flex gap-2 mb-6 border-b border-stone-200">
+            <button
+              onClick={() => setAdminTab('settings')}
+              className={cn(
+                "px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px",
+                adminTab === 'settings'
+                  ? "border-emerald-600 text-emerald-700"
+                  : "border-transparent text-stone-500 hover:text-stone-700"
+              )}
+            >
+              Настройки
+            </button>
+            <button
+              onClick={() => setAdminTab('leads')}
+              className={cn(
+                "px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px",
+                adminTab === 'leads'
+                  ? "border-emerald-600 text-emerald-700"
+                  : "border-transparent text-stone-500 hover:text-stone-700"
+              )}
+            >
+              Заявки
+            </button>
+          </div>
+
+          {adminTab === 'settings' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-2xl p-6 shadow-sm border border-stone-200"
+            >
+              <h2 className="text-lg font-semibold mb-6">Настройки сайта</h2>
+              <div className="space-y-4 mb-6">
+                <label className="flex items-center justify-between p-4 bg-stone-50 rounded-xl cursor-pointer hover:bg-stone-100 transition-colors">
+                  <span className="font-medium">Показывать блок Особенности</span>
+                  <input
+                    type="checkbox"
+                    checked={localSettings.show_features !== false}
+                    onChange={(e) => setLocalSettings({...localSettings, show_features: e.target.checked})}
+                    className="w-5 h-5 accent-emerald-600"
+                  />
+                </label>
+                <label className="flex items-center justify-between p-4 bg-stone-50 rounded-xl cursor-pointer hover:bg-stone-100 transition-colors">
+                  <span className="font-medium">Показывать блок Контакты</span>
+                  <input
+                    type="checkbox"
+                    checked={localSettings.show_contact !== false}
+                    onChange={(e) => setLocalSettings({...localSettings, show_contact: e.target.checked})}
+                    className="w-5 h-5 accent-emerald-600"
+                  />
+                </label>
               </div>
               <div className="flex items-center gap-4">
                 <button
-                  onClick={() => setIsAdmin(false)}
-                  className="text-slate-400 hover:text-white transition-colors text-sm"
+                  onClick={saveSettings}
+                  className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium transition-colors"
                 >
-                  Выйти
+                  Сохранить
                 </button>
+                {saveStatus === 'saving' && <span className="text-stone-500 text-sm">Сохранение...</span>}
+                {saveStatus === 'saved' && <span className="text-emerald-600 text-sm flex items-center gap-1"><SafeIcon name="check" size={16} /> Сохранено</span>}
+                {saveStatus === 'error' && <span className="text-red-600 text-sm">Ошибка</span>}
               </div>
-            </div>
-          </div>
-        </header>
+            </motion.div>
+          )}
 
-        {/* Admin Navigation */}
-        <div className="bg-slate-900/50 border-b border-slate-800">
-          <div className="container mx-auto max-w-7xl px-4 md:px-6">
-            <nav className="flex gap-6">
-              <button
-                onClick={() => setAdminTab('settings')}
-                className={cn(
-                  "py-4 text-sm font-medium border-b-2 transition-colors",
-                  adminTab === 'settings'
-                    ? "border-purple-500 text-white"
-                    : "border-transparent text-slate-400 hover:text-white"
-                )}
-              >
-                <span className="flex items-center gap-2">
-                  <SafeIcon name="slidersHorizontal" size={16} />
-                  Настройки
-                </span>
-              </button>
-              <button
-                onClick={() => setAdminTab('inbox')}
-                className={cn(
-                  "py-4 text-sm font-medium border-b-2 transition-colors",
-                  adminTab === 'inbox'
-                    ? "border-purple-500 text-white"
-                    : "border-transparent text-slate-400 hover:text-white"
-                )}
-              >
-                <span className="flex items-center gap-2">
-                  <SafeIcon name="inbox" size={16} />
-                  Заявки
-                  {leads.length > 0 && (
-                    <span className="bg-purple-600 text-xs px-2 py-0.5 rounded-full">
-                      {leads.length}
-                    </span>
-                  )}
-                </span>
-              </button>
-              <button
-                onClick={() => setAdminTab('analytics')}
-                className={cn(
-                  "py-4 text-sm font-medium border-b-2 transition-colors",
-                  adminTab === 'analytics'
-                    ? "border-purple-500 text-white"
-                    : "border-transparent text-slate-400 hover:text-white"
-                )}
-              >
-                <span className="flex items-center gap-2">
-                  <SafeIcon name="barChart3" size={16} />
-                  Аналитика
-                </span>
-              </button>
-            </nav>
-          </div>
+          {adminTab === 'leads' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden"
+            >
+              <div className="p-6 border-b border-stone-200">
+                <h2 className="text-lg font-semibold">Заявки с формы</h2>
+              </div>
+              {isLoadingLeads ? (
+                <div className="p-8 text-center text-stone-500">Загрузка...</div>
+              ) : leads.length === 0 ? (
+                <div className="p-8 text-center text-stone-500">Пока нет заявок</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-stone-50">
+                      <tr>
+                        <th className="text-left p-4 text-sm font-semibold text-stone-700">Имя</th>
+                        <th className="text-left p-4 text-sm font-semibold text-stone-700">Email</th>
+                        <th className="text-left p-4 text-sm font-semibold text-stone-700">Сообщение</th>
+                        <th className="text-left p-4 text-sm font-semibold text-stone-700">Дата</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-200">
+                      {leads.map((lead) => (
+                        <tr key={lead.id} className="hover:bg-stone-50">
+                          <td className="p-4 text-sm">{lead.name}</td>
+                          <td className="p-4 text-sm">{lead.email}</td>
+                          <td className="p-4 text-sm max-w-xs truncate">{lead.message}</td>
+                          <td className="p-4 text-sm text-stone-500">
+                            {new Date(lead.created_at).toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </motion.div>
+          )}
         </div>
-
-        {/* Admin Content */}
-        <main className="container mx-auto max-w-7xl px-4 md:px-6 py-8">
-          <AnimatePresence mode="wait">
-            {adminTab === 'settings' && (
-              <motion.div
-                key="settings"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="max-w-2xl"
-              >
-                <h2 className="text-2xl font-bold mb-6">Настройки сайта</h2>
-
-                <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6 space-y-6">
-                  <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl">
-                    <div>
-                      <h3 className="font-semibold mb-1">Блок Особенности</h3>
-                      <p className="text-sm text-slate-400">Показывать секцию с преимуществами на главной</p>
-                    </div>
-                    <button
-                      onClick={() => setLocalSettings({...localSettings, show_features: !localSettings.show_features})}
-                      className={cn(
-                        "w-14 h-8 rounded-full transition-colors relative",
-                        localSettings.show_features ? "bg-purple-600" : "bg-slate-700"
-                      )}
-                    >
-                      <div className={cn(
-                        "absolute top-1 w-6 h-6 bg-white rounded-full transition-transform",
-                        localSettings.show_features ? "left-7" : "left-1"
-                      )} />
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl">
-                    <div>
-                      <h3 className="font-semibold mb-1">Блок Контакты</h3>
-                      <p className="text-sm text-slate-400">Показывать форму обратной связи</p>
-                    </div>
-                    <button
-                      onClick={() => setLocalSettings({...localSettings, show_contact: !localSettings.show_contact})}
-                      className={cn(
-                        "w-14 h-8 rounded-full transition-colors relative",
-                        localSettings.show_contact ? "bg-purple-600" : "bg-slate-700"
-                      )}
-                    >
-                      <div className={cn(
-                        "absolute top-1 w-6 h-6 bg-white rounded-full transition-transform",
-                        localSettings.show_contact ? "left-7" : "left-1"
-                      )} />
-                    </button>
-                  </div>
-
-                  <div className="pt-4 border-t border-slate-800">
-                    <button
-                      onClick={handleSaveSettings}
-                      disabled={saveStatus === 'saving'}
-                      className={cn(
-                        "px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all",
-                        saveStatus === 'saving'
-                          ? "bg-slate-700 cursor-not-allowed"
-                          : saveStatus === 'success'
-                            ? "bg-green-600 hover:bg-green-500"
-                            : "bg-purple-600 hover:bg-purple-500"
-                      )}
-                    >
-                      {saveStatus === 'saving' ? (
-                        <>
-                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Сохранение...
-                        </>
-                      ) : saveStatus === 'success' ? (
-                        <>
-                          <SafeIcon name="check" size={18} />
-                          Сохранено!
-                        </>
-                      ) : (
-                        <>
-                          <SafeIcon name="save" size={18} />
-                          Сохранить изменения
-                        </>
-                      )}
-                    </button>
-                    {saveStatus === 'error' && (
-                      <p className="text-red-400 text-sm mt-2">Ошибка сохранения</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="mt-8 p-6 bg-slate-800/30 rounded-2xl border border-slate-800">
-                  <h3 className="font-semibold mb-4 flex items-center gap-2">
-                    <SafeIcon name="eye" size={18} className="text-slate-400" />
-                    Предпросмотр
-                  </h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between py-2 border-b border-slate-800">
-                      <span className="text-slate-400">Особенности:</span>
-                      <span className={localSettings.show_features ? "text-green-400" : "text-red-400"}>
-                        {localSettings.show_features ? 'Включено' : 'Выключено'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b border-slate-800">
-                      <span className="text-slate-400">Контакты:</span>
-                      <span className={localSettings.show_contact ? "text-green-400" : "text-red-400"}>
-                        {localSettings.show_contact ? 'Включено' : 'Выключено'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {adminTab === 'inbox' && (
-              <motion.div
-                key="inbox"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold">Входящие заявки</h2>
-                  <button
-                    onClick={loadLeads}
-                    className="p-2 text-slate-400 hover:text-white transition-colors"
-                    title="Обновить"
-                  >
-                    <SafeIcon name="refreshCw" size={20} />
-                  </button>
-                </div>
-
-                {isLoadingLeads ? (
-                  <div className="flex items-center justify-center py-12">
-                    <span className="w-8 h-8 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
-                  </div>
-                ) : leads.length === 0 ? (
-                  <div className="text-center py-12 bg-slate-900 rounded-2xl border border-slate-800">
-                    <SafeIcon name="inbox" size={48} className="text-slate-600 mx-auto mb-4" />
-                    <p className="text-slate-400">Нет входящих заявок</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {leads.map((lead) => (
-                      <motion.div
-                        key={lead.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="bg-slate-900 rounded-xl border border-slate-800 p-6 hover:border-slate-700 transition-colors"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <div className="w-10 h-10 bg-purple-600/20 rounded-full flex items-center justify-center">
-                                <SafeIcon name="user" size={20} className="text-purple-400" />
-                              </div>
-                              <div>
-                                <h3 className="font-semibold">{lead.name}</h3>
-                                <p className="text-sm text-slate-400">{lead.email}</p>
-                              </div>
-                            </div>
-                            <p className="text-slate-300 mt-4 pl-13 ml-13 leading-relaxed">
-                              {lead.message}
-                            </p>
-                            <p className="text-xs text-slate-500 mt-4">
-                              {new Date(lead.created_at).toLocaleString('ru-RU')}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => handleDeleteLead(lead.id)}
-                            className="p-2 text-slate-500 hover:text-red-400 transition-colors"
-                            title="Удалить"
-                          >
-                            <SafeIcon name="trash2" size={18} />
-                          </button>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            )}
-
-            {adminTab === 'analytics' && (
-              <motion.div
-                key="analytics"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-              >
-                <h2 className="text-2xl font-bold mb-6">Аналитика</h2>
-
-                <div className="grid md:grid-cols-3 gap-6 mb-8">
-                  <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
-                        <SafeIcon name="eye" size={20} className="text-blue-400" />
-                      </div>
-                      <span className="text-slate-400">Просмотры</span>
-                    </div>
-                    <p className="text-3xl font-bold">1,234</p>
-                    <p className="text-sm text-green-400 mt-2">+12% за неделю</p>
-                  </div>
-
-                  <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center">
-                        <SafeIcon name="send" size={20} className="text-purple-400" />
-                      </div>
-                      <span className="text-slate-400">Заявки</span>
-                    </div>
-                    <p className="text-3xl font-bold">{leads.length}</p>
-                    <p className="text-sm text-slate-500 mt-2">Всего получено</p>
-                  </div>
-
-                  <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center">
-                        <SafeIcon name="percent" size={20} className="text-green-400" />
-                      </div>
-                      <span className="text-slate-400">Конверсия</span>
-                    </div>
-                    <p className="text-3xl font-bold">3.2%</p>
-                    <p className="text-sm text-green-400 mt-2">+0.5% за неделю</p>
-                  </div>
-                </div>
-
-                <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6">
-                  <h3 className="font-semibold mb-4">Активность по дням</h3>
-                  <div className="h-64 flex items-end gap-2">
-                    {[40, 65, 45, 80, 55, 90, 70].map((height, idx) => (
-                      <div key={idx} className="flex-1 flex flex-col items-center gap-2">
-                        <div
-                          className="w-full bg-purple-600/50 rounded-t-lg hover:bg-purple-600 transition-colors"
-                          style={{ height: `${height}%` }}
-                        />
-                        <span className="text-xs text-slate-500">
-                          {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'][idx]}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </main>
       </div>
     )
   }
@@ -460,15 +251,76 @@ function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false)
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
-      {/* Admin Access Button (hidden in corner) */}
-      <button
-        onClick={() => setShowAdminLogin(true)}
-        className="fixed bottom-4 right-4 w-10 h-10 bg-slate-800/50 hover:bg-slate-700 rounded-full flex items-center justify-center text-slate-500 hover:text-white transition-all z-50 opacity-0 hover:opacity-100 focus:opacity-100"
-        title="Админ-панель"
-      >
-        <SafeIcon name="lock" size={18} />
-      </button>
+    <div className="min-h-screen bg-stone-50 text-stone-900 font-sans selection:bg-emerald-200 selection:text-emerald-900">
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-stone-50/80 backdrop-blur-md border-b border-stone-200/50">
+        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 md:h-20">
+            <a href="#" className="flex items-center gap-2 font-bold text-xl tracking-tight">
+              <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
+                <SafeIcon name="layers" size={18} className="text-white" />
+              </div>
+              <span className="text-stone-900">Layer</span>
+            </a>
+
+            <nav className="hidden md:flex items-center gap-8">
+              <a href="#hero" className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium">Главная</a>
+              <a href="#features" className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium">Особенности</a>
+              <a href="#contact" className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium">Контакты</a>
+            </nav>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowAdminLogin(true)}
+                className="hidden md:flex p-2 text-stone-400 hover:text-stone-600 transition-colors"
+                title="Вход для администратора"
+              >
+                <SafeIcon name="lock" size={18} />
+              </button>
+              <a
+                href="#contact"
+                className="hidden md:inline-flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all"
+              >
+                Связаться
+              </a>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden p-2 text-stone-600"
+              >
+                <SafeIcon name={mobileMenuOpen ? "x" : "menu"} size={24} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-stone-50 border-b border-stone-200 overflow-hidden"
+            >
+              <nav className="flex flex-col p-4 gap-4">
+                <a href="#hero" onClick={() => setMobileMenuOpen(false)} className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium">Главная</a>
+                <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium">Особенности</a>
+                <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium">Контакты</a>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    setShowAdminLogin(true)
+                  }}
+                  className="text-left text-stone-400 hover:text-stone-600 transition-colors text-sm font-medium flex items-center gap-2"
+                >
+                  <SafeIcon name="lock" size={14} />
+                  Вход для администратора
+                </button>
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
 
       {/* Admin Login Modal */}
       <AnimatePresence>
@@ -477,164 +329,150 @@ function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] bg-stone-900/50 backdrop-blur-sm flex items-center justify-center p-4"
             onClick={() => setShowAdminLogin(false)}
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-slate-900 rounded-2xl border border-slate-800 p-8 max-w-md w-full"
+              className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl"
             >
               <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
-                    <SafeIcon name="shield" size={20} className="text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold">Админ-панель</h2>
-                    <p className="text-sm text-slate-400">Введите пароль для входа</p>
-                  </div>
-                </div>
+                <h3 className="text-lg font-bold flex items-center gap-2">
+                  <SafeIcon name="shield" size={20} className="text-emerald-600" />
+                  Вход в админ-панель
+                </h3>
                 <button
                   onClick={() => setShowAdminLogin(false)}
-                  className="text-slate-500 hover:text-white"
+                  className="p-2 hover:bg-stone-100 rounded-lg transition-colors"
                 >
-                  <SafeIcon name="x" size={24} />
+                  <SafeIcon name="x" size={20} />
                 </button>
               </div>
-
               <form onSubmit={handleAdminLogin} className="space-y-4">
                 <div>
+                  <label className="block text-sm font-medium text-stone-700 mb-1.5">Пароль</label>
                   <input
                     type="password"
                     value={adminPassword}
                     onChange={(e) => setAdminPassword(e.target.value)}
-                    placeholder="Пароль"
-                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500"
+                    className="w-full px-4 py-3 rounded-xl border border-stone-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
+                    placeholder="Введите пароль"
                   />
                 </div>
                 {adminError && (
-                  <p className="text-red-400 text-sm">{adminError}</p>
+                  <p className="text-red-600 text-sm flex items-center gap-1">
+                    <SafeIcon name="alertCircle" size={14} />
+                    {adminError}
+                  </p>
                 )}
                 <button
                   type="submit"
-                  className="w-full py-3 bg-purple-600 hover:bg-purple-500 rounded-xl font-semibold transition-colors"
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium transition-colors"
                 >
                   Войти
                 </button>
               </form>
-
-              <p className="text-xs text-slate-600 text-center mt-4">
-                Пароль по умолчанию: admin123
-              </p>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/50">
-        <div className="container mx-auto max-w-7xl px-4 md:px-6">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <SafeIcon name="zap" size={20} className="text-white" />
-              </div>
-            </div>
-
-            <nav className="hidden md:flex items-center gap-8">
-              <a href="#hero" className="text-slate-300 hover:text-white transition-colors text-sm font-medium">Главная</a>
-              <a href="#features" className="text-slate-300 hover:text-white transition-colors text-sm font-medium">Особенности</a>
-              <a href="#contact" className="text-slate-300 hover:text-white transition-colors text-sm font-medium">Контакты</a>
-            </nav>
-
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-slate-300 hover:text-white"
-            >
-              <SafeIcon name={mobileMenuOpen ? 'x' : 'menu'} size={24} />
-            </button>
-          </div>
-        </div>
-
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="md:hidden bg-slate-900 border-b border-slate-800"
-          >
-            <nav className="flex flex-col p-4 gap-4">
-              <a href="#hero" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-white transition-colors text-sm font-medium">Главная</a>
-              <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-white transition-colors text-sm font-medium">Особенности</a>
-              <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-white transition-colors text-sm font-medium">Контакты</a>
-            </nav>
-          </motion.div>
-        )}
-      </header>
-
       {/* Hero Section */}
-      <section id="hero" className="pt-32 pb-20 md:pt-40 md:pb-32 px-4">
+      <section id="hero" className="pt-32 pb-20 md:pt-48 md:pb-32 px-4 overflow-hidden">
         <div className="container mx-auto max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="max-w-3xl mx-auto text-center"
-          >
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6">
-              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Простота
-              </span>
-              <br />
-              <span className="text-white">в деталях</span>
-            </h1>
-            <p className="text-lg md:text-xl text-slate-400 mb-8 max-w-2xl mx-auto leading-relaxed">
-              Минималистичный подход к созданию цифровых продуктов.
-              Чистый дизайн, интуитивная навигация и безупречный пользовательский опыт.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="#contact"
-                className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-full font-semibold transition-all hover:scale-105 shadow-lg shadow-blue-600/25"
-              >
-                Начать проект
-                <SafeIcon name="arrowRight" size={20} />
-              </a>
-              <a
-                href="#features"
-                className="inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-8 py-4 rounded-full font-semibold transition-all border border-slate-700"
-              >
-                Узнать больше
-              </a>
-            </div>
-          </motion.div>
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium mb-6">
+                <SafeIcon name="sparkles" size={16} />
+                <span>Новый дизайн 2024</span>
+              </div>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight">
+                Создаем цифровое
+                <span className="block text-emerald-700">будущее</span>
+              </h1>
+              <p className="text-lg md:text-xl text-stone-600 mb-8 max-w-lg leading-relaxed">
+                Минималистичный подход к созданию продуктов. Чистый дизайн,
+                интуитивная навигация и безупречный пользовательский опыт.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a
+                  href="#contact"
+                  className="inline-flex items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white px-8 py-4 rounded-full font-semibold transition-all hover:scale-105 shadow-lg shadow-emerald-700/25"
+                >
+                  Начать проект
+                  <SafeIcon name="arrowRight" size={20} />
+                </a>
+                <a
+                  href="#features"
+                  className="inline-flex items-center justify-center gap-2 bg-white hover:bg-stone-100 text-stone-900 px-8 py-4 rounded-full font-semibold transition-all border border-stone-300"
+                >
+                  Узнать больше
+                </a>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-tr from-emerald-200 to-amber-200 rounded-3xl blur-3xl opacity-30" />
+              <div className="relative bg-white rounded-3xl p-8 shadow-2xl shadow-stone-200/50 border border-stone-100">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-4">
+                    <div className="bg-stone-100 rounded-2xl p-6 aspect-square flex items-center justify-center">
+                      <SafeIcon name="palette" size={48} className="text-emerald-600" />
+                    </div>
+                    <div className="bg-emerald-50 rounded-2xl p-6 aspect-[4/3] flex items-center justify-center">
+                      <SafeIcon name="code" size={40} className="text-emerald-700" />
+                    </div>
+                  </div>
+                  <div className="space-y-4 pt-8">
+                    <div className="bg-amber-50 rounded-2xl p-6 aspect-[4/3] flex items-center justify-center">
+                      <SafeIcon name="rocket" size={40} className="text-amber-600" />
+                    </div>
+                    <div className="bg-stone-900 rounded-2xl p-6 aspect-square flex items-center justify-center">
+                      <SafeIcon name="checkCircle" size={48} className="text-white" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Features Section */}
       {settings.show_features !== false && (
-        <section id="features" className="py-20 md:py-32 px-4 bg-slate-900/50">
+        <section id="features" className="py-20 md:py-32 px-4 bg-white">
           <div className="container mx-auto max-w-7xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="text-center mb-16"
+              className="text-center mb-16 md:mb-20"
             >
-              <h2 className="text-3xl md:text-5xl font-bold mb-4">Почему мы?</h2>
-              <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-                Три ключевых принципа, которыми мы руководствуемся в работе
+              <span className="text-emerald-700 font-semibold text-sm uppercase tracking-wider mb-4 block">Преимущества</span>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">Почему выбирают нас</h2>
+              <p className="text-stone-600 text-lg max-w-2xl mx-auto">
+                Три ключевых принципа, которыми мы руководствуемся в работе над каждым проектом
               </p>
             </motion.div>
 
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                { icon: 'zap', title: 'Скорость', desc: 'Быстрая разработка и оптимизированная загрузка сайта без компромиссов в качестве.' },
-                { icon: 'shield', title: 'Надежность', desc: 'Современные технологии и лучшие практики безопасности для стабильной работы.' },
-                { icon: 'sparkles', title: 'Эстетика', desc: 'Продуманный дизайн, который подчеркивает уникальность вашего бренда.' }
+                { icon: 'zap', title: 'Скорость', desc: 'Быстрая разработка и оптимизированная загрузка сайта без компромиссов в качестве.', color: 'amber' },
+                { icon: 'shield', title: 'Надежность', desc: 'Современные технологии и лучшие практики безопасности для стабильной работы.', color: 'emerald' },
+                { icon: 'sparkles', title: 'Эстетика', desc: 'Продуманный дизайн, который подчеркивает уникальность вашего бренда.', color: 'blue' }
               ].map((feature, idx) => (
                 <motion.div
                   key={idx}
@@ -642,13 +480,26 @@ function App() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  className="group p-8 rounded-2xl bg-slate-800/50 border border-slate-700/50 hover:border-blue-500/50 transition-all hover:scale-105"
+                  className="group p-8 rounded-3xl bg-stone-50 hover:bg-white border border-stone-200 hover:border-emerald-200 transition-all hover:shadow-xl hover:shadow-stone-200/50"
                 >
-                  <div className="w-12 h-12 bg-blue-600/20 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-600/30 transition-colors">
-                    <SafeIcon name={feature.icon} size={24} className="text-blue-400" />
+                  <div className={cn(
+                    "w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-colors",
+                    feature.color === 'amber' && "bg-amber-100 group-hover:bg-amber-200",
+                    feature.color === 'emerald' && "bg-emerald-100 group-hover:bg-emerald-200",
+                    feature.color === 'blue' && "bg-blue-100 group-hover:bg-blue-200"
+                  )}>
+                    <SafeIcon
+                      name={feature.icon}
+                      size={28}
+                      className={cn(
+                        feature.color === 'amber' && "text-amber-700",
+                        feature.color === 'emerald' && "text-emerald-700",
+                        feature.color === 'blue' && "text-blue-700"
+                      )}
+                    />
                   </div>
-                  <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                  <p className="text-slate-400 leading-relaxed">{feature.desc}</p>
+                  <h3 className="text-xl font-bold mb-3 text-stone-900">{feature.title}</h3>
+                  <p className="text-stone-600 leading-relaxed">{feature.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -656,9 +507,9 @@ function App() {
         </section>
       )}
 
-      {/* Contact/Footer Section */}
+      {/* Contact Section */}
       {settings.show_contact !== false && (
-        <section id="contact" className="py-20 md:py-32 px-4">
+        <section id="contact" className="py-20 md:py-32 px-4 bg-stone-100">
           <div className="container mx-auto max-w-7xl">
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
               <motion.div
@@ -667,40 +518,29 @@ function App() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
               >
-                <h2 className="text-3xl md:text-5xl font-bold mb-6">Давайте работать вместе</h2>
-                <p className="text-slate-400 text-lg mb-8 leading-relaxed">
-                  Готовы начать новый проект? Свяжитесь с нами любым удобным способом
-                  или заполните форму справа.
+                <span className="text-emerald-700 font-semibold text-sm uppercase tracking-wider mb-4 block">Контакты</span>
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">Давайте работать вместе</h2>
+                <p className="text-stone-600 text-lg mb-8 leading-relaxed">
+                  Готовы начать новый проект? Заполните форму, и мы свяжемся с вами в ближайшее время для обсуждения деталей.
                 </p>
 
                 <div className="space-y-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center">
-                      <SafeIcon name="mail" size={20} className="text-blue-400" />
+                    <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                      <SafeIcon name="mail" size={24} className="text-emerald-700" />
                     </div>
                     <div>
-                      <div className="text-sm text-slate-500 mb-1">Email</div>
-                      <div className="font-medium">hello@example.com</div>
+                      <p className="text-sm text-stone-500 mb-0.5">Email</p>
+                      <p className="font-semibold text-stone-900">hello@layer.studio</p>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center">
-                      <SafeIcon name="phone" size={20} className="text-blue-400" />
+                    <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                      <SafeIcon name="mapPin" size={24} className="text-emerald-700" />
                     </div>
                     <div>
-                      <div className="text-sm text-slate-500 mb-1">Телефон</div>
-                      <div className="font-medium">+7 (999) 123-45-67</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center">
-                      <SafeIcon name="mapPin" size={20} className="text-blue-400" />
-                    </div>
-                    <div>
-                      <div className="text-sm text-slate-500 mb-1">Адрес</div>
-                      <div className="font-medium">Москва, Россия</div>
+                      <p className="text-sm text-stone-500 mb-0.5">Адрес</p>
+                      <p className="font-semibold text-stone-900">Москва, Россия</p>
                     </div>
                   </div>
                 </div>
@@ -711,73 +551,76 @@ function App() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="bg-slate-800/50 p-8 rounded-2xl border border-slate-700/50"
               >
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Ваше имя</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:border-blue-500 transition-colors text-white placeholder-slate-500"
-                      placeholder="Иван Иванов"
-                    />
+                <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-8 shadow-xl shadow-stone-200/50 border border-stone-200">
+                  <div className="space-y-5">
+                    <div>
+                      <label className="block text-sm font-semibold text-stone-700 mb-2">Ваше имя</label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.name}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        className="w-full px-4 py-3.5 rounded-xl border border-stone-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all bg-stone-50 focus:bg-white"
+                        placeholder="Иван Иванов"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-stone-700 mb-2">Email</label>
+                      <input
+                        type="email"
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        className="w-full px-4 py-3.5 rounded-xl border border-stone-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all bg-stone-50 focus:bg-white"
+                        placeholder="ivan@example.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-stone-700 mb-2">Сообщение</label>
+                      <textarea
+                        rows={4}
+                        required
+                        value={formData.message}
+                        onChange={(e) => setFormData({...formData, message: e.target.value})}
+                        className="w-full px-4 py-3.5 rounded-xl border border-stone-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all bg-stone-50 focus:bg-white resize-none"
+                        placeholder="Расскажите о вашем проекте..."
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full py-4 bg-emerald-700 hover:bg-emerald-800 disabled:bg-stone-400 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <SafeIcon name="loader" size={20} className="animate-spin" />
+                          Отправка...
+                        </>
+                      ) : (
+                        <>
+                          Отправить сообщение
+                          <SafeIcon name="send" size={20} />
+                        </>
+                      )}
+                    </button>
+
+                    <AnimatePresence>
+                      {submitStatus && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          className={cn(
+                            "p-4 rounded-xl text-center text-sm font-medium",
+                            submitStatus === 'success' ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"
+                          )}
+                        >
+                          {submitStatus === 'success' ? 'Сообщение отправлено!' : 'Ошибка отправки. Попробуйте позже.'}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Email</label>
-                    <input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:border-blue-500 transition-colors text-white placeholder-slate-500"
-                      placeholder="ivan@example.com"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Сообщение</label>
-                    <textarea
-                      rows={4}
-                      required
-                      value={formData.message}
-                      onChange={(e) => setFormData({...formData, message: e.target.value})}
-                      className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:border-blue-500 transition-colors text-white placeholder-slate-500 resize-none"
-                      placeholder="Расскажите о вашем проекте..."
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className={cn(
-                      "w-full py-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all",
-                      isSubmitting
-                        ? "bg-slate-700 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-500 hover:scale-[1.02] shadow-lg shadow-blue-600/25"
-                    )}
-                  >
-                    {isSubmitting ? (
-                      <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : submitStatus === 'success' ? (
-                      <>
-                        <SafeIcon name="check" size={20} />
-                        Отправлено!
-                      </>
-                    ) : (
-                      <>
-                        Отправить сообщение
-                        <SafeIcon name="send" size={20} />
-                      </>
-                    )}
-                  </button>
-
-                  {submitStatus === 'error' && (
-                    <p className="text-red-400 text-sm text-center">Произошла ошибка. Попробуйте позже.</p>
-                  )}
                 </form>
               </motion.div>
             </div>
@@ -786,20 +629,26 @@ function App() {
       )}
 
       {/* Footer */}
-      <footer className="py-8 px-4 border-t border-slate-800/50">
+      <footer className="py-12 px-4 bg-stone-900 text-stone-400">
         <div className="container mx-auto max-w-7xl">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-blue-600 rounded-md flex items-center justify-center">
-                <SafeIcon name="zap" size={14} className="text-white" />
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2 font-bold text-xl text-white">
+              <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
+                <SafeIcon name="layers" size={18} className="text-white" />
               </div>
+              <span>Layer</span>
             </div>
-            <p className="text-slate-500 text-sm">
-              © 2024 Все права защищены.
-            </p>
-            <div className="flex gap-6">
-              <a href="#" className="text-slate-500 hover:text-white text-sm transition-colors">Политика конфиденциальности</a>
-              <a href="#" className="text-slate-500 hover:text-white text-sm transition-colors">Условия использования</a>
+            <p className="text-sm">© 2024 Layer Studio. Все права защищены.</p>
+            <div className="flex items-center gap-6">
+              <a href="#" className="hover:text-white transition-colors">
+                <SafeIcon name="twitter" size={20} />
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                <SafeIcon name="instagram" size={20} />
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                <SafeIcon name="linkedin" size={20} />
+              </a>
             </div>
           </div>
         </div>

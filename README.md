@@ -1,39 +1,20 @@
-# webly-sites
+# Project
 
-Репозиторий для хостинга пользовательских сайтов через Cloudflare Pages.
+Generated with AI Constructor Bot
 
-## Архитектура
+## Development
 
-- **Один репозиторий** для всех сайтов
-- **Каждый сайт** = отдельная ветка `site-{id}`
-- **Cloudflare Pages** автоматически билдит все ветки
+```bash
+npm install
+npm run dev
+```
 
-## Ветки
+## Build
 
-| Ветка | Назначение | URL |
-|-------|------------|-----|
-| `main` | Основная ветка (пустая) | https://webly-sites.pages.dev |
-| `site-123` | Сайт пользователя #123 | https://site-123.webly-sites.pages.dev |
-| `site-456` | Сайт пользователя #456 | https://site-456.webly-sites.pages.dev |
+```bash
+npm run build
+```
 
-## Технологии
+## Deploy
 
-- React 18
-- Vite 5
-- Tailwind CSS 3
-- Lucide React (иконки)
-
-## Cloudflare Pages
-
-Настройки билда:
-- **Build command:** `npm run build`
-- **Build output directory:** `dist`
-- **Branch deployments:** All branches
-
-## Автоматизация
-
-Ветки создаются автоматически через GitHub API ботом `webly-ai-bot`.
-
----
-
-⚠️ **Не редактируйте ветки вручную** — они управляются ботом автоматически.
+Deployed automatically to Vercel via GitHub.
